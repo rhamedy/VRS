@@ -7,9 +7,6 @@ To be developed by MSc Software Engineering students as a coursework for Group P
 
 Group members: Rafiullah H., Khoula A., Abdullah A. 
 
-Programmer (Server side, Database): Rafiullah H. 
-Database administrator and documentation: Khoula A., Abdullah A., 
-
 Tutor: Paul T., 
 
 Bradford University, 
