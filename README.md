@@ -5,7 +5,7 @@ Vehicle Rental System
 
 To be developed by MSc Software Engineering students as a coursework for Group Project module. 
 
-Group members: Rafiullah H., Khoula A., Abdullah A. 
+Group members: Rafiullah H., Khoula A.
 
 Tutor: Paul T., 
 
