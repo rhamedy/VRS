@@ -2,43 +2,32 @@ package com.vrs.model;
 
 import java.sql.Date;
 
-/*
+/**
  * Model object used as a placeholder for different users of the system
  * such as Customer, Receptionist, Normal users, Administrator and Manager. 
  * 
- *  Author: Rafiullah Hamedy
+ *  @author Rafiullah Hamedy
+ *  @Date	25-02-2013
  */
 
 public class User {
 	
 	private String firstName;
 	private String lastName; 
-	private Date dateOfBirth; 
-	private String email;
-	private String mobileNumber;
-	private String roleName; 
-	private String roleId; 
+	private Date dob; 
+	private String username;
+	private String mobile; 
 	private String password;
 	private Date createdDate; 
 	private boolean disabled;
+	
+	private Role role; 
 	
 	public Date getCreatedDate() {
 		return createdDate;
 	}
 	public void setCreatedDate(Date createdDate) {
 		this.createdDate = createdDate;
-	}
-	public String getRoleName() {
-		return roleName;
-	}
-	public void setRoleName(String roleName) {
-		this.roleName = roleName;
-	}
-	public String getRoleId() {
-		return roleId;
-	}
-	public void setRoleId(String roleId) {
-		this.roleId = roleId;
 	}
 	public String getFirstName() {
 		return firstName;
@@ -52,23 +41,23 @@ public class User {
 	public void setLastName(String lastName) {
 		this.lastName = lastName;
 	}
-	public Date getDateOfBirth() {
-		return dateOfBirth;
+	public Date getDob() {
+		return dob;
 	}
-	public void setDateOfBirth(Date dateOfBirth) {
-		this.dateOfBirth = dateOfBirth;
+	public void setDob(Date dob) {
+		this.dob = dob;
 	}
-	public String getEmail() {
-		return email;
+	public String getUsername() {
+		return username;
 	}
-	public void setEmail(String email) {
-		this.email = email;
+	public void setUsernamel(String username) {
+		this.username = username;
 	}
-	public String getMobileNumber() {
-		return mobileNumber;
+	public String getMobile() {
+		return mobile;
 	}
-	public void setMobileNumber(String mobileNumber) {
-		this.mobileNumber = mobileNumber;
+	public void setMobile(String mobile) {
+		this.mobile = mobile;
 	}
 	public String getPassword() {
 		return password;
@@ -82,4 +71,10 @@ public class User {
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 	} 
+	public Role getRole() {
+		return role;
+	}
+	public void setRole(Role role) {
+		this.role = role;
+	}
 }
