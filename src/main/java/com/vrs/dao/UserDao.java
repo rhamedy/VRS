@@ -75,6 +75,39 @@ public class UserDao {
 		jdbcTemplate.update(SQL,
 				new Object[] { user.getUsername(), role.getRoleId() });
 	}
+	
+	public void updateUser(User user) { 
+		logger.info("entry updateUser()"); 
+		
+		String SQL = "UPDATE auth.user SET first_name = ?, last_name = ?, " +
+				"dob = ?, mobile = ?, disabled = ?, password = ? WHERE username = ?"; 
+		
+		jdbcTemplate.update(SQL, new Object[]{
+				user.getFirstName(), 
+				user.getLastName(), 
+				user.getDob(), 
+				user.getMobile(), 
+				user.isDisabled(), 
+				user.getPassword(), 
+				user.getUsername()
+		}); 
+	}
+	
+	public void updateRole(Role role) { 
+		logger.info("entry updateRole()"); 
+		
+		String SQL = "UPDATE auth.role SET role_name = ? WHERE role_id = ?";
+		
+		jdbcTemplate.update(SQL, new Object[]{ role.getRoleName(), role.getRoleId()}); 
+	}
+	
+	public void updateUserRole(User user, Role role) { 
+		logger.info("entry updateUserRoleRelationship()"); 
+		
+		String SQL = "UPDATE auth.user_role SET role_id = ? WHERE username = ?";
+		
+		jdbcTemplate.update(SQL, new Object[]{ role.getRoleId(), user.getUsername() }); 
+	}
 
 	public User findUser(String username) {
 		logger.info("entry findUser");
@@ -89,7 +122,6 @@ public class UserDao {
 			return user;
 
 		} catch (EmptyResultDataAccessException ex) {
-			//ex.printStackTrace();
 			return null;
 		}
 	}
@@ -108,7 +140,6 @@ public class UserDao {
 			return role;
 
 		} catch (EmptyResultDataAccessException ex) {
-			//ex.printStackTrace();
 			return null;
 		}
 	}
@@ -126,7 +157,6 @@ public class UserDao {
 			return role;
 
 		} catch (EmptyResultDataAccessException ex) {
-			//ex.printStackTrace();
 			return null;
 		}
 	}

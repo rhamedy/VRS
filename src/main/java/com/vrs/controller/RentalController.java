@@ -17,7 +17,6 @@ public class RentalController {
 		ModelAndView mav = new ModelAndView(); 
 		
 		mav.setViewName("index");
-		logger.debug("at the end of the controller{degub}"); 
 		
 		return mav; 
 	}

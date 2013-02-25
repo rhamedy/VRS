@@ -22,12 +22,12 @@ public class TestUtil {
 		return user1;
 	}
 
-	public static Role createTestRole() {
+	public static Role createTestRole(int roleId, String roleName) {
 
 		Role role1 = new Role();
 
-		role1.setRoleId(999);
-		role1.setRoleName("admin_test");
+		role1.setRoleId(roleId);
+		role1.setRoleName(roleName);
 		
 		return role1; 
 	}
