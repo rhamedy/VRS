@@ -3,6 +3,7 @@ package com.vrs.util;
 import com.vrs.model.Branch;
 import com.vrs.model.Role;
 import com.vrs.model.User;
+import com.vrs.model.Vehicle;
 
 public class TestUtil {
 
@@ -35,14 +36,32 @@ public class TestUtil {
 
 	public static Branch createMockBranch(int id, String name, int cityId,
 			String streetName, String postcode) {
-		Branch branch = new Branch(); 
-		
-		branch.setId(id); 
-		branch.setCityId(cityId); 
-		branch.setName(name); 
-		branch.setStreetName(streetName); 
-		branch.setPostcode(postcode); 
-		
+		Branch branch = new Branch();
+
+		branch.setId(id);
+		branch.setCityId(cityId);
+		branch.setName(name);
+		branch.setStreetName(streetName);
+		branch.setPostcode(postcode);
+
 		return branch;
+	}
+
+	public static Vehicle createMockVehicle(String vin, String numberPlate,
+			String seating, String fuel, boolean available, int modelId,
+			int branchId, int maxSpeed) {
+
+		Vehicle vehicle = new Vehicle(); 
+		
+		vehicle.setVin(vin); 
+		vehicle.setAvailable(available); 
+		vehicle.setBranchId(branchId); 
+		vehicle.setMaxSpeed(maxSpeed); 
+		vehicle.setFuel(fuel); 
+		vehicle.setSeating(seating);  
+		vehicle.setModelId(modelId); 
+		vehicle.setNumberPlate(numberPlate); 
+		
+		return vehicle; 
 	}
 }
