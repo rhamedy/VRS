@@ -17,17 +17,9 @@ import com.vrs.model.User;
  * UserDao is used by UserServices to manipulate user related data stored in
  * persistent storage.
  * 
- * JdbcTemplate is a template provided by Spring framework to simplify JDBC
- * related activities.
- * 
- * @Repository annotates that the class is as model/dao in Spring context
- * 
- * @Autowired is annotation is used for depedency injection, we are creating an
- *            instance of jdbcTemplate by injecting it an instance of DataSource
- *            created from XML configuration file named, vrs-datasource.xml
- * 
  * @author Rafiullah Hamedy
  * @Date 25-02-2013
+ * 
  */
 
 @Repository
@@ -37,6 +29,8 @@ public class UserDao {
 
 	private JdbcTemplate jdbcTemplate;
 
+	//initialize JdbcTemplate with DataSource object (database configuration)
+	
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -47,7 +41,7 @@ public class UserDao {
 
 		String SQL = "INSERT INTO auth.user (username, first_name, last_name, "
 				+ "password, dob, mobile, disabled, created_date) VALUES (?,?,?,?,?,?,?,?)";
-
+		
 		jdbcTemplate.update(
 				SQL,
 				new Object[] { user.getUsername(), user.getFirstName(),

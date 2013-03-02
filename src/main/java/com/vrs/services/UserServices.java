@@ -9,6 +9,12 @@ import com.vrs.dao.UserDao;
 import com.vrs.model.Role;
 import com.vrs.model.User;
 
+/**
+ * Is used by Controller class to communicate with dao's and views. 
+ * 
+ * @author Rafiullah Hamedy
+ * @Date   25-02-2012
+ */
 @Service
 public class UserServices {
 	

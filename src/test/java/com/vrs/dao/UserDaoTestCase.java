@@ -16,6 +16,15 @@ import com.vrs.model.Role;
 import com.vrs.model.User;
 import com.vrs.util.TestUtil;
 
+/**
+ * UserDaoTestCase tests different functionalities of UserDao class with test
+ * data.
+ * 
+ * @author Rafiullah Hamedy
+ * @Date 25-02-2013
+ * 
+ */
+
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {
 		"file:src/main/webapp/WEB-INF/vrs-servlet.xml",
@@ -33,11 +42,11 @@ public class UserDaoTestCase {
 	public void testCreateUser1() {
 		logger.info("entry testCreateUser1()");
 
-		User user1 = TestUtil.createTestUser(); // mock user
+		User user1 = TestUtil.createTestUser(); // create mock user
 
 		assertNull(userDao.findUser(user1.getUsername())); // test that user
 															// does not exists
-		userDao.createUser(user1); // create the mock user
+		userDao.createUser(user1); // store the mock user in db
 		assertNotNull(userDao.findUser(user1.getUsername())); // test that user
 																// exists
 		userDao.deleteUser(user1); // delete the recently created mock user
@@ -62,12 +71,11 @@ public class UserDaoTestCase {
 	public void testCreateUserRoleRelationship() {
 		logger.info("entry testCreateUserRoleRelationship()");
 
-		User user1 = TestUtil.createTestUser(); // return mock user
-		Role role1 = TestUtil.createTestRole(999, "admin_test"); // returns mock
-																	// role
+		User user1 = TestUtil.createTestUser();
+		Role role1 = TestUtil.createTestRole(999, "admin_test");
 
-		userDao.createUser(user1); // create mock user
-		userDao.createRole(role1); // create mock role
+		userDao.createUser(user1);
+		userDao.createRole(role1);
 
 		assertNull(userDao.retrieveUserRole(user1.getUsername())); // initially
 																	// no
@@ -82,8 +90,8 @@ public class UserDaoTestCase {
 																	// relationship
 																	// deleted
 
-		userDao.deleteRole(role1); // delete role
-		userDao.deleteUser(user1); // delete user
+		userDao.deleteRole(role1);
+		userDao.deleteUser(user1);
 	}
 
 	@Test
@@ -94,15 +102,15 @@ public class UserDaoTestCase {
 
 		userDao.createUser(user1);
 		assertEquals("raf_test1", userDao.findUser(user1.getUsername())
-				.getFirstName());  //verifying created users firstn name
+				.getFirstName()); // verifying created users firstn name
 
-		user1.setFirstName("raf_test1_updated"); //updating the user obj
+		user1.setFirstName("raf_test1_updated"); // updating the user obj
 		user1.setLastName("hamedy_test1_updated");
 
-		userDao.updateUser(user1); //saving the changes to db
+		userDao.updateUser(user1); // saving the changes to db
 
 		assertEquals("raf_test1_updated", userDao.findUser(user1.getUsername())
-				.getFirstName());  //verifying the changes to first name
+				.getFirstName()); // verifying the changes to first name
 		assertEquals("hamedy_test1_updated",
 				userDao.findUser(user1.getUsername()).getLastName());
 
@@ -117,12 +125,17 @@ public class UserDaoTestCase {
 
 		userDao.createRole(role1);
 
-		assertEquals("admin_test", userDao.findRole(999).getRoleName()); //verifying role name
-		role1.setRoleName("admin_test_updated"); //update the role name in object
-		userDao.updateRole(role1); //save the updates to db
-		assertEquals("admin_test_updated", userDao.findRole(999).getRoleName()); //verify updates
-
-		userDao.deleteRole(role1); 
+		assertEquals("admin_test", userDao.findRole(999).getRoleName()); // verifying
+																			// role
+																			// name
+		role1.setRoleName("admin_test_updated"); // update the role name in
+													// object
+		userDao.updateRole(role1); // save the updates to db
+		assertEquals("admin_test_updated", userDao.findRole(999).getRoleName()); // verify
+																					// db
+																					// entry
+																					// updates
+		userDao.deleteRole(role1);
 	}
 
 	@Test
@@ -132,23 +145,25 @@ public class UserDaoTestCase {
 		User user1 = TestUtil.createTestUser();
 		Role role1 = TestUtil.createTestRole(999, "admin_test");
 
-		userDao.createRole(role1);  //save mock user1 to db
-		userDao.createUser(user1); //save mock role1 to db
-		userDao.createUserRole(user1, role1); //save relations for user1 and role 1
+		userDao.createRole(role1); 
+		userDao.createUser(user1); 
+		userDao.createUserRole(user1, role1); 
 
 		assertEquals(999, userDao.retrieveUserRole(user1.getUsername())
-				.getRoleId()); //verify that user1 has role_id 999
+				.getRoleId()); // verify that user1 has role_id 999
 
-		Role role2 = TestUtil.createTestRole(888, "admin_test2"); //create another mock role obj. with id 888
-		userDao.createRole(role2); //save the role into db
-		userDao.updateUserRole(user1, role2); //update the user1's role from 999 to 888
-
-		assertEquals(888, userDao.retrieveUserRole(user1.getUsername()) 
-				.getRoleId()); //verify update success
+		Role role2 = TestUtil.createTestRole(888, "admin_test2"); 
 		
-		userDao.deleteUserRole(user1, role2); 
-		userDao.deleteRole(role2); 
-		userDao.deleteRole(role1); 
-		userDao.deleteUser(user1); 
+		userDao.createRole(role2); // save the role2 into db
+		userDao.updateUserRole(user1, role2); // update the user1's role from
+												// 999 to 888
+
+		assertEquals(888, userDao.retrieveUserRole(user1.getUsername())
+				.getRoleId()); // verify update success
+
+		userDao.deleteUserRole(user1, role2);
+		userDao.deleteRole(role2);
+		userDao.deleteRole(role1);
+		userDao.deleteUser(user1);
 	}
 }
