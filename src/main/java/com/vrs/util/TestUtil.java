@@ -1,5 +1,6 @@
 package com.vrs.util;
 
+import com.vrs.model.Branch;
 import com.vrs.model.Role;
 import com.vrs.model.User;
 
@@ -28,7 +29,20 @@ public class TestUtil {
 
 		role1.setRoleId(roleId);
 		role1.setRoleName(roleName);
+
+		return role1;
+	}
+
+	public static Branch createMockBranch(int id, String name, int cityId,
+			String streetName, String postcode) {
+		Branch branch = new Branch(); 
 		
-		return role1; 
+		branch.setId(id); 
+		branch.setCityId(cityId); 
+		branch.setName(name); 
+		branch.setStreetName(streetName); 
+		branch.setPostcode(postcode); 
+		
+		return branch;
 	}
 }
