@@ -39,6 +39,28 @@ public class RentalDaoTestCase {
 	@Test
 	public void testGetMaxBranchId1() {
 		logger.info("entry testGetMaxBranchId()");
+
+		int branchId = rentalDao.getMaxBranchId() + 1;
+
+		Branch mockBranch = TestUtil.createMockBranch(branchId, "branch1_test",
+				5, "bradford1_test", "BD71DP");
+		
+		rentalDao.addBrunch(mockBranch); 
+		
+		//getMaxBranchId always returns max (id) of all rows in branch table
+		//to add a new branch we increment the id and add the branch (id=primary key)
+		
+		assertEquals(branchId, rentalDao.getMaxBranchId()); 
+		
+		//above we test that our previously added branch is latest, max one
+		
+		rentalDao.deleteBranch(branchId); 
+		
+		//we delete the recently added branch, then getMaxBranchId should
+		//return branchId -1 (branchId was previously added mock branch)
+		//as follow assertion tests the above fact
+		
+		assertEquals(branchId - 1, rentalDao.getMaxBranchId()); 
 	}
 
 	@Test
@@ -139,36 +161,44 @@ public class RentalDaoTestCase {
 
 		Vehicle updateVehicle = TestUtil.createMockVehicle("a1b2c3d4e5_test",
 				"BB 32 ZX", "Two", "Petrol", true, 16, 1, 220);
-		//same vin number however, different plateNumber and seating type
-		
-		rentalDao.updateVehicle(updateVehicle); 
-		
-		assertEquals("BB 32 ZX", rentalDao.findVehicle(updateVehicle.getVin()).getNumberPlate()); 
-		assertEquals("Two", rentalDao.findVehicle(updateVehicle.getVin()).getSeating()); 
-		
-		//above assertEquals verifies that numberPlate and seating fields are updated 
-		
-		rentalDao.deleteVehicle(updateVehicle.getVin()); 
+		// same vin number however, different plateNumber and seating type
+
+		rentalDao.updateVehicle(updateVehicle);
+
+		assertEquals("BB 32 ZX", rentalDao.findVehicle(updateVehicle.getVin())
+				.getNumberPlate());
+		assertEquals("Two", rentalDao.findVehicle(updateVehicle.getVin())
+				.getSeating());
+
+		// above assertEquals verifies that numberPlate and seating fields are
+		// updated
+
+		rentalDao.deleteVehicle(updateVehicle.getVin());
 	}
-	
+
 	@Test
-	public void testUpdateVehcileStatus1() { 
-		logger.info("entry testUpdateVehicleStatus1()"); 
-		
+	public void testUpdateVehcileStatus1() {
+		logger.info("entry testUpdateVehicleStatus1()");
+
 		Vehicle mockVehicle = TestUtil.createMockVehicle("a1b2c3d4e5_test",
 				"AA 23 V6", "Four", "Petrol", true, 16, 1, 220);
-		
-		rentalDao.addVehicle(mockVehicle); 
-		
-		assertEquals(true, rentalDao.findVehicle(mockVehicle.getVin()).isAvailable()); 
-		
-		//status of mockVehicle in db is true, lets change it to false and update db
-		//updateVehicleStatus inverses value of available (if true false, else true)
-		
-		rentalDao.updateVehicleStatus(mockVehicle.getVin(), mockVehicle.isAvailable()); 
-		
-		assertEquals(false, rentalDao.findVehicle(mockVehicle.getVin()).isAvailable()); 
-		
+
+		rentalDao.addVehicle(mockVehicle);
+
+		assertEquals(true, rentalDao.findVehicle(mockVehicle.getVin())
+				.isAvailable());
+
+		// status of mockVehicle in db is true, lets change it to false and
+		// update db
+		// updateVehicleStatus inverses value of available (if true false, else
+		// true)
+
+		rentalDao.updateVehicleStatus(mockVehicle.getVin(),
+				mockVehicle.isAvailable());
+
+		assertEquals(false, rentalDao.findVehicle(mockVehicle.getVin())
+				.isAvailable());
+
 		rentalDao.deleteVehicle(mockVehicle.getVin());
 	}
 }

@@ -18,7 +18,7 @@ public class RentalDao {
 
 	/**
 	 * RentalDao is used by RentalController to communicate information
-	 * back/forth with database.
+	 * back/forth to/from database.
 	 * 
 	 * @author Rafiullah Hamedy
 	 * @Date 01-03-2013
