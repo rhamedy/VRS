@@ -1,5 +1,7 @@
 package com.vrs.dao;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -59,6 +61,7 @@ public class RentalDao {
 
 			return branch;
 		} catch (EmptyResultDataAccessException ex) {
+			//exception thrown if no result is found
 			return null;
 		}
 	}
@@ -121,6 +124,7 @@ public class RentalDao {
 
 			return vehicle;
 		} catch (EmptyResultDataAccessException ex) {
+			//this exception is thrown if no match is found
 			return null;
 		}
 	}
@@ -156,5 +160,40 @@ public class RentalDao {
 		// status will be current value of available, !status will inverse it
 
 		jdbcTemplate.update(SQL, new Object[] { !status, vin });
+	}
+
+	public boolean isAnyVehiclesRegisteredToBranch(int branchId) {
+		logger.info("entry isAnyVehicleRegisteredToBranch()");
+
+		String SQL = "SELECT COUNT (*) FROM rental.vehicle WHERE branch_id = ?";
+
+		// branch_id is foreign key in vehicle table, hence the SQL
+
+		int count = jdbcTemplate.queryForInt(SQL, new Object[] { branchId });
+
+		return (count > 0) ? true : false;
+	}
+
+	public void deleteBranchVehicles(int branchId) {
+		logger.info("entry deleteBranchVehicles()");
+
+		String SQL = "DELETE From rental.vehicle WHERE branch_id = ?";
+
+		jdbcTemplate.update(SQL, new Object[] { branchId });
+	}
+
+	public List<Vehicle> getBranchVehicles(int branchId) {
+		logger.info("entry getBranchVehicles()");
+
+		String SQL = "SELECT * FROM rental.vehicle WHERE branch_id = ?";
+
+		List<Vehicle> vehicles = jdbcTemplate.query(SQL,
+				new Object[] { branchId }, new BeanPropertyRowMapper<Vehicle>(
+						Vehicle.class));
+		
+		logger.info("value of vehicles is : " + vehicles); 
+		logger.info("size of vehicles is : " + vehicles.size()); 
+
+		return vehicles;
 	}
 }

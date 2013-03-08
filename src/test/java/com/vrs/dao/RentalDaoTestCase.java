@@ -37,33 +37,6 @@ public class RentalDaoTestCase {
 	private RentalDao rentalDao;
 
 	@Test
-	public void testGetMaxBranchId1() {
-		logger.info("entry testGetMaxBranchId()");
-
-		int branchId = rentalDao.getMaxBranchId() + 1;
-
-		Branch mockBranch = TestUtil.createMockBranch(branchId, "branch1_test",
-				5, "bradford1_test", "BD71DP");
-		
-		rentalDao.addBrunch(mockBranch); 
-		
-		//getMaxBranchId always returns max (id) of all rows in branch table
-		//to add a new branch we increment the id and add the branch (id=primary key)
-		
-		assertEquals(branchId, rentalDao.getMaxBranchId()); 
-		
-		//above we test that our previously added branch is latest, max one
-		
-		rentalDao.deleteBranch(branchId); 
-		
-		//we delete the recently added branch, then getMaxBranchId should
-		//return branchId -1 (branchId was previously added mock branch)
-		//as follow assertion tests the above fact
-		
-		assertEquals(branchId - 1, rentalDao.getMaxBranchId()); 
-	}
-
-	@Test
 	public void testAddBranch1() {
 
 		int branchId = rentalDao.getMaxBranchId() + 1; // new mock branch
@@ -113,6 +86,34 @@ public class RentalDaoTestCase {
 
 		rentalDao.deleteBranch(updateBranch.getId());
 
+	}
+
+	@Test
+	public void testGetMaxBranchId1() {
+		logger.info("entry testGetMaxBranchId()");
+
+		int branchId = rentalDao.getMaxBranchId() + 1;
+
+		Branch mockBranch = TestUtil.createMockBranch(branchId, "branch1_test",
+				5, "bradford1_test", "BD71DP");
+
+		rentalDao.addBrunch(mockBranch);
+
+		// getMaxBranchId always returns max (id) of all rows in branch table
+		// to add a new branch we increment the id and add the branch
+		// (id=primary key)
+
+		assertEquals(branchId, rentalDao.getMaxBranchId());
+
+		// above we test that our previously added branch is latest, max one
+
+		rentalDao.deleteBranch(branchId);
+
+		// we delete the recently added branch, then getMaxBranchId should
+		// return branchId -1 (branchId was previously added mock branch)
+		// as follow assertion tests the above fact
+
+		assertEquals(branchId - 1, rentalDao.getMaxBranchId());
 	}
 
 	@Test
@@ -200,5 +201,87 @@ public class RentalDaoTestCase {
 				.isAvailable());
 
 		rentalDao.deleteVehicle(mockVehicle.getVin());
+	}
+
+	@Test
+	public void testIsAnyVehicleRegisteredToBranch() {
+		logger.info("entry testIsAnyVehicleRegisteredToBranch()");
+
+		int branchId = rentalDao.getMaxBranchId() + 1;
+
+		Branch mockBranch = TestUtil.createMockBranch(branchId, "branch1_test",
+				5, "bradford1_test", "BD771B");
+
+		// we will add a mock branch and then test this method with both
+		// condition of no vehicle being registered and some vehicle registered
+
+		rentalDao.addBrunch(mockBranch);
+
+		assertFalse(rentalDao.isAnyVehiclesRegisteredToBranch(mockBranch
+				.getId()));
+
+		// we have not yet added vehicles to branch so above assertions = false
+
+		Vehicle mockVehicle = TestUtil
+				.createMockVehicle("a1b2c3d4e5_test", "AA 23 V6", "Four",
+						"Petrol", true, 16, mockBranch.getId(), 220);
+		
+		rentalDao.addVehicle(mockVehicle); 
+		
+		//added a vehicle to the mockBranch using its id
+		//below assertion should return true
+		
+		assertTrue(rentalDao.isAnyVehiclesRegisteredToBranch(mockBranch.getId())); 
+		
+		rentalDao.deleteVehicle(mockVehicle.getVin()); 
+		rentalDao.deleteBranch(mockBranch.getId()); 
+	}
+	
+	@Test
+	public void testGetBranchVehicles1() { 
+		logger.info("entry testGetBranchVehicles()"); 
+		
+		int branchId = rentalDao.getMaxBranchId() + 1;
+
+		Branch mockBranch = TestUtil.createMockBranch(branchId, "branch1_test",
+				5, "bradford1_test", "BD771B");
+		
+
+		rentalDao.addBrunch(mockBranch); 
+		
+		//we will first test for no vehicles (empty list)
+		
+		assertEquals(0, rentalDao.getBranchVehicles(mockBranch.getId()).size()); 
+		
+		Vehicle mockVehicle1 = TestUtil
+				.createMockVehicle("a1b2c3d4e5_test1", "AA 23 V6", "Four",
+						"Petrol", true, 16, mockBranch.getId(), 220);
+		
+		Vehicle mockVehicle2 = TestUtil
+				.createMockVehicle("a1b2c3d4e5_test2", "AA 23 V6", "Four",
+						"Petrol", true, 16, mockBranch.getId(), 220);
+		
+		rentalDao.addVehicle(mockVehicle1); 
+		rentalDao.addVehicle(mockVehicle2); 
+		
+		assertEquals(2, rentalDao.getBranchVehicles(mockBranch.getId()).size()); 
+		
+		Vehicle mockVehicle3 = TestUtil
+				.createMockVehicle("a1b2c3d4e5_test3", "AA 23 V6", "Four",
+						"Petrol", true, 16, mockBranch.getId(), 220);
+		
+		rentalDao.addVehicle(mockVehicle3); 
+		
+		assertEquals(3, rentalDao.getBranchVehicles(mockBranch.getId()).size()); 
+		
+		rentalDao.deleteVehicle("a1b2c3d4e5_test1"); //mockVehicle1 deleted 
+		rentalDao.deleteVehicle("a1b2c3d4e5_test2"); //mockVehicle2 deleted 
+		
+		//now size should be 1 becuse we deleted 2 our of 3 vehicles
+		
+		assertEquals(1, rentalDao.getBranchVehicles(mockBranch.getId()).size()); 
+		
+		rentalDao.deleteVehicle("a1b2c3d4e5_test3"); 
+		rentalDao.deleteBranch(mockBranch.getId()); 
 	}
 }
