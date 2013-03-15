@@ -9,8 +9,8 @@
 
 	<http pattern="/resources/html/login.html*" security="none" />
 	<http pattern="/resources/html/loginError.html*" security="none" />
-	<http pattern="/home/public" security="none" />
-	<http pattern="/home/public/account" security="none" />
+	<http pattern="/resources/js/**" security="none" />
+	<http pattern="/home/public/**" security="none" />
 
 	<http auto-config="true" use-expressions="true">
 		<intercept-url pattern="/**" access="isAuthenticated()" />
