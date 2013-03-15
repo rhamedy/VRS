@@ -1,6 +1,10 @@
 package com.vrs.dao;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -10,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.vrs.model.Branch;
@@ -61,7 +66,7 @@ public class RentalDao {
 
 			return branch;
 		} catch (EmptyResultDataAccessException ex) {
-			//exception thrown if no result is found
+			// exception thrown if no result is found
 			return null;
 		}
 	}
@@ -124,7 +129,7 @@ public class RentalDao {
 
 			return vehicle;
 		} catch (EmptyResultDataAccessException ex) {
-			//this exception is thrown if no match is found
+			// this exception is thrown if no match is found
 			return null;
 		}
 	}
@@ -190,10 +195,47 @@ public class RentalDao {
 		List<Vehicle> vehicles = jdbcTemplate.query(SQL,
 				new Object[] { branchId }, new BeanPropertyRowMapper<Vehicle>(
 						Vehicle.class));
-		
-		logger.info("value of vehicles is : " + vehicles); 
-		logger.info("size of vehicles is : " + vehicles.size()); 
+
+		logger.info("value of vehicles is : " + vehicles);
+		logger.info("size of vehicles is : " + vehicles.size());
 
 		return vehicles;
+	}
+
+	public List<Map<Integer, String>> getCountryList() {
+		logger.info("entry getCountryList()");
+
+		String SQL = "SELECT * FROM rental.country";
+
+		List<Map<Integer, String>> countries = jdbcTemplate.query(SQL,
+				new RowMapper<Map<Integer, String>>() {
+					public Map<Integer, String> mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						Map<Integer, String> countryTemp = new HashMap<Integer, String>();
+						countryTemp.put(rs.getInt("id"), rs.getString("name"));
+						return countryTemp;
+					}
+				});
+
+		return countries;
+	}
+
+	public List<Map<Integer, String>> getCityList(int countryId) {
+		logger.info("entry getCityList()");
+
+		String SQL = "SELECT * FROM rental.city WHERE country_id = ?";
+
+		List<Map<Integer, String>> cities = jdbcTemplate.query(SQL,
+				new Object[] { countryId },
+				new RowMapper<Map<Integer, String>>() {
+					public Map<Integer, String> mapRow(ResultSet rs, int rowNum)
+							throws SQLException {
+						Map<Integer, String> cityTemp = new HashMap<Integer, String>();
+						cityTemp.put(rs.getInt("id"), rs.getString("name"));
+						return cityTemp;
+					}
+				});
+
+		return cities;
 	}
 }
