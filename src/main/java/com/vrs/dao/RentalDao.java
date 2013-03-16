@@ -238,4 +238,26 @@ public class RentalDao {
 
 		return cities;
 	}
+
+	public List<Branch> getBranchList(int cityId) {
+		logger.info("entry getBranchList()");
+
+		String SQL = "SELECT * FROM rental.branch WHERE city_id = ?";
+
+		List<Branch> branches = jdbcTemplate.query(SQL,
+				new Object[] { cityId }, new BeanPropertyRowMapper<Branch>(
+						Branch.class));
+		return branches;
+	}
+
+	public List<Vehicle> getVehicleList(int branchId) {
+		logger.info("entry getVehicleList()");
+
+		String SQL = "SELECT * FROM rental.vehicle WHERE branch_id = ?";
+
+		List<Vehicle> vehicles = jdbcTemplate.query(SQL,
+				new Object[] { branchId }, new BeanPropertyRowMapper<Vehicle>(
+						Vehicle.class));
+		return vehicles; 
+	}
 }

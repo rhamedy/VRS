@@ -49,11 +49,4 @@ public class UserController {
 
 		return mav;
 	}
-
-	@RequestMapping(value = "/home/public/cities")
-	public @ResponseBody
-	List<Map<Integer, String>> getCities(@RequestParam String countryId) {
-		int parsedCountryId = Integer.parseInt(countryId);
-		return rentalServices.getCities(parsedCountryId); 
-	}
 }

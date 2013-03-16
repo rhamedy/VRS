@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vrs.dao.RentalDao;
+import com.vrs.model.Branch;
+import com.vrs.model.Vehicle;
 
 
 /**
@@ -36,5 +38,17 @@ public class RentalServices {
 		logger.info("entry getCities()");
 		
 		return rentalDao.getCityList(countryId); 
+	}
+	
+	public List<Branch> getBranches(int cityId) { 
+		logger.info("entry getBranches()"); 
+		
+		return rentalDao.getBranchList(cityId); 
+	}
+	
+	public List<Vehicle> getVehicles(int branchId) { 
+		logger.info("entry getVehicles()"); 
+		
+		return rentalDao.getVehicleList(branchId); 
 	}
 }
