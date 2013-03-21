@@ -14,11 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import com.vrs.model.Branch;
 import com.vrs.model.Vehicle;
+import com.vrs.util.KeyValuePair;
 
 @Repository
 public class RentalDao {
@@ -258,6 +260,36 @@ public class RentalDao {
 		List<Vehicle> vehicles = jdbcTemplate.query(SQL,
 				new Object[] { branchId }, new BeanPropertyRowMapper<Vehicle>(
 						Vehicle.class));
-		return vehicles; 
+		return vehicles;
+	}
+
+	// get model and make for a particular vehicle, we use model foreign key
+	// in vehicle table (model_id) match it against model table then use the
+	// foreign key (make_id) from model table and match it against make table
+	// then extract make name and model
+
+	public KeyValuePair<String, String> getMakeAndModelName(String vin) {
+		logger.info("entry getMakeAndeModelName()");
+
+		String SQL = "SELECT rmd.name AS mdname, rmk.name AS mkname FROM rental.vehicle rv, "
+				+ "rental.model rmd, rental.make rmk WHERE rv.vin = ? AND rv.model_id = rmd.id "
+				+ "AND rmd.make_id = rmk.id";
+
+		KeyValuePair<String, String> makeModel = jdbcTemplate.query(SQL,
+				new Object[] { vin },
+				new ResultSetExtractor<KeyValuePair<String, String>>() {
+					public KeyValuePair<String, String> extractData(ResultSet rs)
+							throws SQLException {
+						while (rs.next()) {
+							KeyValuePair<String, String> keyValue = new KeyValuePair<String, String>(
+									rs.getString("mdname"), rs
+											.getString("mkname"));
+							return keyValue;
+						}
+						return null;
+					}
+				});
+
+		return makeModel;
 	}
 }
