@@ -13,6 +13,7 @@
 		<deploymentServer>local</deploymentServer>
 		<managerUrl>http://localhost:8080/manager/html</managerUrl>
 		<db.url>jdbc:postgresql://localhost/vrs</db.url>
+		<skipTests>true</skipTests>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -205,7 +206,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.12.4</version>
 				<configuration>
-					<skipTests>true</skipTests>
+					<skipTests>${skipTests}</skipTests>
 				</configuration>
 			</plugin>
 			<plugin>
