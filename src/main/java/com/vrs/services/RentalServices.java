@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.vrs.dao.RentalDao;
 import com.vrs.model.Branch;
 import com.vrs.model.Vehicle;
+import com.vrs.util.KeyValuePair;
 
 
 /**
@@ -49,6 +50,20 @@ public class RentalServices {
 	public List<Vehicle> getVehicles(int branchId) { 
 		logger.info("entry getVehicles()"); 
 		
-		return rentalDao.getVehicleList(branchId); 
+		List<Vehicle> vehicles = rentalDao.getVehicleList(branchId); 
+		
+		for(Vehicle v: vehicles){ 
+			KeyValuePair<String, String> makeModel = rentalDao.getMakeAndModelName(v.getVin()); 
+			v.setModel(makeModel.getKey()); 
+			v.setMake(makeModel.getValue()); 
+		}
+		
+		return vehicles; 
+	}
+	
+	public KeyValuePair<String, String> getMakeAndModelName(String vin) { 
+		logger.info("entry getVehicleMadeAndMOdelName()"); 
+		
+		return rentalDao.getMakeAndModelName(vin); 
 	}
 }

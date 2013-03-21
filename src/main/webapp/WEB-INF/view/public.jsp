@@ -79,7 +79,10 @@
 						success: function(data) { 
 							if(data.length > 0) { 
 								for(i=0; i< data.length; i++) { 
-									$("tbody#vehicleData").append("<tr><td>" + data[i].maxSpeed + "</td><td>" + data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + data[i].available + "</td></tr>"); 
+									$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
+									data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
+									data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
+									data[i].available + "</td></tr>"); 
 								}
 							}
 						},
@@ -125,6 +128,8 @@
 				<table id="vehicleList" border="1">
 					<thead>
 						<tr>
+							<th>Make</th>
+							<th>Model</th>
 							<th>Max Speed</th>
 							<th>Fuel</th>
 							<th>Seating</th>
