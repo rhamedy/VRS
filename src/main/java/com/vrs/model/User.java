@@ -18,11 +18,38 @@ public class User {
 	private String username;
 	private String mobile; 
 	private String password;
-	private Date createdDate; 
+	private Date createdDate;
+	private String mobileNo; 
+	private String licenseNo; 
+	private Date licenseValidity; 
+	private String address; 
 	private boolean disabled;
-	
 	private Role role; 
 	
+	public String getMobileNo() {
+		return mobileNo;
+	}
+	public void setMobileNo(String mobileNo) {
+		this.mobileNo = mobileNo;
+	}
+	public String getLicenseNo() {
+		return licenseNo;
+	}
+	public void setLicenseNo(String licenseNo) {
+		this.licenseNo = licenseNo;
+	}
+	public Date getLicenseValidity() {
+		return licenseValidity;
+	}
+	public void setLicenseValidity(Date licenseValidity) {
+		this.licenseValidity = licenseValidity;
+	}
+	public String getAddress() {
+		return address;
+	}
+	public void setAddress(String address) {
+		this.address = address;
+	}
 	public Date getCreatedDate() {
 		return createdDate;
 	}
