@@ -6,6 +6,7 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title> Oscar Vehicle Rental System </title> 
+		<link rel="stylesheet" href="/VRS/resources/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css"/> 
 	</head>
 	
 	<body>
@@ -156,6 +157,5 @@
 			}); 
 		}); 
 	</script>
-	<link rel="stylesheet" href="/VRS/resources/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css"/> 
 </html>
 	

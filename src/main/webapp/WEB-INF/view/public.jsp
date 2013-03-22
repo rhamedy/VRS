@@ -6,112 +6,23 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title> Oscar Vehicle Rental System </title> 
-	</head>
-	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-1.6.1.min.js" ></script>
-	<script type="text/javascript">
-		$(document).ready(function(){
-			$("select#countryList").change(function() {
-				$("select#cityList").empty(); 
-				$("select#branchList").empty();  
-				if($(this).children(":selected").val().trim().length > 0) { 
-					$.ajax({
-						url: "/VRS/home/public/cities",
-						data: "countryId=" + $(this).children(":selected").val(), 
-						success: function(data) {
-							var flag = false; 
-							$.each(data, function(k,value) {
-								$.each(value, function(key, v) { 
-									$("select#cityList").append("<option value='" + key + "'>" + v + "</option>"); 
-									flag = true; 
-								}); 
-							}); 
-							if(flag) { 
-								$("select#cityList").append("<option value='' selected></option>");
-							}
-						}, 
-						error: function() { 
-							console.log("failed!"); 
-						} 
-					}); 
-				} else { 
-					console.log("empty selection!"); 
-				}
-			});
-			
-			$("select#cityList").change(function() { 
-				$("select#branchList").empty(); 
-				if($(this).children(":selected").val().trim().length > 0) {
-					$.ajax({ 
-						url: "/VRS/home/public/branches", 
-						data: "cityId=" + $(this).children(":selected").val(), 
-						success: function(data) {
-							var flag = false;
-							var id; 
-							var name; 
-							$.each(data, function(k,value) {
-								$.each(value, function(key, v) { 
-									if(key == "id") { 
-										id = v; 
-									} else if(key == "name") { 
-										name = v; 
-									}
-									flag = true; 
-								}); 
-								if(flag) { 
-									$("select#branchList").append("<option value='" + id + "'>" + name + "</option>");
-								}
-							});
-							if(flag) { 
-								$("select#branchList").append("<option value='' selected></option>");
-							} 
-						}
-					}); 
-				} else { 
-					console.log("empty option was selected!"); 
-				}
-			});
-			
-			$("select#branchList").change(function() { 
-				$("tbody#vehicleData").empty();
-				if($(this).children(":selected").val().trim().length > 0) { 
-					$.ajax({ 
-						url: "/VRS/home/public/vehicles", 
-						data: "branchId=" + $(this).children(":selected").val(), 
-						success: function(data) { 
-							if(data.length > 0) { 
-								for(i=0; i< data.length; i++) { 
-									$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
-									data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
-									data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
-									data[i].available + "</td></tr>"); 
-								}
-							}
-						},
-						error: function() { 
-							conosle.log("error ajax request."); 
-						}
-					});
-				} else { 
-					console.log("empty branch selection!"); 
-				}
-			}); 
-		}); 
-	</script>
-	<style>
-		#main { 
-			padding: 5px 5px 5px 5px; 
-		}
-		#vehicleDiv { 
-			border: 1px solid black; 
-			padding: 5px 5px 5px 5px;
-			margin-top: 10px; 
-		}
-		#accountDiv { 
-			border: 1px solid black; 
-			padding: 5px 5px 5px 5px;
-			margin-top: 10px; 
-		} 
+		<link rel="stylesheet" href="/VRS/resources/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css"/>
+		<style>
+			#main { 
+				padding: 5px 5px 5px 5px; 
+			}
+			#vehicleDiv { 
+				border: 1px solid black; 
+				padding: 5px 5px 5px 5px;
+				margin-top: 10px; 
+			}
+			#accountDiv { 
+				border: 1px solid black; 
+				padding: 5px 5px 5px 5px;
+				margin-top: 10px; 
+			} 
 	</style>
+	</head>
 	<body>
 		<div id="main">
 			<div class="vehicleDiv">
@@ -233,7 +144,93 @@
 	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-1.6.1.min.js"></script>
 	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-ui-1.7.3.custom.min.js"></script>
 	<script type="text/javascript">
-		$(document).ready(function() { 
+		$(document).ready(function(){
+			$("select#countryList").change(function() {
+				$("select#cityList").empty(); 
+				$("select#branchList").empty();  
+				if($(this).children(":selected").val().trim().length > 0) { 
+					$.ajax({
+						url: "/VRS/home/public/cities",
+						data: "countryId=" + $(this).children(":selected").val(), 
+						success: function(data) {
+							var flag = false; 
+							$.each(data, function(k,value) {
+								$.each(value, function(key, v) { 
+									$("select#cityList").append("<option value='" + key + "'>" + v + "</option>"); 
+									flag = true; 
+								}); 
+							}); 
+							if(flag) { 
+								$("select#cityList").append("<option value='' selected></option>");
+							}
+						}, 
+						error: function() { 
+							console.log("failed!"); 
+						} 
+					}); 
+				} else { 
+					console.log("empty selection!"); 
+				}
+			});
+			
+			$("select#cityList").change(function() { 
+				$("select#branchList").empty(); 
+				if($(this).children(":selected").val().trim().length > 0) {
+					$.ajax({ 
+						url: "/VRS/home/public/branches", 
+						data: "cityId=" + $(this).children(":selected").val(), 
+						success: function(data) {
+							var flag = false;
+							var id; 
+							var name; 
+							$.each(data, function(k,value) {
+								$.each(value, function(key, v) { 
+									if(key == "id") { 
+										id = v; 
+									} else if(key == "name") { 
+										name = v; 
+									}
+									flag = true; 
+								}); 
+								if(flag) { 
+									$("select#branchList").append("<option value='" + id + "'>" + name + "</option>");
+								}
+							});
+							if(flag) { 
+								$("select#branchList").append("<option value='' selected></option>");
+							} 
+						}
+					}); 
+				} else { 
+					console.log("empty option was selected!"); 
+				}
+			});
+			
+			$("select#branchList").change(function() { 
+				$("tbody#vehicleData").empty();
+				if($(this).children(":selected").val().trim().length > 0) { 
+					$.ajax({ 
+						url: "/VRS/home/public/vehicles", 
+						data: "branchId=" + $(this).children(":selected").val(), 
+						success: function(data) { 
+							if(data.length > 0) { 
+								for(i=0; i< data.length; i++) { 
+									$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
+									data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
+									data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
+									data[i].available + "</td></tr>"); 
+								}
+							}
+						},
+						error: function() { 
+							conosle.log("error ajax request."); 
+						}
+					});
+				} else { 
+					console.log("empty branch selection!"); 
+				}
+			}); 
+			
 			$('.dateControl').datepicker({
 				changeMonth: true, 
 				changeYear: true, 
@@ -258,5 +255,4 @@
 			}); 
 		}); 
 	</script>
-	<link rel="stylesheet" href="/VRS/resources/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css"/> 
 </html>
