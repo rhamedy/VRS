@@ -66,6 +66,17 @@
 						<tbody>
 							<tr>
 								<td>
+									<form:label path="username" cssClass="inputControl">Username (Valid email)</form:label>
+								</td>
+								<td>
+									<form:input path="username" cssClass="inputError" />
+								</td>
+								<td>
+									<form:errors path="username" cssClass="inputError"/>  
+								</td>
+							</tr>
+							<tr>
+								<td>
 									<form:label path="firstName" cssClass="inputControl">First name</form:label>
 								</td>
 								<td>
