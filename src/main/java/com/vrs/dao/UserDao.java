@@ -1,5 +1,7 @@
 package com.vrs.dao;
 
+import java.util.List;
+
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -68,23 +70,6 @@ public class UserDao {
 
 		jdbcTemplate.update(SQL,
 				new Object[] { user.getUsername(), role.getRoleId() });
-	}
-	
-	public void updateUser(User user) { 
-		logger.info("entry updateUser()"); 
-		
-		String SQL = "UPDATE auth.user SET first_name = ?, last_name = ?, " +
-				"dob = ?, mobile = ?, disabled = ?, password = ? WHERE username = ?"; 
-		
-		jdbcTemplate.update(SQL, new Object[]{
-				user.getFirstName(), 
-				user.getLastName(), 
-				user.getDob(), 
-				user.getMobile(), 
-				user.isDisabled(), 
-				user.getPassword(), 
-				user.getUsername()
-		}); 
 	}
 	
 	public void updateRole(Role role) { 
@@ -178,5 +163,62 @@ public class UserDao {
 
 		jdbcTemplate.update(SQL,
 				new Object[] { user.getUsername(), role.getRoleId() });
+	}
+	
+	public List<Role> getUserRoles(User user) { 
+		logger.info("entry getUserRole()"); 
+		
+		String SQL = "SELECT r.role_id, r.role_name FROM auth.user u, auth.role r, auth.user_role ur WHERE" +
+				" u.username = ? AND u.username = ur.username AND ur.role_id = r.role_id";
+		
+		List<Role> role = jdbcTemplate.query(SQL, new Object[]{ user.getUsername() }, new BeanPropertyRowMapper<Role>(Role.class));
+		
+		return role; 
+	}
+	
+	public List<User> listUsers() { 
+		logger.info("entry listUsers()"); 
+		
+		String SQL = "SELECT * FROM auth.user";
+		
+		List<User> users = jdbcTemplate.query(SQL, new BeanPropertyRowMapper<User>(User.class)); 
+		
+		return users; 
+	}
+	
+	public List<Role> listRoles() { 
+		logger.info("entry listRoles()"); 
+		
+		String SQL = "SELECT * FROM auth.role";
+		
+		List<Role> roles = jdbcTemplate.query(SQL, new BeanPropertyRowMapper<Role>(Role.class)); 
+		
+		return roles;
+	}
+	
+	public void updateUser(User user) { 
+		logger.info("entry updateUser()"); 
+		
+		String SQL = "UPDATE auth.user SET first_name = ?, last_name = ?, dob = ?, mobile = ?, " +
+				"disabled = ?, license_no = ?, license_validity = ? WHERE username = ?"; 
+		
+		jdbcTemplate.update(SQL, new Object[] {
+				user.getFirstName(), 
+				user.getLastName(), 
+				user.getDob(), 
+				user.getMobile(), 
+				user.isDisabled(), 
+				user.getLicenseNo(), 
+				user.getLicenseValidity(), 
+				user.getUsername()
+		}); 
+	}
+	
+	public void updatePassword(User user) { 
+		logger.info("entry updatePassword()"); 
+		
+		String SQL = "UPDATE auth.user SET password = ? WHERE username = ?";
+		
+		jdbcTemplate.update(SQL, new Object[]{ user.getPassword(), user.getUsername()}); 
 	}
 }

@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.vrs.model.Role;
 import com.vrs.model.User;
 import com.vrs.services.RentalServices;
 import com.vrs.services.UserServices;
@@ -39,22 +40,23 @@ public class UserController {
 	@Autowired
 	private RentalServices rentalServices;
 
-	@InitBinder 
-	public void initBinder(WebDataBinder binder) { 
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); 
-		dateFormat.setLenient(false); 
-		
-		binder.registerCustomEditor(Date.class, new CustomSqlDateEditor(dateFormat, true)); 
+	@InitBinder
+	public void initBinder(WebDataBinder binder) {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+		dateFormat.setLenient(false);
+
+		binder.registerCustomEditor(Date.class, new CustomSqlDateEditor(
+				dateFormat, true));
 	}
-	
+
 	@RequestMapping(value = "/home/public")
 	public ModelAndView showHomepage() {
 		logger.info("entry showHomepage()");
 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("public");
-		
-		User user = new User(); 
+
+		User user = new User();
 
 		List<Map<Integer, String>> countries = rentalServices.getCountries();
 
@@ -68,7 +70,7 @@ public class UserController {
 		// }
 
 		mav.addObject("countries", countries);
-		mav.addObject("user", user); 
+		mav.addObject("user", user);
 
 		return mav;
 	}
@@ -79,50 +81,56 @@ public class UserController {
 		mav.setViewName("editUser");
 
 		User user = userServices.findUser(username);
-
+		
+		List<Role> allRoles = userServices.listRoles(); 
+		List<Role> userRoles = userServices.getUserRole(user); 
+		List<Role> nonUserRoles = userServices.nonUserRoles(allRoles, userRoles); 
+		
 		mav.addObject("user", user);
 		mav.addObject("username", user.getUsername());
+		mav.addObject("userRoles", userRoles); 
+		mav.addObject("nonUserRoles", nonUserRoles); 
 
 		return mav;
 	}
 
 	@RequestMapping(value = "/user/editUser", method = RequestMethod.POST)
 	public void editUser(@Valid User user, BindingResult binding,
-			@RequestParam String username, ModelMap model,
-			HttpServletResponse response) {
-		
-		if(user.hasRole("admin")) { 
-			model.addObject("usersList", userList); 
-		}
-		
+			@RequestParam String username, HttpServletResponse response) {
+
 		if (binding.hasErrors()) {
-			for(FieldError fe: binding.getFieldErrors()) { 
-				logger.info("binding error : {}", fe.getDefaultMessage()); 
-				response.addHeader("error_" + fe.getField(), fe.getDefaultMessage()); 
+			for (FieldError fe : binding.getFieldErrors()) {
+				logger.info("binding error : {}", fe.getDefaultMessage());
+				response.addHeader("error_" + fe.getField(),
+						fe.getDefaultMessage());
 			}
 			response.setStatus(302);
 		} else {
-			response.setStatus(200); 
-			userServices.createUser(user); 
+			user.setUsername(username); 
+			userServices.updateUser(user); 
+			
+			response.setStatus(200);
+
 		}
 
 	}
-	
+
 	@RequestMapping(value = "/home/public/accountRequest", method = RequestMethod.POST)
-	public void accountRequest(@Valid User user, BindingResult binding, HttpServletResponse response) { 
-		logger.info("entry accountRequest()"); 
-		
+	public void accountRequest(@Valid User user, BindingResult binding,
+			HttpServletResponse response) {
+		logger.info("entry accountRequest()");
+
 		if (binding.hasErrors()) {
-			for(FieldError fe: binding.getFieldErrors()) { 
-				logger.info("binding error : {}", fe.getDefaultMessage()); 
-				response.addHeader("error_" + fe.getField(), fe.getDefaultMessage()); 
+			for (FieldError fe : binding.getFieldErrors()) {
+				logger.info("binding error : {}", fe.getDefaultMessage());
+				response.addHeader("error_" + fe.getField(),
+						fe.getDefaultMessage());
 			}
 			response.setStatus(302);
 		} else {
-			
-			userServices.createUser(user); 
-			
-			response.setStatus(200); 
+
+			userServices.createUser(user);
+			response.setStatus(200);
 		}
 	}
 }
