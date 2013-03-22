@@ -1,19 +1,31 @@
 package com.vrs.controller;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.vrs.model.User;
 import com.vrs.services.RentalServices;
 import com.vrs.services.UserServices;
+import com.vrs.util.CustomSqlDateEditor;
 
 @Controller
 public class UserController {
@@ -27,6 +39,14 @@ public class UserController {
 	@Autowired
 	private RentalServices rentalServices;
 
+	@InitBinder 
+	public void initBinder(WebDataBinder binder) { 
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); 
+		dateFormat.setLenient(false); 
+		
+		binder.registerCustomEditor(Date.class, new CustomSqlDateEditor(dateFormat, true)); 
+	}
+	
 	@RequestMapping(value = "/home/public")
 	public ModelAndView showHomepage() {
 		logger.info("entry showHomepage()");
@@ -48,5 +68,35 @@ public class UserController {
 		mav.addObject("countries", countries);
 
 		return mav;
+	}
+
+	@RequestMapping(value = "/user/editUser", method = RequestMethod.GET)
+	public ModelAndView editUser(@RequestParam String username) {
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("editUser");
+
+		User user = userServices.findUser(username);
+
+		mav.addObject("user", user);
+		mav.addObject("username", user.getUsername());
+
+		return mav;
+	}
+
+	@RequestMapping(value = "/user/editUser", method = RequestMethod.POST)
+	public void editUser(@Valid User user, BindingResult binding,
+			@RequestParam String username, ModelMap model,
+			HttpServletResponse response) {
+
+		if (binding.hasErrors()) {
+			for(FieldError fe: binding.getFieldErrors()) { 
+				logger.info("binding error : {}", fe.getDefaultMessage()); 
+				response.addHeader("error_" + fe.getField(), fe.getDefaultMessage()); 
+			}
+			response.setStatus(302);
+		} else {
+			response.setStatus(200); 
+		}
+
 	}
 }

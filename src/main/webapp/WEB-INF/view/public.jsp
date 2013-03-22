@@ -100,7 +100,12 @@
 		#main { 
 			padding: 5px 5px 5px 5px; 
 		}
-		#account { 
+		#vehicleDiv { 
+			border: 1px solid black; 
+			padding: 5px 5px 5px 5px;
+			margin-top: 10px; 
+		}
+		#accountDiv { 
 			border: 1px solid black; 
 			padding: 5px 5px 5px 5px;
 			margin-top: 10px; 
@@ -108,7 +113,7 @@
 	</style>
 	<body>
 		<div id="main">
-			<div class="countryDiv">
+			<div class="vehicleDiv">
 				<label for="countriesList"> Countries </label>
 				<select id="countryList">
 					<option value="" selected></option>
@@ -139,6 +144,17 @@
 					<tbody id="vehicleData">
 					</tbody>
 				</table>
+			</div>
+			<div id="">
+				<h4> Fill out an account request form </h4>
+				<label for="firstName"> First name </label>
+				<input type="text" name="firstName" id="firstName"></input><br>
+				<label for="lastName"> Last name </label>
+				<input type="text" name="lastName" id="lastName"></input><br>
+				<label for="email"> Email </label>
+				<input type="text" name="email" id="email"></input><br><br>
+				<p id="accountStatus"></p>
+				<button type="button" onclick="javascript:validateUserInput()"> Submit </button>
 			</div>
 		</div>
 	</body>
