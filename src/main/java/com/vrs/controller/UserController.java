@@ -53,6 +53,8 @@ public class UserController {
 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("public");
+		
+		User user = new User(); 
 
 		List<Map<Integer, String>> countries = rentalServices.getCountries();
 
@@ -66,6 +68,7 @@ public class UserController {
 		// }
 
 		mav.addObject("countries", countries);
+		mav.addObject("user", user); 
 
 		return mav;
 	}
@@ -87,7 +90,11 @@ public class UserController {
 	public void editUser(@Valid User user, BindingResult binding,
 			@RequestParam String username, ModelMap model,
 			HttpServletResponse response) {
-
+		
+		if(user.hasRole("admin")) { 
+			model.addObject("usersList", userList); 
+		}
+		
 		if (binding.hasErrors()) {
 			for(FieldError fe: binding.getFieldErrors()) { 
 				logger.info("binding error : {}", fe.getDefaultMessage()); 
@@ -96,7 +103,26 @@ public class UserController {
 			response.setStatus(302);
 		} else {
 			response.setStatus(200); 
+			userServices.createUser(user); 
 		}
 
+	}
+	
+	@RequestMapping(value = "/home/public/accountRequest", method = RequestMethod.POST)
+	public void accountRequest(@Valid User user, BindingResult binding, HttpServletResponse response) { 
+		logger.info("entry accountRequest()"); 
+		
+		if (binding.hasErrors()) {
+			for(FieldError fe: binding.getFieldErrors()) { 
+				logger.info("binding error : {}", fe.getDefaultMessage()); 
+				response.addHeader("error_" + fe.getField(), fe.getDefaultMessage()); 
+			}
+			response.setStatus(302);
+		} else {
+			
+			userServices.createUser(user); 
+			
+			response.setStatus(200); 
+		}
 	}
 }

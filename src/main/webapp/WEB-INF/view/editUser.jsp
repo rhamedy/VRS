@@ -7,6 +7,7 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title> Oscar Vehicle Rental System </title> 
 	</head>
+	
 	<body>
 		<div id="main">
 			<div id="editUser">
@@ -18,10 +19,10 @@
 							<form:hidden path="username" />
 							<tr>
 								<td>
-									<form:label path="firstName" cssClass="inputControl">First name</form:label>
+									<form:label path="firstName" cssClass="inputTitle">First name</form:label>
 								</td>
 								<td>
-									<form:input path="firstName" cssClass="inputError" />
+									<form:input path="firstName" cssClass="inputControl" />
 								</td>
 								<td>
 									<form:errors path="firstName" cssClass="inputError"/>  

@@ -1,5 +1,6 @@
 <%@ page isELIgnored="false" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 <!DOCTYPE html>
 <html xmlns="http://www.w3c.org/1999/xhtml">
 	<head>
@@ -145,17 +146,117 @@
 					</tbody>
 				</table>
 			</div>
-			<div id="">
+			<div id="account">
 				<h4> Fill out an account request form </h4>
-				<label for="firstName"> First name </label>
-				<input type="text" name="firstName" id="firstName"></input><br>
-				<label for="lastName"> Last name </label>
-				<input type="text" name="lastName" id="lastName"></input><br>
-				<label for="email"> Email </label>
-				<input type="text" name="email" id="email"></input><br><br>
-				<p id="accountStatus"></p>
-				<button type="button" onclick="javascript:validateUserInput()"> Submit </button>
+				<form:form action="/VRS/home/public/accountRequest" method="POST" commandName="user">
+					<table border="1">
+						<thead>
+						</thead> 
+						<tbody>
+							<tr>
+								<td>
+									<form:label path="firstName" cssClass="inputControl">First name</form:label>
+								</td>
+								<td>
+									<form:input path="firstName" cssClass="inputError" />
+								</td>
+								<td>
+									<form:errors path="firstName" cssClass="inputError"/>  
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<form:label path="lastName" cssClass="inputTitle">Last name</form:label>
+								</td>
+								<td>
+									<form:input path="lastName" cssClass="inputControl" />
+								</td>
+								<td>
+									<form:errors path="lastName" cssClass="inputError"/>  
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<form:label path="dob" cssClass="dateTitle">Date of birth</form:label>
+								</td>
+								<td>
+									<form:input path="dob" cssClass="dateControl" />
+								</td>
+								<td>
+									<form:errors path="dob" cssClass="dateError"/>  
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<form:label path="mobile" cssClass="inputTitle">Mobile</form:label>
+								</td>
+								<td>
+									<form:input path="mobile" cssClass="inputControl" />
+								</td>
+								<td>
+									<form:errors path="mobile" cssClass="inputError"/>  
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<form:label path="licenseNo" cssClass="inputTitle">License no</form:label>
+								</td>
+								<td>
+									<form:input path="licenseNo" cssClass="inputControl" />
+								</td>
+								<td>
+									<form:errors path="licenseNo" cssClass="inputError"/>  
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<form:label path="licenseValidity" cssClass="dateTitle">License validity</form:label>
+								</td>
+								<td>
+									<form:input path="licenseValidity" cssClass="dateControl" />
+								</td>
+								<td>
+									<form:errors path="licenseValidity" cssClass="dateError"/>  
+								</td>
+							</tr>
+							<tr>
+								<td colspan="2">
+									<button id="update">Update</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</form:form>
 			</div>
 		</div>
 	</body>
+	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-1.6.1.min.js"></script>
+	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-ui-1.7.3.custom.min.js"></script>
+	<script type="text/javascript">
+		$(document).ready(function() { 
+			$('.dateControl').datepicker({
+				changeMonth: true, 
+				changeYear: true, 
+				dateFormat: 'yy-mm-dd'
+			}); 
+			
+			$('#update').click(function() { 
+				$.ajax({ 
+					url: '/VRS/home/public/accountRequest', 
+					data: $('#user').serialize(), 
+					dataType: 'json', 
+					type: 'POST', 
+					success: function(data) {
+						alert("request sent!");  
+					}, 
+					error: function(data) {
+						alert("request failed!"); 
+					}
+				}); 
+				
+				return false; 
+			}); 
+		}); 
+	</script>
+	<link rel="stylesheet" href="/VRS/resources/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css"/> 
 </html>
