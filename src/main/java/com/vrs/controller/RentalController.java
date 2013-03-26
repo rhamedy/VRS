@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.vrs.model.Branch;
+import com.vrs.model.User;
 import com.vrs.model.Vehicle;
 import com.vrs.services.RentalServices;
 import com.vrs.services.UserServices;
@@ -34,6 +35,10 @@ public class RentalController {
 		ModelAndView mav = new ModelAndView(); 
 		
 		mav.setViewName("index");
+		
+		List<User> users = userServices.listUsers(); 
+		
+		mav.addObject("users", users); 
 		
 		return mav; 
 	}

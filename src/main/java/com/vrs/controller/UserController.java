@@ -110,7 +110,6 @@ public class UserController {
 			userServices.updateUser(user); 
 			
 			response.setStatus(200);
-
 		}
 
 	}
