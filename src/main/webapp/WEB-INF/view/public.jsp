@@ -6,7 +6,7 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title> Oscar Vehicle Rental System </title> 
-		<link rel="stylesheet" href="/VRS/resources/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css"/>
+		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/ui-lightness/jquery-ui.css" type="text/css" />
 		<style>
 			#main { 
 				padding: 5px 5px 5px 5px; 
@@ -152,8 +152,8 @@
 			</div>
 		</div>
 	</body>
-	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-1.6.1.min.js"></script>
-	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-ui-1.7.3.custom.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function(){
 			$("select#countryList").change(function() {

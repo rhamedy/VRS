@@ -6,8 +6,10 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title> Oscar Vehicle Rental System </title> 
-		<link rel="stylesheet" href="/VRS/resources/css/ui-lightness/jquery-ui-1.7.3.custom.css" type="text/css"/> 
+		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/ui-lightness/jquery-ui.css" type="text/css" />
 	</head>
+	<style>
+	</style> 
 	<body>
 		<div id="main">
 			<table border="1" id="userList">
@@ -19,22 +21,40 @@
 						<th>Mobile</th>
 						<th>License no</th>
 						<th>License validity</th>
+						<th>Action</th>
 					</tr>
 				</thead>
 				<tbody id="userListBody">
 					<c:forEach items="${users}" var="user">
 						<tr>
-							<td></td>
+							<td>${user.firstName}</td>
+							<td>${user.lastName}</td>
+							<td>${user.dob}</td>
+							<td>${user.mobile}</td>
+							<td>${user.licenseNo}</td>
+							<td>${user.licenseValidity}</td>
+							<td><a href="/VRS/user/editUser?username=${user.username}">Edit|</a>
+								<a id="deleteUser" href="/VRS/user/deleteUser?username=${user.username}">Delete|</a>
+								<a id="resetPassword" href="/VRS/user/resetPassword?username=${user.username}">Reset password</a>
+							</td>
 						</tr>
 					</c:forEach>
 				</tobdy>
 			</table>
 		</div>
+		<div id="deleteModalDialog" title="Delete user">
+			<p> The selected user will be deleted permanently. Do you want to proceed? </p>
+		</div>
+		<div id="resetModalDialog" title="Reset password">
+			<p> Do you wish to proceed with reseting this user's password? </p>
+		</div>
 	</body>
-	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-1.6.1.min.js"></script>
-	<script language="JavaScript" type="text/javascript" src="/VRS/resources/js/jquery-ui-1.7.3.custom.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() { 
+			var username; 
+			
 			$('.dateControl').datepicker({
 				changeMonth: true, 
 				changeYear: true, 
@@ -57,6 +77,52 @@
 				
 				return false; 
 			}); 
+			
+			$('#deleteModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: { 
+					Yes: function() {
+						window.location.href= $(this).data('link').href; 
+						$(this).dialog("close"); 
+					}, 
+					No: function() { 
+						$(this).dialog("close"); 
+					}
+				}
+			});
+			
+			$('#resetModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: { 
+					Yes: function() {
+						window.location.href= $(this).data('link').href; 
+						$(this).dialog("close"); 
+					}, 
+					No: function() { 
+						$(this).dialog("close"); 
+					}
+				}
+			});
+			
+			$('#deleteUser').click(function() {
+				$('#deleteModalDialog')
+				.data('link',this)
+				.dialog('open');
+				return false; 
+			});  
+			
+			$('#resetPassword').click(function() {
+				$('#resetModalDialog')
+				.data('link',this)
+				.dialog('open');
+				return false; 
+			});  
 		}); 
 	</script>
 </html>
