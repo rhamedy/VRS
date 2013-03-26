@@ -2,6 +2,7 @@ package com.vrs.controller;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.vrs.model.Role;
@@ -27,6 +28,9 @@ import com.vrs.model.User;
 import com.vrs.services.RentalServices;
 import com.vrs.services.UserServices;
 import com.vrs.util.CustomSqlDateEditor;
+import com.vrs.util.JSONResponse;
+import com.vrs.util.JSONUtil;
+import com.vrs.util.KeyValuePair;
 
 @Controller
 public class UserController {
@@ -95,21 +99,24 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/user/editUser", method = RequestMethod.POST)
-	public void editUser(@Valid User user, BindingResult binding,
+	public @ResponseBody JSONResponse editUser(@Valid User user, BindingResult binding,
 			@RequestParam String username, HttpServletResponse response) {
 
 		if (binding.hasErrors()) {
+			List<KeyValuePair<String, String>> errors = new ArrayList<KeyValuePair<String, String>>(); 
+			KeyValuePair<String, String> kvp; 
 			for (FieldError fe : binding.getFieldErrors()) {
 				logger.info("binding error : {}", fe.getDefaultMessage());
-				response.addHeader("error_" + fe.getField(),
-						fe.getDefaultMessage());
+				kvp = new KeyValuePair<String, String>(fe.getField(), fe.getDefaultMessage()); 
+				errors.add(kvp); 
 			}
-			response.setStatus(302);
+			
+			return JSONUtil.createFailureResponse("Updating user fields failed.", errors); 
 		} else {
 			user.setUsername(username); 
 			userServices.updateUser(user); 
 			
-			response.setStatus(200);
+			return JSONUtil.createSuccessResponse("Changed user fields are updated successfully!"); 
 		}
 
 	}
@@ -125,11 +132,9 @@ public class UserController {
 				response.addHeader("error_" + fe.getField(),
 						fe.getDefaultMessage());
 			}
-			response.setStatus(302);
 		} else {
 
 			userServices.createUser(user);
-			response.setStatus(200);
 		}
 	}
 }
