@@ -127,6 +127,11 @@
 					</table> 
 				</form:form> 
 			</div> 
+			<div id="updateStatus">
+				<p id="updateStatusTitle"></p>
+				<table id="errorsTable" border="1">
+				</table> 
+			</div>
 		</div>
 	</body>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -146,10 +151,38 @@
 					dataType: 'json', 
 					type: 'POST', 
 					success: function(data) {
-						alert("success!");  
+						$('table#errorsTable').empty();
+						$('table#errorsTable').show();	
+						$.each(data, function(key, value) { 
+							if(key == "status" && value == "success") { 
+								$('p#updateStatusTitle').css('color','green');	
+							} else if(key == "status" && value == "failure") { 
+								$('p#updateStatusTitle').css('color','red');	
+							} else if(key == "message") { 
+								$('p#updateStatusTitle').html(value); 
+							} else if(key == "errors") { 
+								if(value.length > 0) {	
+									$('table#errorsTable').append("<thead><th>Error</th><th>Field</th></thead>"); 
+									$('table#errorsTable').append("<tbody id='errorsTableBody'></tbody>"); 
+									$.each(value, function(k,v) {
+										var key; 
+										var value; 
+										$.each(v, function(kk,vv) {
+											if(kk == "key") { 
+												key = vv; 
+											} else if(kk == "value"){
+												value = vv;  
+											}
+										});
+										$("tbody[id='errorsTableBody']").append("<tr><td>"+key+"</td><td>"+value+"</td></tr>"); 
+									}); 
+								}
+							}
+						});
 					}, 
 					error: function(data) {
-						alert("failed!"); 
+						 $('p#updateStatusTitle').val() = "Connection error[System Unreachable]."; 
+						 $('p#updateStatusTitle').css('color','green');
 					}
 				}); 
 				
