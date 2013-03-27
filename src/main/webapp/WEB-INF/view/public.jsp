@@ -60,6 +60,7 @@
 			<div id="account">
 				<h4> Fill out an account request form </h4>
 				<form:form action="/VRS/home/public/accountRequest" method="POST" commandName="user">
+					<input type="hidden" id="usernameAvailable" value="false" />
 					<table border="1">
 						<thead>
 						</thead> 
@@ -149,6 +150,14 @@
 						</tbody>
 					</table>
 				</form:form>
+			</div>
+			<div id="updateStatus">
+				<p id="updateStatusTitle"></p>
+				<table id="errorsTable" border="1">
+				</table> 
+			</div>
+			<div id="usernameModalDialog">
+				<p> The username is already in use, choose a different one. </p>
 			</div>
 		</div>
 	</body>
@@ -248,21 +257,85 @@
 				dateFormat: 'yy-mm-dd'
 			}); 
 			
-			$('#update').click(function() { 
+			$('button#update').click(function() {
+				if($('#usernameAvailable').attr('value') == 'true') { 
+					$('#usernameModalDialog').dialog('open');
+				} else if($('#usernameAvailable').attr('value') == 'false'){ 
+					$.ajax({ 
+						url: '/VRS/home/public/accountRequest', 
+						data: $('#user').serialize(), 
+						dataType: 'json', 
+						type: 'POST', 
+						success: function(data) {
+							$('table#errorsTable').empty();
+							$.each(data, function(key, value) { 
+								if(key == "status" && value == "success") { 
+									$('p#updateStatusTitle').css('color','green');
+								} else if(key == "status" && value == "failure") { 
+									$('p#updateStatusTitle').css('color','red');	
+								} else if(key == "message") { 
+									$('p#updateStatusTitle').html(value); 
+								} else if(key == "errors") { 
+									if(value.length > 0) {	
+										$('table#errorsTable').append("<thead><th>Error</th><th>Field</th></thead>"); 
+										$('table#errorsTable').append("<tbody id='errorsTableBody'></tbody>"); 
+										$.each(value, function(k,v) {
+											var key; 
+											var value; 
+											$.each(v, function(kk,vv) {
+												if(kk == "key") { 
+													key = vv; 
+												} else if(kk == "value"){
+													value = vv;  
+												}
+											});
+											$("tbody[id='errorsTableBody']").append("<tr><td>"+key+"</td><td>"+value+"</td></tr>"); 
+										}); 
+									}
+								}
+							});
+						},  
+						error: function(req, status, error) {
+							$('p#updateStatusTitle').text("Server Error. Failed sending account request. Try later."); 
+							$('p#updateStatusTitle').css('color','red');
+						}
+					});
+				}
+				return false;
+			}); 
+			
+			$('input#username').change(function() { 
 				$.ajax({ 
-					url: '/VRS/home/public/accountRequest', 
-					data: $('#user').serialize(), 
+					url: "/VRS/home/public/usernameAvailable", 
+					data: "username=" + $('input#username').val(), 
 					dataType: 'json', 
-					type: 'POST', 
+					method: 'GET', 
 					success: function(data) {
-						alert("request sent!");  
+						if(data['status'] == 'success') { 
+							$('input#usernameAvailable').attr('value','false');
+						} else if(data['status'] == 'failure') { 
+							$('input#usernameAvailable').attr('value','true');
+						} 
 					}, 
-					error: function(data) {
-						alert("request failed!"); 
+					error: function(req, status, error) {
+						$('input#usernameAvailable').attr('value','false'); 
 					}
 				}); 
-				
-				return false; 
+			}); 
+			
+			$('#usernameModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: { 
+					Yes: function() {
+						$(this).dialog("close"); 
+					}, 
+					No: function() { 
+						$(this).dialog("close"); 
+					}
+				}
 			}); 
 		}); 
 	</script>

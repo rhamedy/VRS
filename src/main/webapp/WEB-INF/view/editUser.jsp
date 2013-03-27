@@ -152,7 +152,6 @@
 					type: 'POST', 
 					success: function(data) {
 						$('table#errorsTable').empty();
-						$('table#errorsTable').show();	
 						$.each(data, function(key, value) { 
 							if(key == "status" && value == "success") { 
 								$('p#updateStatusTitle').css('color','green');	
@@ -181,11 +180,10 @@
 						});
 					}, 
 					error: function(data) {
-						 $('p#updateStatusTitle').val() = "Connection error[System Unreachable]."; 
-						 $('p#updateStatusTitle').css('color','green');
+						 $('p#updateStatusTitle').text("Connection error[System Unreachable]."); 
+						 $('p#updateStatusTitle').css('color','red');
 					}
 				}); 
-				
 				return false; 
 			}); 
 		}); 
