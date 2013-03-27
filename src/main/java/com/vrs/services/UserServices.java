@@ -109,4 +109,10 @@ public class UserServices {
 		
 		userDao.updateUser(user); 
 	}
+	
+	public boolean isUsernameExists(String username) { 
+		logger.info("entry isUsernameExists()"); 
+		
+		return userDao.isUsernameExists(username); 
+	}
 }

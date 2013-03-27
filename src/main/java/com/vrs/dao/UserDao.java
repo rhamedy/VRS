@@ -221,4 +221,14 @@ public class UserDao {
 		
 		jdbcTemplate.update(SQL, new Object[]{ user.getPassword(), user.getUsername()}); 
 	}
+	
+	public boolean isUsernameExists(String username) { 
+		logger.info("entry isUsernameExists()"); 
+		
+		String SQL = "SELECT COUNT(*) FROM auth.user WHERE username = ?"; 
+		
+		int result = jdbcTemplate.queryForInt(SQL, new Object[]{ username }); 
+		
+		return (result > 0) ? true : false; 
+	}
 }
