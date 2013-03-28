@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
@@ -37,8 +38,20 @@ public class RentalController {
 		mav.setViewName("index");
 		
 		List<User> users = userServices.listUsers(); 
+		List<Vehicle> vehicles = rentalServices.getVehicles(2); 
+		List<Branch> branches = rentalServices.getBranches(5); 
+		
+		/*
+		 * rentalServices.getVehicles(branchId) we should be able to 
+		 * record the current users branch and then retrieve that from
+		 * some where. @ the moment we will hardcode a branch id. 
+		 * 
+		 * same goes for rentalServices.getBranches(5)
+		 */
 		
 		mav.addObject("users", users); 
+		mav.addObject("vehicles", vehicles); 
+		mav.addObject("branches", branches); 
 		
 		return mav; 
 	}
@@ -69,5 +82,13 @@ public class RentalController {
 		int parseBranchId = Integer.parseInt(branchId); 
 		
 		return rentalServices.getVehicles(parseBranchId); 
+	}
+	
+	@RequestMapping(value = "/vehicle/editVehicle", method = RequestMethod.GET) 
+	public ModelAndView getVehicle(@RequestParam String vin) { 
+		ModelAndView mav = new ModelAndView(); 
+		mav.setViewName("editVehicle"); 
+		
+		return mav;
 	}
 }
