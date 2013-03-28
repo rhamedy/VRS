@@ -122,7 +122,7 @@ public class RentalDaoTestCase {
 		logger.info("entry testAddVehicle1()");
 
 		Vehicle mockVehicle = TestUtil.createMockVehicle("a1b2c3d4e5_test",
-				"AA 23 V6", "Four", "Petrol", true, 16, 1, 220);
+				"AA 23 V6", 4, "Petrol", true, 16, 1, 220);
 		// 16 is model for corolla from model table, 1 is branch for bradford
 		// from branch table
 		// true means car is available for hire, 220 is max speed
@@ -150,7 +150,7 @@ public class RentalDaoTestCase {
 		logger.info("entry testUpdateVehicle1()");
 
 		Vehicle mockVehicle = TestUtil.createMockVehicle("a1b2c3d4e5_test",
-				"AA 23 V6", "Four", "Petrol", true, 16, 1, 220);
+				"AA 23 V6", 4, "Petrol", true, 16, 1, 220);
 
 		rentalDao.addVehicle(mockVehicle); // above vehicle added in db
 
@@ -162,14 +162,14 @@ public class RentalDaoTestCase {
 		// lets update a few field of the above vehicle in db
 
 		Vehicle updateVehicle = TestUtil.createMockVehicle("a1b2c3d4e5_test",
-				"BB 32 ZX", "Two", "Petrol", true, 16, 1, 220);
+				"BB 32 ZX", 2, "Petrol", true, 16, 1, 220);
 		// same vin number however, different plateNumber and seating type
 
 		rentalDao.updateVehicle(updateVehicle);
 
 		assertEquals("BB 32 ZX", rentalDao.findVehicle(updateVehicle.getVin())
 				.getNumberPlate());
-		assertEquals("Two", rentalDao.findVehicle(updateVehicle.getVin())
+		assertEquals(2, rentalDao.findVehicle(updateVehicle.getVin())
 				.getSeating());
 
 		// above assertEquals verifies that numberPlate and seating fields are
@@ -183,7 +183,7 @@ public class RentalDaoTestCase {
 		logger.info("entry testUpdateVehicleStatus1()");
 
 		Vehicle mockVehicle = TestUtil.createMockVehicle("a1b2c3d4e5_test",
-				"AA 23 V6", "Four", "Petrol", true, 16, 1, 220);
+				"AA 23 V6", 4, "Petrol", true, 16, 1, 220);
 
 		rentalDao.addVehicle(mockVehicle);
 
@@ -224,7 +224,7 @@ public class RentalDaoTestCase {
 		// we have not yet added vehicles to branch so above assertions = false
 
 		Vehicle mockVehicle = TestUtil
-				.createMockVehicle("a1b2c3d4e5_test", "AA 23 V6", "Four",
+				.createMockVehicle("a1b2c3d4e5_test", "AA 23 V6", 4,
 						"Petrol", true, 16, mockBranch.getId(), 220);
 
 		rentalDao.addVehicle(mockVehicle);
@@ -255,11 +255,11 @@ public class RentalDaoTestCase {
 		assertEquals(0, rentalDao.getBranchVehicles(mockBranch.getId()).size());
 
 		Vehicle mockVehicle1 = TestUtil
-				.createMockVehicle("a1b2c3d4e5_test1", "AA 23 V6", "Four",
+				.createMockVehicle("a1b2c3d4e5_test1", "AA 23 V6", 4,
 						"Petrol", true, 16, mockBranch.getId(), 220);
 
 		Vehicle mockVehicle2 = TestUtil
-				.createMockVehicle("a1b2c3d4e5_test2", "AA 23 V6", "Four",
+				.createMockVehicle("a1b2c3d4e5_test2", "AA 23 V6", 4,
 						"Petrol", true, 16, mockBranch.getId(), 220);
 
 		rentalDao.addVehicle(mockVehicle1);
@@ -268,7 +268,7 @@ public class RentalDaoTestCase {
 		assertEquals(2, rentalDao.getBranchVehicles(mockBranch.getId()).size());
 
 		Vehicle mockVehicle3 = TestUtil
-				.createMockVehicle("a1b2c3d4e5_test3", "AA 23 V6", "Four",
+				.createMockVehicle("a1b2c3d4e5_test3", "AA 23 V6",4,
 						"Petrol", true, 16, mockBranch.getId(), 220);
 
 		rentalDao.addVehicle(mockVehicle3);
@@ -298,11 +298,11 @@ public class RentalDaoTestCase {
 		rentalDao.addBrunch(mockBranch);
 
 		Vehicle mockVehicle1 = TestUtil
-				.createMockVehicle("a1b2c3d4e5_test1", "AA 23 V6", "Four",
+				.createMockVehicle("a1b2c3d4e5_test1", "AA 23 V6", 4,
 						"Petrol", true, 16, mockBranch.getId(), 220);
 
 		Vehicle mockVehicle2 = TestUtil
-				.createMockVehicle("a1b2c3d4e5_test2", "AA 23 V6", "Four",
+				.createMockVehicle("a1b2c3d4e5_test2", "AA 23 V6", 4,
 						"Petrol", true, 16, mockBranch.getId(), 220);
 
 		rentalDao.addVehicle(mockVehicle1);
@@ -326,7 +326,7 @@ public class RentalDaoTestCase {
 		logger.info("entry testGetMakeAndModelName1()");
 
 		Vehicle mockVehicle = TestUtil.createMockVehicle("a1b2c3d4e5_test",
-				"AA 23 V6", "Four", "Petrol", true, 16, 1, 220);
+				"AA 23 V6", 4, "Petrol", true, 16, 1, 220);
 
 		// 16 is model for corolla from model table
 		// corolla is of make Toyota with id 9

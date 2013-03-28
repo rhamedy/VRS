@@ -48,7 +48,7 @@ public class TestUtil {
 	}
 
 	public static Vehicle createMockVehicle(String vin, String numberPlate,
-			String seating, String fuel, boolean available, int modelId,
+			int seating, String fuel, boolean available, int modelId,
 			int branchId, int maxSpeed) {
 
 		Vehicle vehicle = new Vehicle(); 

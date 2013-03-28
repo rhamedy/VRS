@@ -14,7 +14,7 @@ public class Vehicle {
 	private String vin; 
 	private String numberPlate; 
 	private int maxSpeed; 
-	private String seating; 
+	private int seating; 
 	private String fuel; 
 	private int modelId; 
 	private boolean available; 
@@ -52,10 +52,10 @@ public class Vehicle {
 	public void setMaxSpeed(int maxSpeed) {
 		this.maxSpeed = maxSpeed;
 	}
-	public String getSeating() {
+	public int getSeating() {
 		return seating;
 	}
-	public void setSeating(String seating) {
+	public void setSeating(int seating) {
 		this.seating = seating;
 	}
 	public String getFuel() {
