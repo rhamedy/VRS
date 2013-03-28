@@ -1,6 +1,7 @@
 package com.vrs.services;
 
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,5 +115,33 @@ public class UserServices {
 		logger.info("entry isUsernameExists()"); 
 		
 		return userDao.isUsernameExists(username); 
+	}
+	
+	public void updateUserRoles(User user, List<Role> newRoles) { 
+		logger.info("entry updateUserRoles()"); 
+		
+		List<Role> oldRoles = userDao.getUserRoles(user); 
+		
+		Map<String, List<Role>> mapRoles = Comparator.filterIntersections(oldRoles, newRoles); 
+		
+		List<Role> rolesToDelete = mapRoles.get("toDelete"); 
+		List<Role> rolesToInsert = mapRoles.get("toInsert"); 
+		
+		logger.info("roles to delete : "); 
+		for(Role r: rolesToDelete) { 
+			logger.info("role to delete : " + r.getRoleName());
+		}
+		
+		logger.info("roles to insert : "); 
+		for(Role r: rolesToInsert) { 
+			logger.info("role to insert : " + r.getRoleName());
+		}
+		
+		for(Role r: rolesToDelete) { 
+			userDao.deleteUserRole(user, r); 
+		}
+		for(Role r: rolesToInsert) { 
+			userDao.insertUserRole(user, r); 
+		}	
 	}
 }

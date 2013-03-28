@@ -24,7 +24,7 @@ public class User {
 	private Date licenseValidity; 
 	private String address; 
 	private boolean disabled;
-	private Role role; 
+	//private Role role; 
 	
 	public String getMobileNo() {
 		return mobileNo;
@@ -98,10 +98,10 @@ public class User {
 	public void setDisabled(boolean disabled) {
 		this.disabled = disabled;
 	} 
-	public Role getRole() {
-		return role;
-	}
-	public void setRole(Role role) {
-		this.role = role;
-	}
+//	public Role getRole() {
+//		return role;
+//	}
+//	public void setRole(Role role) {
+//		this.role = role;
+//	}
 }

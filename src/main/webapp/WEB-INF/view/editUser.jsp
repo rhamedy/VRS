@@ -109,13 +109,15 @@
 							</tr>
 							<tr>
 								<td>
-									<form:label path="role.roleName" cssClass="inputTitle">Role</form:label>
+									<label name="roleName" class="inputTitle">Roles<label>
 								</td>
 								<td>
-									<form:input path="role.roleName" cssClass="inputControl" />
-								</td>
-								<td>
-									<form:errors path="role.roleName" cssClass="inputError"/>  
+									<c:forEach items="${userRoles}" var="uRole">
+										<input type="checkbox" name="role" value="${uRole.roleId}" checked>${uRole.roleName}</checkbox><br />
+									</c:forEach>
+									<c:forEach items="${nonUserRoles}" var="nRole">
+										<input type="checkbox" name="role" value="${nRole.roleId}">${nRole.roleName}</checkbox><br />
+									</c:forEach>
 								</td>
 							</tr>
 							<tr>

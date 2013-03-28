@@ -2,9 +2,11 @@ package com.vrs.controller;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
@@ -82,6 +84,15 @@ public class UserController {
 		List<Role> nonUserRoles = userServices
 				.nonUserRoles(allRoles, userRoles);
 
+		logger.info("user roles are as follow : ");
+		for (Role r : userRoles) {
+			logger.info("rolename : " + r.getRoleName());
+		}
+		logger.info("roles user is not assigned to are as follow :");
+		for (Role r : nonUserRoles) {
+			logger.info("non-user rolename: " + r.getRoleName());
+		}
+
 		mav.addObject("user", user);
 		mav.addObject("username", user.getUsername());
 		mav.addObject("userRoles", userRoles);
@@ -93,16 +104,30 @@ public class UserController {
 	@RequestMapping(value = "/user/editUser", method = RequestMethod.POST)
 	public @ResponseBody
 	JSONResponse editUser(@Valid User user, BindingResult binding,
-			@RequestParam String username, HttpServletResponse response) {
+			@RequestParam String username, HttpServletResponse response,
+			HttpServletRequest request) {
 
 		if (binding.hasErrors()) {
 			return JSONUtil.createFailureResponse(
 					"Updating user fields failed.",
 					ErrorUtil.listErrors(binding));
+		} else if (request.getParameter("role") == null) {
+			return JSONUtil.createFailureResponse("Select atleast one role for this user."); 
 		} else {
 			user.setUsername(username);
 			userServices.updateUser(user);
-
+			
+			List<Role> newRoles = new ArrayList<Role>(); 
+			String[] rolesId = request.getParameterValues("role"); 
+			
+			for(String r: rolesId) { 
+				int roleId = Integer.parseInt(r); 
+				newRoles.add(userServices.findRole(roleId)); 
+				logger.info("new selected role : " + userServices.findRole(roleId).getRoleName());
+			}
+			
+			userServices.updateUserRoles(user, newRoles); 
+			
 			return JSONUtil
 					.createSuccessResponse("Changed user fields are updated successfully!");
 		}
@@ -119,24 +144,25 @@ public class UserController {
 			return JSONUtil.createFailureResponse(
 					"Please provide valid data to the corresponding fields.",
 					ErrorUtil.listErrors(binding));
-		} else if(user.getUsername() == null) { 
-			return JSONUtil.createFailureResponse(
-					"Please provide a valid email address as username.");
-		}
-		else {
+		} else if (user.getUsername() == null) {
+			return JSONUtil
+					.createFailureResponse("Please provide a valid email address as username.");
+		} else {
 			userServices.createUser(user);
 			return JSONUtil
-					.createSuccessResponse("Your account request is stored. You will " +
-							"receive a confirmation email soon.");
+					.createSuccessResponse("Your account request is stored. You will "
+							+ "receive a confirmation email soon.");
 		}
 	}
-	
+
 	@RequestMapping(value = "/home/public/usernameAvailable", method = RequestMethod.GET)
-	public @ResponseBody JSONResponse isUsernameAvailable(@RequestParam String username) { 
-		if(userServices.isUsernameExists(username)) { 
-			return JSONUtil.createFailureResponse("The choosen username is already in use."); 
-		} else { 
-			return JSONUtil.createSuccessResponse(); 
+	public @ResponseBody
+	JSONResponse isUsernameAvailable(@RequestParam String username) {
+		if (userServices.isUsernameExists(username)) {
+			return JSONUtil
+					.createFailureResponse("The choosen username is already in use.");
+		} else {
+			return JSONUtil.createSuccessResponse();
 		}
 	}
 }

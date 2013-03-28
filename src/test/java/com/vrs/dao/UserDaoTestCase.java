@@ -139,7 +139,7 @@ public class UserDaoTestCase {
 	}
 
 	@Test
-	public void testUpdateUserRoleRelation1() {
+	public void testInsertUserRole1() {
 		logger.info("entry testUpdateUserRoleRelation()");
 
 		User user1 = TestUtil.createTestUser();
@@ -155,8 +155,8 @@ public class UserDaoTestCase {
 		Role role2 = TestUtil.createTestRole(888, "admin_test2"); 
 		
 		userDao.createRole(role2); // save the role2 into db
-		userDao.updateUserRole(user1, role2); // update the user1's role from
-												// 999 to 888
+		userDao.deleteUserRole(user1, role1); //delete the role1 
+		userDao.insertUserRole(user1, role2); // insert new role
 
 		assertEquals(888, userDao.retrieveUserRole(user1.getUsername())
 				.getRoleId()); // verify update success

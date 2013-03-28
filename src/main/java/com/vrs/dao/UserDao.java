@@ -80,10 +80,10 @@ public class UserDao {
 		jdbcTemplate.update(SQL, new Object[]{ role.getRoleName(), role.getRoleId()}); 
 	}
 	
-	public void updateUserRole(User user, Role role) { 
-		logger.info("entry updateUserRoleRelationship()"); 
+	public void insertUserRole(User user, Role role) { 
+		logger.info("entry insertUserRole()"); 
 		
-		String SQL = "UPDATE auth.user_role SET role_id = ? WHERE username = ?";
+		String SQL = "INSERT INTO auth.user_role(role_id, username) VALUES (?,?)";
 		
 		jdbcTemplate.update(SQL, new Object[]{ role.getRoleId(), user.getUsername() }); 
 	}
