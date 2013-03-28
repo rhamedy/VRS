@@ -292,4 +292,28 @@ public class RentalDao {
 
 		return makeModel;
 	}
+	
+	public List<String> listMakes() { 
+		logger.info("entry listMakes()"); 
+		
+		String SQL = "SELECT name FROM rental.make"; 
+		
+		return jdbcTemplate.queryForList(SQL, String.class); 
+	}
+	
+	public List<String> listMakeModels(int makeId) { 
+		logger.info("entry listMakeModels()"); 
+		
+		String SQL = "SELECT name FROM rental.model WHERE make_id = ?"; 
+		
+		return jdbcTemplate.queryForList(SQL, new Object[] { makeId }, String.class); 
+	}
+	
+	public int getMakeId(String makeName) { 
+		logger.info("entry getMakeId()"); 
+		
+		String SQL = "SELECT id FROM rental.make WHERE name = ?"; 
+		
+		return jdbcTemplate.queryForInt(SQL, new Object[]{ makeName }); 
+	}
 }

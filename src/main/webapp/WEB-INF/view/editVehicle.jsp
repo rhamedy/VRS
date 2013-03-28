@@ -41,13 +41,13 @@
 							</tr>
 							<tr>
 								<td>
-									<form:label path="max_speed" cssClass="dateTitle">Max Speed</form:label>
+									<form:label path="maxSpeed" cssClass="dateTitle">Max Speed</form:label>
 								</td>
 								<td>
-									<form:input path="max_speed" cssClass="dateControl"/>
+									<form:input path="maxSpeed" cssClass="dateControl"/>
 								</td>
 								<td>
-									<form:errors path="max_speed" cssClass="dateError"/>  
+									<form:errors path="maxSpeed" cssClass="dateError"/>  
 								</td>
 							</tr>
 							<tr>
@@ -89,7 +89,18 @@
 									<label name="make" class="inputTitle">Make</label>
 								</td>
 								<td>
-									<input name="make" class="inputControl"/>
+									<select name="make" id="makeSelect">
+										<c:forEach items="${makes}" var="make">
+											<c:choose>
+												<c:when test="${make == vehicle.make}">
+													<option value="${make}" selected>${make}</option>
+												</c:when>
+												<c:otherwise>
+													<option value="${make}">${make}</option>
+												</c:otherwise>
+											</c:choose>
+										</c:forEach>
+									</select>
 								</td>
 								
 							</tr>
@@ -98,24 +109,38 @@
 									<label name="model" class="inputTitle">Model</label>
 								</td>
 								<td>
-									<input name="model" class="inputControl"/>
+									<select name="model" id="modelSelect">
+										<c:forEach items="${models}" var="model">
+											<c:choose>
+												<c:when test="${model == vehicle.model}">
+													<option value="${model}" selected>${model}</option>
+												</c:when>
+												<c:otherwise>
+													<option value="${model}">${model}</option>
+												</c:otherwise>
+											</c:choose>
+										</c:forEach>
+									</select>
 								</td>
 								
-							</tr>
-							<tr>
-								<td>
-									<label name="city" class="inputTitle">City</label>
-								</td>
-								<td>
-									<input name="city" class="inputControl"/>
-								</td>
 							</tr>
 							<tr>
 								<td>
 									<label name="branch" class="inputTitle">Branch</label>
 								</td>
 								<td>
-									<input name="branch" class="inputControl"/>
+									<select name="branch" id="branchSelect">
+										<c:forEach items="${branches}" var="branch">
+											<c:choose>
+												<c:when test="${branch.id == vehicle.branchId}">
+													<option value="${branch.id}" selected>${branch.name}</option>
+												</c:when>
+												<c:otherwise>
+													<option value="${branch.id}">${branch.name}</option>
+												</c:otherwise>
+											</c:choose>
+										</c:forEach>
+									</select>
 								</td>
 							</tr>
 							<tr>

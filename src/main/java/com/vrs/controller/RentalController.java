@@ -89,6 +89,26 @@ public class RentalController {
 		ModelAndView mav = new ModelAndView(); 
 		mav.setViewName("editVehicle"); 
 		
+		Vehicle vehicle = rentalServices.findVehicle(vin);
+		vehicle = rentalServices.setMakeAndModel(vehicle); 
+		
+		int makeId = rentalServices.getMakeId(vehicle.getMake());
+		
+		
+		List<Branch> branches = rentalServices.getBranches(5); 
+		List<String> makes = rentalServices.listMakes();  
+		List<String> models = rentalServices.listMakeModels(makeId); 
+		
+		/*
+		 * city id is hard coded, we will have to obtain that from the logged in 
+		 * user somehow. 
+		 */
+		
+		mav.addObject("vehicle", vehicle); 
+		mav.addObject("branches", branches); 
+		mav.addObject("makes", makes); 
+		mav.addObject("models", models); 
+		
 		return mav;
 	}
 }
