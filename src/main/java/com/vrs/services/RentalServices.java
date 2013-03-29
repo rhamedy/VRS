@@ -96,4 +96,20 @@ public class RentalServices {
 		
 		return rentalDao.getMakeId(makeName);
 	}
+	
+	public void addVehicle(Vehicle vehicle) { 
+		logger.info("entry addVehicle()"); 
+		
+		rentalDao.addVehicle(vehicle); 
+	}
+	
+	public void updateVehicle(Vehicle vehicle) { 
+		logger.info("entry updateVehicle()"); 
+		
+		rentalDao.updateVehicle(vehicle); 
+	}
+	
+	public int getModelId(String modelName) { 
+		return rentalDao.getModelId(modelName);
+	}
 }

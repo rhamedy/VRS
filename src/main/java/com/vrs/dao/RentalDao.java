@@ -316,4 +316,12 @@ public class RentalDao {
 		
 		return jdbcTemplate.queryForInt(SQL, new Object[]{ makeName }); 
 	}
+	
+	public int getModelId(String modelName) { 
+		logger.info("entry getModelId()"); 
+		
+		String SQL = "SELECT id FROM rental.model WHERE name = ?";
+		
+		return jdbcTemplate.queryForInt(SQL, new Object[]{ modelName });
+	}
 }

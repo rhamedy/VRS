@@ -12,7 +12,7 @@
 	<body>
 		<div id="main">
 			<div id="editVehicle">
-				<form:form action="/VRS/rental/editVehicle" method="POST" commandName="vehicle">
+				<form:form action="/VRS/vehicle/editVehicle" method="POST" commandName="vehicle">
 					<table border="1">
 						<thead>
 						</thead> 
@@ -157,14 +157,96 @@
 				<table id="errorsTable" border="1">
 				</table> 
 			</div>
+			<div id="modelModalDialog">
+				<p> To update, you are required to choose a model! </p>
+			</div>
 		</div>
 	</body>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() { 
-			$('#update').click(function() { 
+			$('#modelModalDialog').dialog({ 
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: { 
+					Alright: function() {
+						$(this).dialog("close"); 
+					}
+				}
 			}); 
+			
+			$('#update').click(function() { 
+				if($('select#modelSelect').children(':selected').val().trim().length <= 0) { 
+					$('#modelModalDialog').dialog('open');
+				} else { 
+					$.ajax({ 
+						url: '/VRS/vehicle/editVehicle', 
+						data: $('#vehicle').serialize(), 
+						dataType: 'json', 
+						method: 'POST', 
+						success: function(data) {
+							$('table#errorsTable').empty(); 
+							$.each(data, function(key, value) { 
+								if(key == "status" && value == "success") { 
+									$('p#updateStatusTitle').css('color','green');
+								} else if(key == "status" && value == "failure") { 
+									$('p#updateStatusTitle').css('color','red');	
+								} else if(key == "message") { 
+									$('p#updateStatusTitle').html(value); 
+								} else if(key == "errors") { 
+									if(value.length > 0) {	
+										$('table#errorsTable').append("<thead><th>Error</th><th>Field</th></thead>"); 
+										$('table#errorsTable').append("<tbody id='errorsTableBody'></tbody>"); 
+										$.each(value, function(k,v) {
+											var key; 
+											var value; 
+											$.each(v, function(kk,vv) {
+												if(kk == "key") { 
+													key = vv; 
+												} else if(kk == "value"){
+													value = vv;  
+												}
+											});
+											$("tbody[id='errorsTableBody']").append("<tr><td>"+key+"</td><td>"+value+"</td></tr>"); 
+										}); 
+									}
+								}
+							}); 
+							 
+						}, 
+						error: function(r) { 
+						}
+					}); 
+				}
+				return false;
+			});
+			
+			$('select#makeSelect').change(function() { 
+				$('select#modelSelect').empty(); 
+				$.ajax({ 
+					url: "/VRS/vehicle/listModels",
+					data: "makeName=" + $(this).children(":selected").val(), 
+					dataType: 'json', 
+					method: 'GET', 
+					success: function(data) { 
+						var flag = false; 
+						$.each(data, function(key, value) { 
+							if(key == "models") {
+								$.each(value, function(k,v) { 
+									flag = true;  
+									$('select#modelSelect').append("<option value='"+v+"'>"+v+"</option>"); 
+								}); 
+							}
+						});
+						if(flag) { 
+							$('select#modelSelect').append("<option value='' selected></option>"); 
+						} 
+					}
+				}); 
+			});  
 		}); 
 	</script>
 </html>
