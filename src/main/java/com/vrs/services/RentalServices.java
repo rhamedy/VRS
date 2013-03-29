@@ -112,4 +112,20 @@ public class RentalServices {
 	public int getModelId(String modelName) { 
 		return rentalDao.getModelId(modelName);
 	}
+	
+	public Branch findBranch(int branchId) { 
+		return rentalDao.findBranch(branchId); 
+	}
+	
+	public int getMaxBranchId() { 
+		return rentalDao.getMaxBranchId(); 
+	}
+	
+	public void addBranch(Branch branch) { 
+		rentalDao.addBrunch(branch);
+	}
+	
+	public void updateBranch(Branch branch) { 
+		rentalDao.updateBranch(branch);
+	}
 }

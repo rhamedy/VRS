@@ -84,9 +84,48 @@
 					</tobdy>
 				</table>
 			</div>
+			<br />
+			<a href="/VRS/branch/editBranch">Add new branch</a>
+			<div id="branchDiv">
+				<table border="1" id="branchList">
+					<thead>
+						<tr>
+							<th>Branch name</th>
+							<th>City</th>
+							<th>Street name</th>
+							<th>Postcode</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody id="branchListBody">
+						<c:forEach items="${branches}" var="branch">
+							<tr>
+								<td>${branch.name}</td>
+								<td>
+									<c:forEach items="${cities}" var="city">
+										<c:forEach items="${city}" var="c">
+											<c:if test="${c.key == branch.cityId}">
+												${c.value}
+											</c:if>
+										</c:forEach>
+									</c:forEach>
+								</td>
+								<td>${branch.streetName}</td>
+								<td>${branch.postcode}</td>
+								<td><a href="/VRS/branch/editBranch?branchId=${branch.id}">Edit|</a>
+									<a id="deleteBranch" href="/VRS/branch/deleteBranch?branchId=${branch.id}">Delete</a>
+								</td>
+							</tr>
+						</c:forEach>
+					</tobdy>
+				</table>
+			</div>
 		</div>
 		<div id="deleteModalDialog" title="Delete user">
 			<p> The selected user will be deleted permanently. Do you want to proceed? </p>
+		</div>
+		<div id="deleteBranchModalDialog" title="Delete branch">
+			<p> The selected branch and all assets and its users will be deleted permanently. Do you want to proceed? </p>
 		</div>
 		<div id="deleteVehicleModalDialog" title="Delete vehicle">
 			<p> The selected vehicle will be deleted permanently. Do you want to proceed? </p>
@@ -106,23 +145,6 @@
 				dateFormat: 'yy-mm-dd'
 			}); 
 			
-			$('#update').click(function() { 
-				$.ajax({ 
-					url: '/VRS/user/editUser', 
-					data: $('#user').serialize(), 
-					dataType: 'json', 
-					type: 'POST', 
-					success: function(data) {
-						alert("success!");  
-					}, 
-					error: function(data) {
-						alert("failed!"); 
-					}
-				}); 
-				
-				return false; 
-			}); 
-			
 			$('#deleteModalDialog').dialog({
 				modal: true, 
 				autoOpen: false, 
@@ -140,6 +162,22 @@
 			});
 			
 			$('#resetModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: { 
+					Yes: function() {
+						window.location.href= $(this).data('link').href; 
+						$(this).dialog("close"); 
+					}, 
+					No: function() { 
+						$(this).dialog("close"); 
+					}
+				}
+			});
+			
+			$('#deleteBranchModalDialog').dialog({
 				modal: true, 
 				autoOpen: false, 
 				width: 'auto', 
@@ -191,6 +229,13 @@
 				.dialog('open');
 				return false; 
 			});  
+			
+			$('#deleteBranch').click(function() {
+				$('#deleteBranchModalDialog')
+				.data('link',this)
+				.dialog('open');
+				return false; 
+			}); 
 		}); 
 	</script>
 </html>

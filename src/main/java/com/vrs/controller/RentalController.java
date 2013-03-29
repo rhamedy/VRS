@@ -62,6 +62,11 @@ public class RentalController {
 		mav.addObject("users", users);
 		mav.addObject("vehicles", vehicles);
 		mav.addObject("branches", branches);
+		mav.addObject("cities", rentalServices.getCities(1)); 
+		
+		/*
+		 * hardcoded country=1 has to be taken from user profile.
+		 */
 
 		return mav;
 	}
@@ -173,5 +178,59 @@ public class RentalController {
 		modelsMap.put("models", models);
 		return modelsMap;
 	}
-
+	
+	@RequestMapping(value = "/branch/editBranch", method = RequestMethod.GET) 
+	public ModelAndView getBracnh(@RequestParam(required = false) String branchId) { 
+		logger.info("entry getBranch()"); 
+		
+		ModelAndView mav = new ModelAndView(); 
+		mav.setViewName("editBranch"); 
+		
+		Branch branch; 
+		
+		if(branchId != null && branchId.length() > 0) {
+			int branchIdParsed = Integer.parseInt(branchId); 
+			branch = rentalServices.findBranch(branchIdParsed); 
+			mav.addObject("existingBranch", "false"); 
+			
+		} else { 
+			int newBranchId = rentalServices.getMaxBranchId(); 
+			branch = new Branch();
+			branch.setId(++newBranchId); 
+			mav.addObject("existingBranch", "true"); 
+		}
+		
+		mav.addObject("cities", rentalServices.getCities(1)); 
+		mav.addObject("branch", branch); 
+		
+		/*
+		 * we have hardcoded country id (1 for UK) ... we have to 
+		 * somehow retrieve this from the logged in user and replace
+		 * it here.
+		 */
+		
+		return mav; 
+	}
+	
+	@RequestMapping(value = "/branch/editBranch", method = RequestMethod.POST)
+	public @ResponseBody JSONResponse editBranch(@Valid Branch branch, BindingResult result, 
+			HttpServletRequest request) { 
+		
+		if(result.hasErrors()) { 
+			return JSONUtil.createFailureResponse(
+					"Please provide valid data to the corresponding fields.",
+					ErrorUtil.listErrors(result));
+		} else { 
+			int cityId = Integer.parseInt(request.getParameter("city")); 
+			branch.setCityId(cityId); 
+			
+			if(rentalServices.findBranch(branch.getId()) == null) { 
+				rentalServices.addBranch(branch); 
+			} else { 
+				rentalServices.updateBranch(branch); 
+			}
+			return JSONUtil
+					.createSuccessResponse("The branch information is added/updated to the system.");
+		}
+	}
 }

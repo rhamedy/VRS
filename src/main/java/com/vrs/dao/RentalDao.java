@@ -85,11 +85,11 @@ public class RentalDao {
 	public void updateBranch(Branch branch) {
 		logger.info("entry updateBranch()");
 
-		String SQL = "UPDATE rental.branch SET name = ?, street_name = ?, postcode = ?"
+		String SQL = "UPDATE rental.branch SET name = ?, city_id = ?, street_name = ?, postcode = ?"
 				+ " WHERE id = ? ";
 		jdbcTemplate.update(
 				SQL,
-				new Object[] { branch.getName(), branch.getStreetName(),
+				new Object[] { branch.getName(), branch.getCityId(), branch.getStreetName(),
 						branch.getPostcode(), branch.getId() });
 	}
 

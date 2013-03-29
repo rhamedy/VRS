@@ -217,7 +217,9 @@
 							}); 
 							 
 						}, 
-						error: function(r) { 
+						error: function(data) { 
+							 $('p#updateStatusTitle').text("Connection error[System Unreachable]."); 
+							 $('p#updateStatusTitle').css('color','red');
 						}
 					}); 
 				}
