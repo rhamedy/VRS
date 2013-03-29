@@ -44,6 +44,7 @@
 				</table>
 			</div>
 			<br /><br />
+			<a href="/VRS/vehicle/editVehicle">Add new vehicle</a>
 			<div id="vehiclesDiv">
 				<table border="1" id="vehicleList">
 					<thead>

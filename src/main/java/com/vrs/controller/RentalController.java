@@ -1,5 +1,6 @@
 package com.vrs.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -96,20 +97,26 @@ public class RentalController {
 	}
 
 	@RequestMapping(value = "/vehicle/editVehicle", method = RequestMethod.GET)
-	public ModelAndView getVehicle(@RequestParam String vin) {
+	public ModelAndView getVehicle(@RequestParam(required=false) String vin) {
 		logger.info("entry getVehicle()");
 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("editVehicle");
+		
+		List<String> models = new ArrayList<String>(); 
 
 		Vehicle vehicle = rentalServices.findVehicle(vin);
-		vehicle = rentalServices.setMakeAndModel(vehicle);
-
-		int makeId = rentalServices.getMakeId(vehicle.getMake());
+		if(vehicle == null) { 
+			vehicle = new Vehicle(); 
+		} else {
+			vehicle = rentalServices.setMakeAndModel(vehicle);
+			int makeId = rentalServices.getMakeId(vehicle.getMake());
+			models = rentalServices.listMakeModels(makeId);
+		}
 
 		List<Branch> branches = rentalServices.getBranches(5);
 		List<String> makes = rentalServices.listMakes();
-		List<String> models = rentalServices.listMakeModels(makeId);
+		
 
 		/*
 		 * city id is hard coded, we will have to obtain that from the logged in
@@ -120,7 +127,7 @@ public class RentalController {
 		mav.addObject("branches", branches);
 		mav.addObject("makes", makes);
 		mav.addObject("models", models);
-
+		
 		return mav;
 	}
 
