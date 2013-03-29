@@ -108,6 +108,7 @@ public class RentalController {
 		Vehicle vehicle = rentalServices.findVehicle(vin);
 		if(vehicle == null) { 
 			vehicle = new Vehicle(); 
+			vehicle.setAvailable(true); 
 		} else {
 			vehicle = rentalServices.setMakeAndModel(vehicle);
 			int makeId = rentalServices.getMakeId(vehicle.getMake());

@@ -32,6 +32,16 @@ import com.vrs.util.ErrorUtil;
 import com.vrs.util.JSONResponse;
 import com.vrs.util.JSONUtil;
 
+/**
+ * UserController serves user related requests coming from web browser, 
+ * make use of UserServices to interact with UserDao in order to exchange 
+ * information back/forth with database.
+ * 
+ * @author Rafiullah Hamedy
+ * @Date 25-02-2013
+ * 
+ */
+
 @Controller
 public class UserController {
 
@@ -73,14 +83,22 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/user/editUser", method = RequestMethod.GET)
-	public ModelAndView editUser(@RequestParam String username) {
+	public ModelAndView editUser(@RequestParam(required = false) String username) {
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("editUser");
 
 		User user = userServices.findUser(username);
+		List<Role> userRoles = new ArrayList<Role>();
+
+		if (user == null) {
+			user = new User();
+			user.setDisabled(true);
+			user.setUsername("new");
+		} else {
+			userRoles = userServices.getUserRole(user);
+		}
 
 		List<Role> allRoles = userServices.listRoles();
-		List<Role> userRoles = userServices.getUserRole(user);
 		List<Role> nonUserRoles = userServices
 				.nonUserRoles(allRoles, userRoles);
 
@@ -112,24 +130,32 @@ public class UserController {
 					"Updating user fields failed.",
 					ErrorUtil.listErrors(binding));
 		} else if (request.getParameter("role") == null) {
-			return JSONUtil.createFailureResponse("Select atleast one role for this user."); 
+			return JSONUtil
+					.createFailureResponse("Select atleast one role for this user.");
 		} else {
 			user.setUsername(username);
-			userServices.updateUser(user);
-			
-			List<Role> newRoles = new ArrayList<Role>(); 
-			String[] rolesId = request.getParameterValues("role"); 
-			
-			for(String r: rolesId) { 
-				int roleId = Integer.parseInt(r); 
-				newRoles.add(userServices.findRole(roleId)); 
-				logger.info("new selected role : " + userServices.findRole(roleId).getRoleName());
+			if (userServices.findUser(username) == null) {
+				// in case new user is added
+				userServices.createUser(user);
+			} else {
+				// in case an existing user is edited
+				userServices.updateUser(user);
 			}
-			
-			userServices.updateUserRoles(user, newRoles); 
-			
+
+			List<Role> newRoles = new ArrayList<Role>();
+			String[] rolesId = request.getParameterValues("role");
+
+			for (String r : rolesId) {
+				int roleId = Integer.parseInt(r);
+				newRoles.add(userServices.findRole(roleId));
+				logger.info("new selected role : "
+						+ userServices.findRole(roleId).getRoleName());
+			}
+
+			userServices.updateUserRoles(user, newRoles);
+
 			return JSONUtil
-					.createSuccessResponse("Changed user fields are updated successfully!");
+					.createSuccessResponse("Changes are to the user fields are updated successfully!");
 		}
 
 	}

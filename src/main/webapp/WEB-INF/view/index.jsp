@@ -13,6 +13,7 @@
 	<body>
 		<div id="main">
 			<div id="usersDiv">
+				<a href="/VRS/user/editUser"> Add new user</a>
 				<table border="1" id="userList">
 					<thead>
 						<tr>

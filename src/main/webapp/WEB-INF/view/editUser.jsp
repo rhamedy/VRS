@@ -17,7 +17,24 @@
 						<thead>
 						</thead> 
 						<tbody>
-							<form:hidden path="username" />
+							<c:choose>
+								<c:when test="${username == 'new'}">
+									<tr>
+										<td>
+											<form:label path="username" cssClass="inputTitle">Username (Valid Email)</form:label>
+										</td>
+										<td>
+											<form:input path="username" cssClass="inputControl" />
+										</td>
+										<td>
+											<form:errors path="username" cssClass="inputError"/>  
+										</td>
+									</tr>
+								</c:when>
+								<c:otherwise>
+									<form:hidden path="username" />
+								</c:otherwise>
+							</c:choose>
 							<tr>
 								<td>
 									<form:label path="firstName" cssClass="inputTitle">First name</form:label>
@@ -140,6 +157,12 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() { 
+			if($('#username').val() == 'new') {
+				console.log("resetting value of username."); 
+				$('#username').attr('value',''); 
+				$('#username').text('');
+			}
+			
 			$('.dateControl').datepicker({
 				changeMonth: true, 
 				changeYear: true, 
