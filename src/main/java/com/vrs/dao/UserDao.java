@@ -42,14 +42,14 @@ public class UserDao {
 		logger.info("entry crateUser()");
 
 		String SQL = "INSERT INTO auth.user (username, first_name, last_name, "
-				+ "password, dob, mobile, disabled, created_date) VALUES (?,?,?,?,?,?,?,?)";
+				+ "password, dob, mobile, disabled, created_date, branch_id) VALUES (?,?,?,?,?,?,?,?,?)";
 		
 		jdbcTemplate.update(
 				SQL,
 				new Object[] { user.getUsername(), user.getFirstName(),
 						user.getLastName(), user.getPassword(), user.getDob(),
 						user.getMobile(), user.isDisabled(),
-						user.getCreatedDate() });
+						user.getCreatedDate(), user.getBranchId() });
 	}
 
 	public void createRole(Role role) {
@@ -98,9 +98,14 @@ public class UserDao {
 					new Object[] { username }, new BeanPropertyRowMapper<User>(
 							User.class));
 
+			logger.info("found user : " ); 
+			logger.info("user.username = " + user.getUsername()); 
+			logger.info("user.lastName = " + user.getLastName()); 
+			
 			return user;
 
 		} catch (EmptyResultDataAccessException ex) {
+			ex.printStackTrace();
 			return null;
 		}
 	}
@@ -200,7 +205,7 @@ public class UserDao {
 		logger.info("entry updateUser()"); 
 		
 		String SQL = "UPDATE auth.user SET first_name = ?, last_name = ?, dob = ?, mobile = ?, " +
-				"disabled = ?, license_no = ?, license_validity = ? WHERE username = ?"; 
+				"disabled = ?, license_no = ?, license_validity = ?, branch_id = ? WHERE username = ?"; 
 		
 		jdbcTemplate.update(SQL, new Object[] {
 				user.getFirstName(), 
@@ -209,7 +214,8 @@ public class UserDao {
 				user.getMobile(), 
 				user.isDisabled(), 
 				user.getLicenseNo(), 
-				user.getLicenseValidity(), 
+				user.getLicenseValidity(),
+				user.getBranchId(),
 				user.getUsername()
 		}); 
 	}

@@ -174,6 +174,7 @@ public class UserController {
 			return JSONUtil
 					.createFailureResponse("Please provide a valid email address as username.");
 		} else {
+			user.setDisabled(true); 
 			userServices.createUser(user);
 			return JSONUtil
 					.createSuccessResponse("Your account request is stored. You will "

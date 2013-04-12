@@ -24,6 +24,8 @@ public class User {
 	private Date licenseValidity; 
 	private String address; 
 	private boolean disabled;
+	private int branchId; 
+	
 	//private Role role; 
 	
 	public String getMobileNo() {
@@ -104,4 +106,10 @@ public class User {
 //	public void setRole(Role role) {
 //		this.role = role;
 //	}
+	public int getBranchId() {
+		return branchId;
+	}
+	public void setBranchId(int branchId) {
+		this.branchId = branchId;
+	}
 }

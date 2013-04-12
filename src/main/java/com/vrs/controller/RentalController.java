@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.vrs.model.Branch;
+import com.vrs.model.Role;
 import com.vrs.model.User;
 import com.vrs.model.Vehicle;
 import com.vrs.services.RentalServices;
@@ -43,30 +44,63 @@ public class RentalController {
 	@RequestMapping(value = "/home")
 	public ModelAndView homepage() {
 		logger.info("inside controller {info}");
+		
+		String roleType = ""; 
+		
 		ModelAndView mav = new ModelAndView();
-
-		mav.setViewName("index");
-
-		List<User> users = userServices.listUsers();
-		List<Vehicle> vehicles = rentalServices.getVehicles(2);
-		List<Branch> branches = rentalServices.getBranches(5);
-
-		/*
-		 * rentalServices.getVehicles(branchId) we should be able to record the
-		 * current users branch and then retrieve that from some where. @ the
-		 * moment we will hardcode a branch id.
-		 * 
-		 * same goes for rentalServices.getBranches(5)
-		 */
-
-		mav.addObject("users", users);
-		mav.addObject("vehicles", vehicles);
-		mav.addObject("branches", branches);
-		mav.addObject("cities", rentalServices.getCities(1)); 
+		
+		User user = userServices.findUser(userServices.getCurrentUsername()); 
+		
+		List<Role> roles = userServices.getUserRole(user); 
+		
+		logger.info("rentalController home roles.size = " + roles.size());
+		
+		for(Role role: roles) { 
+			if(role.getRoleName().equals("admin")) { 
+				roleType = "admin";  
+				break; 
+			} else if(role.getRoleName().equals("technical")) { 
+				roleType = "technical"; 
+			} else if(role.getRoleName().equals("staff")) { 
+				roleType = "staff";
+			}
+		}
+		
+		
+		mav.setViewName("index"); 
+		
+		mav.addObject("userType", roleType);
 		
 		/*
-		 * hardcoded country=1 has to be taken from user profile.
+		 * userType/roleType allow the view to render divs accordingly ... for example
+		 * if the user is admin display users management, if the user is technical
+		 * do not display users display back and restore functionalities. 
+		 *  
 		 */
+		
+		if(roleType.equals("admin")) { 
+			/*
+			 * The user management and branch management will be only displayed to 
+			 * administrators. 
+			 */
+			
+			mav.addObject("users", userServices.listUsers());
+			mav.addObject("countries", rentalServices.getCountries()); 
+			
+		} else if(roleType.equals("staff")) { 
+			/*
+			 * The staff will not see user and branch related data but, list of 
+			 * vehicles on the branch they are assigned to as well as that 
+			 * branch details.
+			 */
+			mav.addObject("branch", rentalServices.findBranch(user.getBranchId()));
+			mav.addObject("vehicles", rentalServices.getVehicles(user.getBranchId()));
+			
+		} else if(roleType.equals("technical")) { 
+			/*
+			 * backup/restore and other configuration functionalities. 
+			 */
+		}
 
 		return mav;
 	}

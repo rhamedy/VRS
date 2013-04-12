@@ -19,6 +19,7 @@ public class TestUtil {
 		user1.setFirstName("raf_test1");
 		user1.setLastName("hamedy_test1");
 		user1.setMobile("0700282663");
+		user1.setBranchId(2); 
 		user1.setDisabled(true);
 
 		return user1;

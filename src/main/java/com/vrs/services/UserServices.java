@@ -6,6 +6,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import com.vrs.dao.UserDao;
@@ -26,6 +27,10 @@ public class UserServices {
 
 	@Autowired
 	private UserDao userDao;
+	
+	public String getCurrentUsername() {
+		return SecurityContextHolder.getContext().getAuthentication().getName();
+	}
 
 	public User findUser(String username) {
 		logger.info("entry findUser");
