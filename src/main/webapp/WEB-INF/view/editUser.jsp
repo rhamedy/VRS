@@ -17,6 +17,7 @@
 						<thead>
 						</thead> 
 						<tbody>
+							<form:hidden path="branchId" />
 							<c:choose>
 								<c:when test="${username == 'new'}">
 									<tr>
@@ -124,6 +125,39 @@
 									<form:errors path="disabled" cssClass="inputError"/>  
 								</td>
 							</tr>
+							<c:if test="${username != 'new'}">	
+								<tr>
+									<td>
+										<label name="currentBranch">Current branch</label>
+									</td>
+									<td>
+										${branch.name} - ${city.value} - ${country.value}
+									</td>
+									<td></td>
+								</tr>
+							</c:if>
+							<tr>
+								<td>
+									<label name="updateBranch"> Update branch</label>
+								</td>
+								<td>
+									Choose a country <br />
+									<select id="countryList">
+										<option value='' selected></option>
+										<c:forEach items="${countries}" var="country">
+											<c:forEach items="${country}" var="c">
+												<option value='${c.key}'>${c.value}</option>
+											</c:forEach>
+										</c:forEach>
+									</select><br />
+									Choose a city <br />
+									<select id="cityList">
+									</select><br />
+									Choose a branch <br />
+									<select id="branchList">
+									</select>
+								</td>
+							</tr>
 							<tr>
 								<td>
 									<label name="roleName" class="inputTitle">Roles<label>
@@ -157,6 +191,74 @@
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 	<script type="text/javascript">
 		$(document).ready(function() { 
+			
+			$("select#countryList").change(function() {
+				$("select#cityList").empty(); 
+				$("select#branchList").empty();  
+				if($(this).children(":selected").val().trim().length > 0) { 
+					$.ajax({
+						url: "/VRS/home/public/cities",
+						data: "countryId=" + $(this).children(":selected").val(), 
+						success: function(data) {
+							var flag = false; 
+							$.each(data, function(k,value) {
+								$.each(value, function(key, v) { 
+									$("select#cityList").append("<option value='" + key + "'>" + v + "</option>"); 
+									flag = true; 
+								}); 
+							}); 
+							if(flag) { 
+								$("select#cityList").append("<option value='' selected></option>");
+							}
+						}, 
+						error: function() { 
+							console.log("failed!"); 
+						} 
+					}); 
+				} else { 
+					console.log("empty selection!"); 
+				}
+			});
+			
+			$("select#cityList").change(function() { 
+				$("select#branchList").empty(); 
+				if($(this).children(":selected").val().trim().length > 0) {
+					$.ajax({ 
+						url: "/VRS/home/public/branches", 
+						data: "cityId=" + $(this).children(":selected").val(), 
+						success: function(data) {
+							var flag = false;
+							var id; 
+							var name; 
+							$.each(data, function(k,value) {
+								$.each(value, function(key, v) { 
+									if(key == "id") { 
+										id = v; 
+									} else if(key == "name") { 
+										name = v; 
+									}
+									flag = true; 
+								}); 
+								if(flag) { 
+									$("select#branchList").append("<option value='" + id + "'>" + name + "</option>");
+								}
+							});
+							if(flag) { 
+								$("select#branchList").append("<option value='' selected></option>");
+							} 
+						}
+					}); 
+				} else { 
+					console.log("empty option was selected!"); 
+				}
+			});
+			
+			$("select#branchList").change(function() { 
+				branchId = $(this).children(":selected").attr('value'); 
+				console.log("branch id is : " + branchId);
+				$('#branchId').val(branchId); 
+			}); 
+		
 			if($('#username').val() == 'new') {
 				console.log("resetting value of username."); 
 				$('#username').attr('value',''); 

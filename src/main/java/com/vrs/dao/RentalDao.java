@@ -89,8 +89,9 @@ public class RentalDao {
 				+ " WHERE id = ? ";
 		jdbcTemplate.update(
 				SQL,
-				new Object[] { branch.getName(), branch.getCityId(), branch.getStreetName(),
-						branch.getPostcode(), branch.getId() });
+				new Object[] { branch.getName(), branch.getCityId(),
+						branch.getStreetName(), branch.getPostcode(),
+						branch.getId() });
 	}
 
 	public int getMaxBranchId() {
@@ -292,36 +293,76 @@ public class RentalDao {
 
 		return makeModel;
 	}
-	
-	public List<String> listMakes() { 
-		logger.info("entry listMakes()"); 
-		
-		String SQL = "SELECT name FROM rental.make"; 
-		
-		return jdbcTemplate.queryForList(SQL, String.class); 
+
+	public List<String> listMakes() {
+		logger.info("entry listMakes()");
+
+		String SQL = "SELECT name FROM rental.make";
+
+		return jdbcTemplate.queryForList(SQL, String.class);
 	}
-	
-	public List<String> listMakeModels(int makeId) { 
-		logger.info("entry listMakeModels()"); 
-		
-		String SQL = "SELECT name FROM rental.model WHERE make_id = ?"; 
-		
-		return jdbcTemplate.queryForList(SQL, new Object[] { makeId }, String.class); 
+
+	public List<String> listMakeModels(int makeId) {
+		logger.info("entry listMakeModels()");
+
+		String SQL = "SELECT name FROM rental.model WHERE make_id = ?";
+
+		return jdbcTemplate.queryForList(SQL, new Object[] { makeId },
+				String.class);
 	}
-	
-	public int getMakeId(String makeName) { 
-		logger.info("entry getMakeId()"); 
-		
-		String SQL = "SELECT id FROM rental.make WHERE name = ?"; 
-		
-		return jdbcTemplate.queryForInt(SQL, new Object[]{ makeName }); 
+
+	public int getMakeId(String makeName) {
+		logger.info("entry getMakeId()");
+
+		String SQL = "SELECT id FROM rental.make WHERE name = ?";
+
+		return jdbcTemplate.queryForInt(SQL, new Object[] { makeName });
 	}
-	
-	public int getModelId(String modelName) { 
-		logger.info("entry getModelId()"); 
-		
+
+	public int getModelId(String modelName) {
+		logger.info("entry getModelId()");
+
 		String SQL = "SELECT id FROM rental.model WHERE name = ?";
-		
-		return jdbcTemplate.queryForInt(SQL, new Object[]{ modelName });
+
+		return jdbcTemplate.queryForInt(SQL, new Object[] { modelName });
+	}
+
+	public KeyValuePair<Integer, String> getCity(int cityId) {
+		logger.info("entry getCityByBranch()");
+
+		String SQL = "SELECT name FROM rental.city WHERE id = ?";
+
+		String cityName = jdbcTemplate.queryForObject(SQL,
+				new Object[] { cityId }, String.class);
+
+		KeyValuePair<Integer, String> kvp = new KeyValuePair<Integer, String>(
+				new Integer(cityId), cityName);
+
+		return kvp;
+
+	}
+
+	public KeyValuePair<Integer, String> getCountryByCity(int cityId) {
+		logger.info("entry getCountryByCityId()");
+
+		String SQL = "SELECT co.id, co.name FROM rental.country co, "
+				+ "rental.city ci WHERE ci.id = ? AND ci.country_id = co.id";
+
+		KeyValuePair<Integer, String> country = jdbcTemplate.query(SQL,
+				new Object[] { cityId },
+				new ResultSetExtractor<KeyValuePair<Integer, String>>() {
+					public KeyValuePair<Integer, String> extractData(ResultSet rs)
+							throws SQLException {
+						while (rs.next()) {
+							KeyValuePair<Integer, String> keyValue = new KeyValuePair<Integer, String>(
+									rs.getInt("id"), rs
+											.getString("name"));
+							return keyValue;
+						}
+						return null;
+					}
+				});
+
+		return country;
 	}
 }

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.vrs.model.Branch;
 import com.vrs.model.Role;
 import com.vrs.model.User;
 import com.vrs.services.RentalServices;
@@ -31,11 +32,12 @@ import com.vrs.util.CustomSqlDateEditor;
 import com.vrs.util.ErrorUtil;
 import com.vrs.util.JSONResponse;
 import com.vrs.util.JSONUtil;
+import com.vrs.util.KeyValuePair;
 
 /**
- * UserController serves user related requests coming from web browser, 
- * make use of UserServices to interact with UserDao in order to exchange 
- * information back/forth with database.
+ * UserController serves user related requests coming from web browser, make use
+ * of UserServices to interact with UserDao in order to exchange information
+ * back/forth with database.
  * 
  * @author Rafiullah Hamedy
  * @Date 25-02-2013
@@ -84,6 +86,7 @@ public class UserController {
 
 	@RequestMapping(value = "/user/editUser", method = RequestMethod.GET)
 	public ModelAndView editUser(@RequestParam(required = false) String username) {
+		
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("editUser");
 
@@ -96,6 +99,15 @@ public class UserController {
 			user.setUsername("new");
 		} else {
 			userRoles = userServices.getUserRole(user);
+			Branch branch = rentalServices.findBranch(user.getBranchId());
+			KeyValuePair<Integer, String> city = rentalServices.getCity(branch
+					.getCityId());
+			KeyValuePair<Integer, String> country = rentalServices
+					.getCountryByCity(branch.getCityId());
+			
+			mav.addObject("branch", branch); 
+			mav.addObject("city", city); 
+			mav.addObject("country", country);
 		}
 
 		List<Role> allRoles = userServices.listRoles();
@@ -115,6 +127,7 @@ public class UserController {
 		mav.addObject("username", user.getUsername());
 		mav.addObject("userRoles", userRoles);
 		mav.addObject("nonUserRoles", nonUserRoles);
+		mav.addObject("countries", rentalServices.getCountries()); 
 
 		return mav;
 	}
@@ -132,6 +145,9 @@ public class UserController {
 		} else if (request.getParameter("role") == null) {
 			return JSONUtil
 					.createFailureResponse("Select atleast one role for this user.");
+		} else if(user.getBranchId() == 0) { 
+			return JSONUtil
+					.createFailureResponse("Select a branch for the user.");
 		} else {
 			user.setUsername(username);
 			if (userServices.findUser(username) == null) {
@@ -174,7 +190,7 @@ public class UserController {
 			return JSONUtil
 					.createFailureResponse("Please provide a valid email address as username.");
 		} else {
-			user.setDisabled(true); 
+			user.setDisabled(true);
 			userServices.createUser(user);
 			return JSONUtil
 					.createSuccessResponse("Your account request is stored. You will "

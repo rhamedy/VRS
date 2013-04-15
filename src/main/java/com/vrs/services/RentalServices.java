@@ -128,4 +128,12 @@ public class RentalServices {
 	public void updateBranch(Branch branch) { 
 		rentalDao.updateBranch(branch);
 	}
+	
+	public KeyValuePair<Integer, String> getCity(int cityId) { 
+		return rentalDao.getCity(cityId); 
+	}
+	
+	public KeyValuePair<Integer, String> getCountryByCity(int cityId) { 
+		return rentalDao.getCountryByCity(cityId); 
+	}
 }

@@ -31,8 +31,8 @@ public class UserDao {
 
 	private JdbcTemplate jdbcTemplate;
 
-	//initialize JdbcTemplate with DataSource object (database configuration)
-	
+	// initialize JdbcTemplate with DataSource object (database configuration)
+
 	@Autowired
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
@@ -43,6 +43,8 @@ public class UserDao {
 
 		String SQL = "INSERT INTO auth.user (username, first_name, last_name, "
 				+ "password, dob, mobile, disabled, created_date, branch_id) VALUES (?,?,?,?,?,?,?,?,?)";
+
+		logger.info("updateUser branchId = " + user.getBranchId());
 		
 		jdbcTemplate.update(
 				SQL,
@@ -63,29 +65,32 @@ public class UserDao {
 
 	public void createUserRole(User user, Role role) {
 		logger.info("entry createUserRole");
-		
-		logger.info("username {}, role_id{}", user.getUsername(), role.getRoleId());
+
+		logger.info("username {}, role_id{}", user.getUsername(),
+				role.getRoleId());
 
 		String SQL = "INSERT INTO auth.user_role (username, role_id) VALUES (?,?)";
 
 		jdbcTemplate.update(SQL,
 				new Object[] { user.getUsername(), role.getRoleId() });
 	}
-	
-	public void updateRole(Role role) { 
-		logger.info("entry updateRole()"); 
-		
+
+	public void updateRole(Role role) {
+		logger.info("entry updateRole()");
+
 		String SQL = "UPDATE auth.role SET role_name = ? WHERE role_id = ?";
-		
-		jdbcTemplate.update(SQL, new Object[]{ role.getRoleName(), role.getRoleId()}); 
+
+		jdbcTemplate.update(SQL,
+				new Object[] { role.getRoleName(), role.getRoleId() });
 	}
-	
-	public void insertUserRole(User user, Role role) { 
-		logger.info("entry insertUserRole()"); 
-		
+
+	public void insertUserRole(User user, Role role) {
+		logger.info("entry insertUserRole()");
+
 		String SQL = "INSERT INTO auth.user_role(role_id, username) VALUES (?,?)";
-		
-		jdbcTemplate.update(SQL, new Object[]{ role.getRoleId(), user.getUsername() }); 
+
+		jdbcTemplate.update(SQL,
+				new Object[] { role.getRoleId(), user.getUsername() });
 	}
 
 	public User findUser(String username) {
@@ -98,10 +103,10 @@ public class UserDao {
 					new Object[] { username }, new BeanPropertyRowMapper<User>(
 							User.class));
 
-			logger.info("found user : " ); 
-			logger.info("user.username = " + user.getUsername()); 
-			logger.info("user.lastName = " + user.getLastName()); 
-			
+			logger.info("found user : ");
+			logger.info("user.username = " + user.getUsername());
+			logger.info("user.lastName = " + user.getLastName());
+
 			return user;
 
 		} catch (EmptyResultDataAccessException ex) {
@@ -169,72 +174,74 @@ public class UserDao {
 		jdbcTemplate.update(SQL,
 				new Object[] { user.getUsername(), role.getRoleId() });
 	}
-	
-	public List<Role> getUserRoles(User user) { 
-		logger.info("entry getUserRole()"); 
-		
-		String SQL = "SELECT r.role_id, r.role_name FROM auth.user u, auth.role r, auth.user_role ur WHERE" +
-				" u.username = ? AND u.username = ur.username AND ur.role_id = r.role_id";
-		
-		List<Role> role = jdbcTemplate.query(SQL, new Object[]{ user.getUsername() }, new BeanPropertyRowMapper<Role>(Role.class));
-		
-		return role; 
+
+	public List<Role> getUserRoles(User user) {
+		logger.info("entry getUserRole()");
+
+		String SQL = "SELECT r.role_id, r.role_name FROM auth.user u, auth.role r, auth.user_role ur WHERE"
+				+ " u.username = ? AND u.username = ur.username AND ur.role_id = r.role_id";
+
+		List<Role> role = jdbcTemplate.query(SQL,
+				new Object[] { user.getUsername() },
+				new BeanPropertyRowMapper<Role>(Role.class));
+
+		return role;
 	}
-	
-	public List<User> listUsers() { 
-		logger.info("entry listUsers()"); 
-		
+
+	public List<User> listUsers() {
+		logger.info("entry listUsers()");
+
 		String SQL = "SELECT * FROM auth.user";
-		
-		List<User> users = jdbcTemplate.query(SQL, new BeanPropertyRowMapper<User>(User.class)); 
-		
-		return users; 
+
+		List<User> users = jdbcTemplate.query(SQL,
+				new BeanPropertyRowMapper<User>(User.class));
+
+		return users;
 	}
-	
-	public List<Role> listRoles() { 
-		logger.info("entry listRoles()"); 
-		
+
+	public List<Role> listRoles() {
+		logger.info("entry listRoles()");
+
 		String SQL = "SELECT * FROM auth.role";
-		
-		List<Role> roles = jdbcTemplate.query(SQL, new BeanPropertyRowMapper<Role>(Role.class)); 
-		
+
+		List<Role> roles = jdbcTemplate.query(SQL,
+				new BeanPropertyRowMapper<Role>(Role.class));
+
 		return roles;
 	}
-	
-	public void updateUser(User user) { 
-		logger.info("entry updateUser()"); 
+
+	public void updateUser(User user) {
+		logger.info("entry updateUser()");
+
+		String SQL = "UPDATE auth.user SET first_name = ?, last_name = ?, dob = ?, mobile = ?, "
+				+ "disabled = ?, license_no = ?, license_validity = ?, branch_id = ? WHERE username = ?";
+
+		logger.info("updateUser branchId = " + user.getBranchId());
 		
-		String SQL = "UPDATE auth.user SET first_name = ?, last_name = ?, dob = ?, mobile = ?, " +
-				"disabled = ?, license_no = ?, license_validity = ?, branch_id = ? WHERE username = ?"; 
-		
-		jdbcTemplate.update(SQL, new Object[] {
-				user.getFirstName(), 
-				user.getLastName(), 
-				user.getDob(), 
-				user.getMobile(), 
-				user.isDisabled(), 
-				user.getLicenseNo(), 
-				user.getLicenseValidity(),
-				user.getBranchId(),
-				user.getUsername()
-		}); 
+		jdbcTemplate.update(
+				SQL,
+				new Object[] { user.getFirstName(), user.getLastName(),
+						user.getDob(), user.getMobile(), user.isDisabled(),
+						user.getLicenseNo(), user.getLicenseValidity(),
+						user.getBranchId(), user.getUsername() });
 	}
-	
-	public void updatePassword(User user) { 
-		logger.info("entry updatePassword()"); 
-		
+
+	public void updatePassword(User user) {
+		logger.info("entry updatePassword()");
+
 		String SQL = "UPDATE auth.user SET password = ? WHERE username = ?";
-		
-		jdbcTemplate.update(SQL, new Object[]{ user.getPassword(), user.getUsername()}); 
+
+		jdbcTemplate.update(SQL,
+				new Object[] { user.getPassword(), user.getUsername() });
 	}
-	
-	public boolean isUsernameExists(String username) { 
-		logger.info("entry isUsernameExists()"); 
-		
-		String SQL = "SELECT COUNT(*) FROM auth.user WHERE username = ?"; 
-		
-		int result = jdbcTemplate.queryForInt(SQL, new Object[]{ username }); 
-		
-		return (result > 0) ? true : false; 
+
+	public boolean isUsernameExists(String username) {
+		logger.info("entry isUsernameExists()");
+
+		String SQL = "SELECT COUNT(*) FROM auth.user WHERE username = ?";
+
+		int result = jdbcTemplate.queryForInt(SQL, new Object[] { username });
+
+		return (result > 0) ? true : false;
 	}
 }
