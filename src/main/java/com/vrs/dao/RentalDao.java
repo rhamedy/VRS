@@ -110,14 +110,15 @@ public class RentalDao {
 		logger.info("entry addVehicle()");
 
 		String SQL = "INSERT INTO rental.vehicle (vin, number_plate, max_speed, "
-				+ "seating, fuel, model_id, available, branch_id) VALUES (?,?,?,?,?,?,?,?)";
+				+ "seating, fuel, model_id, available, branch_id, daily_cost) VALUES (?,?,?,?,?,?,?,?,?)";
 
 		jdbcTemplate.update(
 				SQL,
 				new Object[] { vehicle.getVin(), vehicle.getNumberPlate(),
 						vehicle.getMaxSpeed(), vehicle.getSeating(),
 						vehicle.getFuel(), vehicle.getModelId(),
-						vehicle.isAvailable(), vehicle.getBranchId() });
+						vehicle.isAvailable(), vehicle.getBranchId(),
+						vehicle.getDailyCost() });
 	}
 
 	public Vehicle findVehicle(String vin) {
@@ -149,7 +150,7 @@ public class RentalDao {
 		logger.info("entry updateVehicle()");
 
 		String SQL = "UPDATE rental.vehicle SET number_plate = ?, max_speed = ?, "
-				+ "seating = ?, fuel = ?, model_id = ?, branch_id = ?, available = ? "
+				+ "seating = ?, fuel = ?, model_id = ?, branch_id = ?, available = ?, daily_cost = ? "
 				+ "WHERE vin = ?";
 
 		jdbcTemplate.update(
@@ -157,7 +158,8 @@ public class RentalDao {
 				new Object[] { vehicle.getNumberPlate(), vehicle.getMaxSpeed(),
 						vehicle.getSeating(), vehicle.getFuel(),
 						vehicle.getModelId(), vehicle.getBranchId(),
-						vehicle.isAvailable(), vehicle.getVin() });
+						vehicle.isAvailable(), vehicle.getDailyCost(),
+						vehicle.getVin() });
 	}
 
 	public void updateVehicleStatus(String vin, boolean status) {
@@ -351,12 +353,11 @@ public class RentalDao {
 		KeyValuePair<Integer, String> country = jdbcTemplate.query(SQL,
 				new Object[] { cityId },
 				new ResultSetExtractor<KeyValuePair<Integer, String>>() {
-					public KeyValuePair<Integer, String> extractData(ResultSet rs)
-							throws SQLException {
+					public KeyValuePair<Integer, String> extractData(
+							ResultSet rs) throws SQLException {
 						while (rs.next()) {
 							KeyValuePair<Integer, String> keyValue = new KeyValuePair<Integer, String>(
-									rs.getInt("id"), rs
-											.getString("name"));
+									rs.getInt("id"), rs.getString("name"));
 							return keyValue;
 						}
 						return null;

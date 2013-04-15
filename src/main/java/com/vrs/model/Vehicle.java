@@ -20,7 +20,8 @@ public class Vehicle {
 	private boolean available; 
 	private int branchId;
 	private String make; 
-	private String model; 
+	private String model;
+	private double dailyCost; 
 	
 	public String getMake() {
 		return make;
@@ -81,5 +82,11 @@ public class Vehicle {
 	}
 	public void setBranchId(int branchId) {
 		this.branchId = branchId;
+	}
+	public double getDailyCost() {
+		return dailyCost;
+	}
+	public void setDailyCost(double dailyCost) {
+		this.dailyCost = dailyCost;
 	} 
 }

@@ -86,6 +86,17 @@
 							</tr>
 							<tr>
 								<td>
+									<form:label path="dailyCost" cssClass="inputTitle">Cost per day</form:label>
+								</td>
+								<td>
+									<form:input path="dailyCost" cssClass="inputControl" />
+								</td>
+								<td>
+									<form:errors path="dailyCost" cssClass="inputError"/>  
+								</td>
+							</tr>
+							<tr>
+								<td>
 									<label name="make" class="inputTitle">Make</label>
 								</td>
 								<td>
