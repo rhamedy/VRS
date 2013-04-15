@@ -67,8 +67,7 @@ public class RentalController {
 		}
 		
 		
-		mav.setViewName("index"); 
-		
+		mav.setViewName("index");
 		mav.addObject("userType", roleType);
 		
 		/*
@@ -93,6 +92,7 @@ public class RentalController {
 			 * vehicles on the branch they are assigned to as well as that 
 			 * branch details.
 			 */
+
 			mav.addObject("branch", rentalServices.findBranch(user.getBranchId()));
 			mav.addObject("vehicles", rentalServices.getVehicles(user.getBranchId()));
 			

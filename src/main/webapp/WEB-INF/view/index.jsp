@@ -17,6 +17,26 @@
 	</style> 
 	<body>
 		<div id="main">
+			<c:if test="${userType == 'staff'}">
+				<div id="branchDetails">
+					<table border="1">
+						<thead>
+							<tr>
+								<th>Branch name</th>
+								<th>Street name</th>
+								<th>Postcode</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>${branch.name}</td>
+								<td>${branch.streetName}</td>
+								<td>${branch.postcode}</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</c:if> 
 			<c:if test="${userType == 'admin'}">
 				<div id="usersDiv">
 					<a href="/VRS/user/editUser"> Add new user</a>
@@ -127,13 +147,7 @@
 									<td>${vehicle.seating}</td>
 									<td>${vehicle.fuel}</td>
 									<td>${vehicle.model}</td>
-									<td>
-										<c:forEach items="${branches}" var="branch">
-											<c:if test="${branch.id==vehicle.branchId}">
-												${branch.name} 
-											</c:if>
-										</c:forEach>
-									</td>
+									<td>${branch.name}</td>
 									<td><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit|</a>
 										<a id="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete|</a>
 									</td>
