@@ -61,17 +61,17 @@
 							</c:forEach>
 						</c:forEach>
 					</select><br />
-					<table id="countriesListTable">
+					<table id="countriesListTable" border="1">
 						<thead>
 						</thead>
 						</tbody>
 						</tbody>
 					</table>
 					<br />
-					<label for="cityList"> Cities </label>
+					<label for="cityList">Cities</label>
 					<select id="cityList">
 					</select><br />
-					<table id="cityListTable">
+					<table id="cityListTable" border="1">
 						<thead>
 						</thead>
 						<tbody>
@@ -81,12 +81,8 @@
 					<label for="branchList">Branches</label>
 					<select id="branchList">
 					</select><br /><br />
-					<table id="branchListTabel">
-						<thead>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
+					<table id="branchListTable" border="1">
+					</table><br /><br />
 					<label for="vehicleList">Vehicles list</label><br />
 					<table id="vehicleList" border="1">
 						<thead>
@@ -182,7 +178,7 @@
 							$("table#cityListTable").append('<tbody>');  
 							$.each(data, function(k,value) {
 								$.each(value, function(key, v) {
-									$("table#cityListTable").append("<tr><td>" + v + "</td><td><a href='/VRS/city/delete?id='" + key + "'</td></tr>");  
+									$("table#cityListTable").append("<tr><td>" + v + "</td><td><a href='/VRS/city/delete?id=" + key + "'>Delete</a></td></tr>");  
 									$("select#cityList").append("<option value='" + key + "'>" + v + "</option>"); 
 									flag = true; 
 								}); 
@@ -203,6 +199,7 @@
 			
 			$("select#cityList").change(function() { 
 				$("select#branchList").empty(); 
+				$("table#branchListTable").empty();
 				if($(this).children(":selected").val().trim().length > 0) {
 					$.ajax({ 
 						url: "/VRS/home/public/branches", 
@@ -211,19 +208,28 @@
 							var flag = false;
 							var id; 
 							var name; 
+							var streetName; 
+							var postcode; 
+							
+							$("table#branchListTable").append('<thead><tr><th>Branch name</th><th>Street name</th><th>postcode</th><th>Action</th></tr></thead>');  
+							$("table#branchListTable").append('<tbody>');  
 							$.each(data, function(k,value) {
 								$.each(value, function(key, v) { 
 									if(key == "id") { 
 										id = v; 
 									} else if(key == "name") { 
 										name = v; 
+									} else if(key == "streetName") { 
+										streetName = v; 
+									} else if(key == "postcode") { 
+										postcode = v; 
 									}
 									flag = true; 
 								}); 
-								if(flag) { 
-									$("select#branchList").append("<option value='" + id + "'>" + name + "</option>");
-								}
+								$("table#branchListTable").append("<tr><td>" + name + "</td><td>" + streetName + "</td><td>" + postcode +"</td><td><a href='/VRS/home/branch/delete?id=" + id + "'>Delete</a></td></tr>"); 
+								$("select#branchList").append("<option value='" + id + "'>" + name + "</option>");	
 							});
+							$("table#branchListTable").append('</tbody>');
 							if(flag) { 
 								$("select#branchList").append("<option value='' selected></option>");
 							} 
@@ -246,7 +252,8 @@
 									$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
 									data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
 									data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
-									data[i].available + "</td></tr>"); 
+									data[i].available + "</td><td><a href='/VRS/home/public/vehicles/delete?vin=" + 
+									data[i].vin +"'>Delete</a></td></tr>"); 
 								}
 							}
 						},
