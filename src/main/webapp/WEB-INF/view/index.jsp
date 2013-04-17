@@ -159,6 +159,67 @@
 			</c:if>
 			<br />
 		</div>
+		<c:if test="${userType == 'customer'}">
+			<div id="customerDiv">
+				<div id="userDetails">
+					<table border="1" id="userList">
+						<tbody id="userListBody">
+								<tr>
+									<td>First name</td><td>${user.firstName}</td>
+								</tr>
+								<tr>
+									<td>Last name</td><td>${user.lastName}</td>
+								</tr>
+								<tr>
+									<td>Date of birth</td><td>${user.dob}</td>
+								</tr>
+								<tr>
+									<td>Mobile</td><td>${user.mobile}</td>
+								</tr>
+								<tr>
+									<td>License no</td><td>${user.licenseNo}</td>
+								</tr>
+								<tr>
+									<td>License validity</td><td>${user.licenseValidity}</td>
+								</tr>	
+						</tbody>
+					</table>
+				</div><br /><br />
+				<div id="vehiclesForHire">
+					<label for="countriesList"> Countries </label>
+					<select id="countryList">
+						<option value="" selected></option>
+						<c:forEach var="entry" items="${countries}">
+							<c:forEach var="e" items="${entry}">
+								<option class="" value="${e.key}">${e.value}</option>
+							</c:forEach>
+						</c:forEach>
+					</select><br />
+					<label for="cityListNoTable">Cities</label>
+					<select id="cityList">
+					</select><br />
+					<label for="branchList">Branches</label>
+					<select id="branchList">
+					</select><br /><br />
+					<label for="vehicleList">Vehicles list</label><br />
+					<table id="vehicleList" border="1">
+						<thead>
+							<tr>
+								<th>Make</th>
+								<th>Model</th>
+								<th>Max Speed</th>
+								<th>Fuel</th>
+								<th>Seating</th>
+								<th>Available</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody id="vehicleData">
+						</tbody>
+					</table>
+				</div>
+			</div>
+		</c:if>
 		<div id="deleteModalDialog" title="Delete user">
 			<p> The selected user will be deleted permanently. Do you want to proceed? </p>
 		</div>
@@ -170,6 +231,11 @@
 		</div>
 		<div id="resetModalDialog" title="Reset password">
 			<p> Do you wish to proceed with reseting this user's password? </p>
+		</div>
+		<div id="hireVehicleModalDialog" title="Book vehicle">
+			 <p> Hire details for the following vehicle; </p>
+			 <table border="1">
+			 </table> 
 		</div>
 	</body>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -193,8 +259,7 @@
 							$.each(data, function(k,value) {
 								$.each(value, function(key, v) {
 									$("table#cityListTable").append("<tr><td>" + v + "</td><td><a href='/VRS/city/delete?id=" + key + "'>Delete</a></td></tr>");  
-									$("select#cityList").append("<option value='" + key + "'>" + v + "</option>"); 
-									flag = true; 
+									$("select#cityList").append("<option value='" + key + "'>" + v + "</option>");  
 								}); 
 							}); 
 							$("table#cityListTable").append('</tbody>');
@@ -261,13 +326,61 @@
 						url: "/VRS/home/public/vehicles", 
 						data: "branchId=" + $(this).children(":selected").val(), 
 						success: function(data) { 
+							console.log('${userType}'); 
+							if('${accountType}' == "") { 
+								console.log("working ..."); 
+							} else { 
+								console.log("failed ..."); 
+							}
 							if(data.length > 0) { 
 								for(i=0; i< data.length; i++) { 
-									$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
-									data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
-									data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
-									data[i].available + "</td><td><a href='/VRS/home/public/vehicles/delete?vin=" + 
-									data[i].vin +"'>Delete</a></td></tr>"); 
+									if('${userType}' == 'customer') {
+										var vinNumber = data[i].vin; 
+										$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
+										data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
+										data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
+										data[i].available + "</td><td><a id='vehicleHire" + data[i].vin +"' href='#'>Book</a></td></tr>"); 
+										
+										$("#vehicleHire" + vinNumber).click(function() {
+											$.ajax({ 
+												url: "/VRS/vehicle/getVehicle", 
+												data: "vin=" + vinNumber, 
+												success: function(data) {
+													$('#hireVehicleModalDialog table').append("<tbody>"); 
+													$('#hireVehicleModalDialog table').append("<tr><td>Make</td><td>" + data.make +"</td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Model</td><td>" + data.model +"</td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Max Speed</td><td>" + data.maxSpeed +"</td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Seating</td><td>" + data.seating +"</td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Fuel type</td><td>" + data.fuelType +"</td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Daily cost</td><td>" + data.dailyCost +"</td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Start date</td><td><input type='text' id='hireStartDate' class='dateControl' /></td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>End date</td><td><input type='text' id='hireEndDate' class='dateControl' /></td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Insurance</td><td><input type='radio' name='insurance' value='yes' />Yes<input type='radio' name='insurance' value='no' selected />No</td></tr>");	
+													$('#hireVehicleModalDialog table').append("</tbody>");	
+													
+													$('.dateControl').datepicker({
+														changeMonth: true, 
+														changeYear: true, 
+														dateFormat: 'yy-mm-dd'
+													}); 		 
+												}, 
+												error: function() { 
+													alert("failed.");
+												}
+											}); 
+				 
+											$('#hireVehicleModalDialog')
+												.data('link', this)
+												.dialog('open'); 
+												 return false;
+										}); 			
+									} else { 
+										$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
+										data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
+										data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
+										data[i].available + "</td><td><a href='/VRS/home/public/vehicles/delete?vin=" + 
+										data[i].vin +"'>Delete</a></td></tr>"); 
+									}
 								}
 							}
 						},
@@ -301,6 +414,21 @@
 					}
 				}
 			});
+			
+			$('#hireVehicleModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: { 
+					Yes: function() { 
+						//ajax call
+					}, 
+					No: function() { 
+						$(this).dialog("close");
+					}
+				}
+			}); 
 			
 			$('#resetModalDialog').dialog({
 				modal: true, 

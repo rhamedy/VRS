@@ -28,6 +28,7 @@ import com.vrs.services.UserServices;
 import com.vrs.util.ErrorUtil;
 import com.vrs.util.JSONResponse;
 import com.vrs.util.JSONUtil;
+import com.vrs.util.KeyValuePair;
 
 @Controller
 public class RentalController {
@@ -63,6 +64,8 @@ public class RentalController {
 				roleType = "technical"; 
 			} else if(role.getRoleName().equals("staff")) { 
 				roleType = "staff";
+			} else if(role.getRoleName().equals("customer")) { 
+				roleType = "customer"; 
 			}
 		}
 		
@@ -84,7 +87,6 @@ public class RentalController {
 			 */
 			
 			mav.addObject("users", userServices.listUsers());
-			mav.addObject("countries", rentalServices.getCountries()); 
 			
 		} else if(roleType.equals("staff")) { 
 			/*
@@ -100,8 +102,19 @@ public class RentalController {
 			/*
 			 * backup/restore and other configuration functionalities. 
 			 */
+		} else if(roleType.equals("customer")) { 
+			/*
+			 * customers will be allowed to browse available vehicles and book a vehicle 
+			 * for hire
+			 */
+			
+			
 		}
 
+		mav.addObject("countries", rentalServices.getCountries()); 
+		mav.addObject("user", user); 
+		
+		
 		return mav;
 	}
 
@@ -134,10 +147,22 @@ public class RentalController {
 
 		return rentalServices.getVehicles(parseBranchId);
 	}
+	
+	@RequestMapping(value = "/vehicle/getVehicle", method = RequestMethod.GET)
+	public @ResponseBody Vehicle getVehicle(@RequestParam(required=true) String vin) { 
+		logger.info("entry getVehicle()"); 
+		
+		Vehicle vehicle =  rentalServices.findVehicle(vin); 
+		KeyValuePair<String, String> makeModel = rentalServices.getMakeAndModelName(vin); 
+		vehicle.setMake(makeModel.getValue()); 
+		vehicle.setModel(makeModel.getKey()); 
+		
+		return vehicle;
+	}
 
 	@RequestMapping(value = "/vehicle/editVehicle", method = RequestMethod.GET)
-	public ModelAndView getVehicle(@RequestParam(required=false) String vin) {
-		logger.info("entry getVehicle()");
+	public ModelAndView editVehicle(@RequestParam(required=false) String vin) {
+		logger.info("entry editVehicle()");
 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("editVehicle");
@@ -159,6 +184,7 @@ public class RentalController {
 		
 
 		/*
+		 * to be fixed 
 		 * city id is hard coded, we will have to obtain that from the logged in
 		 * user somehow.
 		 */
