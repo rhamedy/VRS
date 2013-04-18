@@ -1,5 +1,6 @@
 package com.vrs.dao;
 
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -365,5 +366,16 @@ public class RentalDao {
 				});
 
 		return country;
+	}
+
+	public void addVehicleBooking(String username, String vin, Date startDate,
+			Date endDate, boolean insurance, double hireCost) {
+		logger.info("entry addVehicleBooking()");
+
+		String SQL = "INSERT INTO rental.customer_vehicle(vehicle_vin, username,"
+				+ "start_date,end_date,insurance,hire_cost) VALUES(?,?,?,?,?,?)";
+
+		jdbcTemplate.update(SQL, new Object[] { vin, username, startDate,
+				endDate, insurance, hireCost });
 	}
 }

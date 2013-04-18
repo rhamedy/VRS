@@ -1,5 +1,8 @@
 package com.vrs.controller;
 
+import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,76 +48,75 @@ public class RentalController {
 	@RequestMapping(value = "/home")
 	public ModelAndView homepage() {
 		logger.info("inside controller {info}");
-		
-		String roleType = ""; 
-		
+
+		String roleType = "";
+
 		ModelAndView mav = new ModelAndView();
-		
-		User user = userServices.findUser(userServices.getCurrentUsername()); 
-		
-		List<Role> roles = userServices.getUserRole(user); 
-		
+
+		User user = userServices.findUser(userServices.getCurrentUsername());
+
+		List<Role> roles = userServices.getUserRole(user);
+
 		logger.info("rentalController home roles.size = " + roles.size());
-		
-		for(Role role: roles) { 
-			if(role.getRoleName().equals("admin")) { 
-				roleType = "admin";  
-				break; 
-			} else if(role.getRoleName().equals("technical")) { 
-				roleType = "technical"; 
-			} else if(role.getRoleName().equals("staff")) { 
+
+		for (Role role : roles) {
+			if (role.getRoleName().equals("admin")) {
+				roleType = "admin";
+				break;
+			} else if (role.getRoleName().equals("technical")) {
+				roleType = "technical";
+			} else if (role.getRoleName().equals("staff")) {
 				roleType = "staff";
-			} else if(role.getRoleName().equals("customer")) { 
-				roleType = "customer"; 
+			} else if (role.getRoleName().equals("customer")) {
+				roleType = "customer";
 			}
 		}
-		
-		
+
 		mav.setViewName("index");
 		mav.addObject("userType", roleType);
-		
+
 		/*
-		 * userType/roleType allow the view to render divs accordingly ... for example
-		 * if the user is admin display users management, if the user is technical
-		 * do not display users display back and restore functionalities. 
-		 *  
+		 * userType/roleType allow the view to render divs accordingly ... for
+		 * example if the user is admin display users management, if the user is
+		 * technical do not display users display back and restore
+		 * functionalities.
 		 */
-		
-		if(roleType.equals("admin")) { 
+
+		if (roleType.equals("admin")) {
 			/*
-			 * The user management and branch management will be only displayed to 
-			 * administrators. 
+			 * The user management and branch management will be only displayed
+			 * to administrators.
 			 */
-			
+
 			mav.addObject("users", userServices.listUsers());
-			
-		} else if(roleType.equals("staff")) { 
+
+		} else if (roleType.equals("staff")) {
 			/*
-			 * The staff will not see user and branch related data but, list of 
-			 * vehicles on the branch they are assigned to as well as that 
+			 * The staff will not see user and branch related data but, list of
+			 * vehicles on the branch they are assigned to as well as that
 			 * branch details.
 			 */
 
-			mav.addObject("branch", rentalServices.findBranch(user.getBranchId()));
-			mav.addObject("vehicles", rentalServices.getVehicles(user.getBranchId()));
-			
-		} else if(roleType.equals("technical")) { 
+			mav.addObject("branch",
+					rentalServices.findBranch(user.getBranchId()));
+			mav.addObject("vehicles",
+					rentalServices.getVehicles(user.getBranchId()));
+
+		} else if (roleType.equals("technical")) {
 			/*
-			 * backup/restore and other configuration functionalities. 
+			 * backup/restore and other configuration functionalities.
 			 */
-		} else if(roleType.equals("customer")) { 
+		} else if (roleType.equals("customer")) {
 			/*
-			 * customers will be allowed to browse available vehicles and book a vehicle 
-			 * for hire
+			 * customers will be allowed to browse available vehicles and book a
+			 * vehicle for hire
 			 */
-			
-			
+
 		}
 
-		mav.addObject("countries", rentalServices.getCountries()); 
-		mav.addObject("user", user); 
-		
-		
+		mav.addObject("countries", rentalServices.getCountries());
+		mav.addObject("user", user);
+
 		return mav;
 	}
 
@@ -147,32 +149,34 @@ public class RentalController {
 
 		return rentalServices.getVehicles(parseBranchId);
 	}
-	
+
 	@RequestMapping(value = "/vehicle/getVehicle", method = RequestMethod.GET)
-	public @ResponseBody Vehicle getVehicle(@RequestParam(required=true) String vin) { 
-		logger.info("entry getVehicle()"); 
-		
-		Vehicle vehicle =  rentalServices.findVehicle(vin); 
-		KeyValuePair<String, String> makeModel = rentalServices.getMakeAndModelName(vin); 
-		vehicle.setMake(makeModel.getValue()); 
-		vehicle.setModel(makeModel.getKey()); 
-		
+	public @ResponseBody
+	Vehicle getVehicle(@RequestParam(required = true) String vin) {
+		logger.info("entry getVehicle()");
+
+		Vehicle vehicle = rentalServices.findVehicle(vin);
+		KeyValuePair<String, String> makeModel = rentalServices
+				.getMakeAndModelName(vin);
+		vehicle.setMake(makeModel.getValue());
+		vehicle.setModel(makeModel.getKey());
+
 		return vehicle;
 	}
 
 	@RequestMapping(value = "/vehicle/editVehicle", method = RequestMethod.GET)
-	public ModelAndView editVehicle(@RequestParam(required=false) String vin) {
+	public ModelAndView editVehicle(@RequestParam(required = false) String vin) {
 		logger.info("entry editVehicle()");
 
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("editVehicle");
-		
-		List<String> models = new ArrayList<String>(); 
+
+		List<String> models = new ArrayList<String>();
 
 		Vehicle vehicle = rentalServices.findVehicle(vin);
-		if(vehicle == null) { 
-			vehicle = new Vehicle(); 
-			vehicle.setAvailable(true); 
+		if (vehicle == null) {
+			vehicle = new Vehicle();
+			vehicle.setAvailable(true);
 		} else {
 			vehicle = rentalServices.setMakeAndModel(vehicle);
 			int makeId = rentalServices.getMakeId(vehicle.getMake());
@@ -181,20 +185,61 @@ public class RentalController {
 
 		List<Branch> branches = rentalServices.getBranches(5);
 		List<String> makes = rentalServices.listMakes();
-		
 
 		/*
-		 * to be fixed 
-		 * city id is hard coded, we will have to obtain that from the logged in
-		 * user somehow.
+		 * to be fixed city id is hard coded, we will have to obtain that from
+		 * the logged in user somehow.
 		 */
 
 		mav.addObject("vehicle", vehicle);
 		mav.addObject("branches", branches);
 		mav.addObject("makes", makes);
 		mav.addObject("models", models);
-		
+
 		return mav;
+	}
+
+	@RequestMapping(value = "/vehicle/hireVehicle", method = RequestMethod.POST)
+	public @ResponseBody
+	JSONResponse hireVehicle(@RequestParam(required = true) String vin,
+			@RequestParam(required = true) String startDate,
+			@RequestParam(required = true) String endDate,
+			@RequestParam(required = true) String insurance) {
+
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+		Date sqlStartDate = null;
+		Date sqlEndDate = null;
+		try {
+			sqlStartDate = new Date(formatter.parse(startDate).getTime());
+			sqlEndDate = new Date(formatter.parse(endDate).getTime());
+		} catch (ParseException pe) {
+			return JSONUtil
+					.createFailureResponse("Invalid date format selected.");
+		}
+
+		if (vin == null || vin.length() <= 0) {
+			return JSONUtil.createFailureResponse("Missing vehicle identity.");
+		} else if (startDate == null) {
+			return JSONUtil
+					.createFailureResponse("startDate is not specified.");
+		} else if (endDate == null) {
+			return JSONUtil.createFailureResponse("endDate is not specificed.");
+		} else if ((sqlEndDate.getTime() - sqlStartDate.getTime()) < 1) {
+			return JSONUtil
+					.createFailureResponse("Invalid start date and end date choosen.");
+		} else if (insurance.length() <= 0) {
+			return JSONUtil
+					.createFailureResponse("Whether insurance required is not specified.");
+		}
+
+		String username = userServices.getCurrentUsername();
+		boolean insuranceBool = insurance.equals("yes") ? true : false;
+		rentalServices.addVehicleBooking(vin, username, sqlStartDate,
+				sqlEndDate, insuranceBool);
+
+		return JSONUtil
+				.createSuccessResponse("The booking has been added to the system.");
+
 	}
 
 	@RequestMapping(value = "/vehicle/editVehicle", method = RequestMethod.POST)
@@ -238,56 +283,57 @@ public class RentalController {
 		modelsMap.put("models", models);
 		return modelsMap;
 	}
-	
-	@RequestMapping(value = "/branch/editBranch", method = RequestMethod.GET) 
-	public ModelAndView getBracnh(@RequestParam(required = false) String branchId) { 
-		logger.info("entry getBranch()"); 
-		
-		ModelAndView mav = new ModelAndView(); 
-		mav.setViewName("editBranch"); 
-		
-		Branch branch; 
-		
-		if(branchId != null && branchId.length() > 0) {
-			int branchIdParsed = Integer.parseInt(branchId); 
-			branch = rentalServices.findBranch(branchIdParsed); 
-			mav.addObject("existingBranch", "false"); 
-			
-		} else { 
-			int newBranchId = rentalServices.getMaxBranchId(); 
+
+	@RequestMapping(value = "/branch/editBranch", method = RequestMethod.GET)
+	public ModelAndView getBracnh(
+			@RequestParam(required = false) String branchId) {
+		logger.info("entry getBranch()");
+
+		ModelAndView mav = new ModelAndView();
+		mav.setViewName("editBranch");
+
+		Branch branch;
+
+		if (branchId != null && branchId.length() > 0) {
+			int branchIdParsed = Integer.parseInt(branchId);
+			branch = rentalServices.findBranch(branchIdParsed);
+			mav.addObject("existingBranch", "false");
+
+		} else {
+			int newBranchId = rentalServices.getMaxBranchId();
 			branch = new Branch();
-			branch.setId(++newBranchId); 
-			mav.addObject("existingBranch", "true"); 
+			branch.setId(++newBranchId);
+			mav.addObject("existingBranch", "true");
 		}
-		
-		mav.addObject("cities", rentalServices.getCities(1)); 
-		mav.addObject("branch", branch); 
-		
+
+		mav.addObject("cities", rentalServices.getCities(1));
+		mav.addObject("branch", branch);
+
 		/*
-		 * we have hardcoded country id (1 for UK) ... we have to 
-		 * somehow retrieve this from the logged in user and replace
-		 * it here.
+		 * we have hardcoded country id (1 for UK) ... we have to somehow
+		 * retrieve this from the logged in user and replace it here.
 		 */
-		
-		return mav; 
+
+		return mav;
 	}
-	
+
 	@RequestMapping(value = "/branch/editBranch", method = RequestMethod.POST)
-	public @ResponseBody JSONResponse editBranch(@Valid Branch branch, BindingResult result, 
-			HttpServletRequest request) { 
-		
-		if(result.hasErrors()) { 
+	public @ResponseBody
+	JSONResponse editBranch(@Valid Branch branch, BindingResult result,
+			HttpServletRequest request) {
+
+		if (result.hasErrors()) {
 			return JSONUtil.createFailureResponse(
 					"Please provide valid data to the corresponding fields.",
 					ErrorUtil.listErrors(result));
-		} else { 
-			int cityId = Integer.parseInt(request.getParameter("city")); 
-			branch.setCityId(cityId); 
-			
-			if(rentalServices.findBranch(branch.getId()) == null) { 
-				rentalServices.addBranch(branch); 
-			} else { 
-				rentalServices.updateBranch(branch); 
+		} else {
+			int cityId = Integer.parseInt(request.getParameter("city"));
+			branch.setCityId(cityId);
+
+			if (rentalServices.findBranch(branch.getId()) == null) {
+				rentalServices.addBranch(branch);
+			} else {
+				rentalServices.updateBranch(branch);
 			}
 			return JSONUtil
 					.createSuccessResponse("The branch information is added/updated to the system.");

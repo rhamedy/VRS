@@ -237,6 +237,8 @@
 			 <table border="1">
 			 </table> 
 		</div>
+		<div id="customAlertModalDialog">
+		</div>
 	</body>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
@@ -336,33 +338,74 @@
 								for(i=0; i< data.length; i++) { 
 									if('${userType}' == 'customer') {
 										var vinNumber = data[i].vin; 
+										var dailyCost = data[i].dailyCost; 
 										$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
 										data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
 										data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
-										data[i].available + "</td><td><a id='vehicleHire" + data[i].vin +"' href='#'>Book</a></td></tr>"); 
+										data[i].available + "</td><td>"+ data[i].dailyCost +"</td><td><a id='vehicleHire" + data[i].vin +"' href='#'>Book</a></td></tr>"); 
 										
 										$("#vehicleHire" + vinNumber).click(function() {
 											$.ajax({ 
 												url: "/VRS/vehicle/getVehicle", 
 												data: "vin=" + vinNumber, 
 												success: function(data) {
+													$('#hireVehicleModalDialog table').empty();
 													$('#hireVehicleModalDialog table').append("<tbody>"); 
+													$('#hireVehicleModalDialog').append("<input type='hidden' value='" + vinNumber +"' id='hireVinNumber' />");
 													$('#hireVehicleModalDialog table').append("<tr><td>Make</td><td>" + data.make +"</td></tr>");
 													$('#hireVehicleModalDialog table').append("<tr><td>Model</td><td>" + data.model +"</td></tr>");
 													$('#hireVehicleModalDialog table').append("<tr><td>Max Speed</td><td>" + data.maxSpeed +"</td></tr>");
 													$('#hireVehicleModalDialog table').append("<tr><td>Seating</td><td>" + data.seating +"</td></tr>");
-													$('#hireVehicleModalDialog table').append("<tr><td>Fuel type</td><td>" + data.fuelType +"</td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Fuel type</td><td>" + data.fuel +"</td></tr>");
 													$('#hireVehicleModalDialog table').append("<tr><td>Daily cost</td><td>" + data.dailyCost +"</td></tr>");
 													$('#hireVehicleModalDialog table').append("<tr><td>Start date</td><td><input type='text' id='hireStartDate' class='dateControl' /></td></tr>");
-													$('#hireVehicleModalDialog table').append("<tr><td>End date</td><td><input type='text' id='hireEndDate' class='dateControl' /></td></tr>");
-													$('#hireVehicleModalDialog table').append("<tr><td>Insurance</td><td><input type='radio' name='insurance' value='yes' />Yes<input type='radio' name='insurance' value='no' selected />No</td></tr>");	
+													$('#hireVehicleModalDialog table').append("<tr><td>End date</td><td><input type='text' id='hireEndDate' class='dateControl'/></td></tr>");
+													$('#hireVehicleModalDialog table').append("<tr><td>Insurance</td><td><input type='radio' name='insurance' value='yes' />Yes<input type='radio' name='insurance' value='no' checked />No</td></tr>");	
+													$('#hireVehicleModalDialog table').append("<tr><td>Total cost</td><td id='hireTotalCost'></td></tr>"); 
 													$('#hireVehicleModalDialog table').append("</tbody>");	
 													
-													$('.dateControl').datepicker({
+													$('#hireStartDate').datepicker({
 														changeMonth: true, 
-														changeYear: true, 
+														changeYear: false,
+														minDate: 1,
+														maxDate: 3,  
 														dateFormat: 'yy-mm-dd'
-													}); 		 
+													}); 
+													
+													$('#hireEndDate').datepicker({
+														changeMonth: true, 
+														changeYear: true,
+														minDate: 2,
+														dateFormat: 'yy-mm-dd'
+													}); 
+													
+													$("#hireStartDate, #hireEndDate, input[type='radio'][name='insurance']").change(function(){ 
+														console.log("event triggered ..."); 
+														if($('#hireEndDate').datepicker('getDate') != null) { 
+															var startDate = $('#hireStartDate').datepicker('getDate'); 
+															var endDate = $('#hireEndDate').datepicker('getDate'); 
+															
+															var dateDifference = endDate.getTime() - startDate.getTime(); 
+															var days = dateDifference/(86400000); 
+															
+															var insuranceTaken = $("input[type='radio'][name='insurance']:checked"); 
+															var total; 
+															if(dateDifference > 1) {
+																if(insuranceTaken.val() == 'yes') { 
+																	total = (days * dailyCost) + 110; //110 is insurance value 
+																	$('#hireTotalCost').text(total + 'Pound'); 
+																} else { 
+																	total = days * dailyCost; 
+																	$('#hireTotalCost').text(total + 'Pound'); 
+																}
+															} else { 
+																$('#customAlertModalDialog').empty(); 
+																$('#customAlertModalDialog').append('<p>Invalid selection. Choose valid start and end date.</p>'); 
+																$('#customAlertModalDialog').dialog('open');
+																return false;
+															}							
+														}
+													});
 												}, 
 												error: function() { 
 													alert("failed.");
@@ -421,10 +464,47 @@
 				width: 'auto', 
 				resizable: false, 
 				buttons: { 
-					Yes: function() { 
-						//ajax call
+					Confirm: function() { 
+						 
+						var startDate = $('#hireStartDate').datepicker({dateFormat:'yy-mm-dd'}).val();
+						var endDate = $('#hireEndDate').datepicker({dateFormat:'yy-mm-dd'}).val();
+						
+						var vinNumber = $('#hireVinNumber').val(); 
+						var insurance = $("input[type='radio'][name='insurance']:checked"); 
+						var diff =  $('#hireEndDate').datepicker('getDate').getTime() - 
+							$('#hireStartDate').datepicker('getDate').getTime(); 
+						if(diff < 1) { 
+							$('#customAlertModalDialog').empty(); 
+							$('#customAlertModalDialog').append('<p> Invalid start and end date selection.'); 
+							$('#customAlertModalDialog').dialog('open');
+						} else { 
+							$.ajax({
+								type:'POST', 
+								url: '/VRS/vehicle/hireVehicle',
+								data: 'vin=' + vinNumber + '&startDate=' + startDate + '&endDate=' + 
+									endDate + '&insurance=' + insurance.val(),
+								dataType: 'json', 
+								success: function(data) {  
+									
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p> The booking has been added to the system. Press OK to reload.</p>'); 
+									$('#customAlertModalDialog').dialog('open');
+									$(this).dialog("close");
+									
+								}, 
+								error: function() { 
+									
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p> The booking process failed. </p>'); 
+									$('#customAlertModalDialog').dialog('open');
+									$(this).dialog('close'); 
+									
+									//fix the dissapearing dialog issue.
+								}	
+							}); 
+						}
 					}, 
-					No: function() { 
+					Cancel: function() { 
 						$(this).dialog("close");
 					}
 				}
@@ -477,6 +557,18 @@
 					}
 				}
 			});
+			
+			$('#customAlertModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: {
+					OK: function() { 
+						$(this).dialog("close");
+					}
+				}
+			}); 
 			
 			$('#deleteUser').click(function() {
 				$('#deleteModalDialog')
