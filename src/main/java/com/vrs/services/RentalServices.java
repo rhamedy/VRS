@@ -153,6 +153,12 @@ public class RentalServices {
 	public List<Vehicle> getVehiclesForHire(int branchId) { 
 		logger.info("entry getVehiclesForHire()"); 
 		
-		return rentalDao.getVehiclesForHire(branchId); 
+		List<Vehicle> vehicles = rentalDao.getVehiclesForHire(branchId); 
+		
+		for (Vehicle v : vehicles) {
+			v = setMakeAndModel(v);
+		}
+
+		return vehicles;
 	}
 }

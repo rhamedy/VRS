@@ -342,7 +342,8 @@
 										$("tbody#vehicleData").append("<tr><td>" + data[i].make + "</td><td>" + 
 										data[i].model + "</td><td>" + data[i].maxSpeed + "</td><td>" + 
 										data[i].fuel + "</td><td>" + data[i].seating + "</td><td>" + 
-										data[i].available + "</td><td>"+ data[i].dailyCost +"</td><td><a id='vehicleHire" + data[i].vin +"' href='#'>Book</a></td></tr>"); 
+										data[i].dailyCost +"</td><td><a id='vehicleHire" + 
+										data[i].vin +"' href='#'>Book</a></td></tr>"); 
 										
 										$("#vehicleHire" + vinNumber).click(function() {
 											$.ajax({ 
