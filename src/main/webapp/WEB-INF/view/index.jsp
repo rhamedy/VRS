@@ -325,7 +325,7 @@
 				$("tbody#vehicleData").empty();
 				if($(this).children(":selected").val().trim().length > 0) { 
 					$.ajax({ 
-						url: "/VRS/home/public/vehicles", 
+						url: "/VRS/vehicle/vehiclesForHire", 
 						data: "branchId=" + $(this).children(":selected").val(), 
 						success: function(data) { 
 							console.log('${userType}'); 
@@ -566,6 +566,10 @@
 				buttons: {
 					OK: function() { 
 						$(this).dialog("close");
+						if($('#hireVehicleModalDialog').is(':visible')) {
+							$('#hireVehicleModalDialog').dialog('close');
+							location.reload(); 
+						}
 					}
 				}
 			}); 

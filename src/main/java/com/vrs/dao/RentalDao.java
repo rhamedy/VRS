@@ -378,4 +378,15 @@ public class RentalDao {
 		jdbcTemplate.update(SQL, new Object[] { vin, username, startDate,
 				endDate, insurance, hireCost });
 	}
+	
+	public List<Vehicle> getVehiclesForHire(int branchId) { 
+		logger.info("entry getVehiclesFroHire()"); 
+		
+		String SQL = "SELECT * FROM rental.vehicle WHERE branch_id = ? AND available = true";
+
+		List<Vehicle> vehicles = jdbcTemplate.query(SQL,
+				new Object[] { branchId }, new BeanPropertyRowMapper<Vehicle>(
+						Vehicle.class));
+		return vehicles;
+	}
 }

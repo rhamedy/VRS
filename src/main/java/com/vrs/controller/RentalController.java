@@ -339,4 +339,14 @@ public class RentalController {
 					.createSuccessResponse("The branch information is added/updated to the system.");
 		}
 	}
+	
+	@RequestMapping(value = "/vehicle/vehiclesForHire", method = RequestMethod.GET)
+	public @ResponseBody
+	List<Vehicle> getVehiclesForHire(@RequestParam String branchId) {
+		logger.info("entry getVehicles()");
+
+		int parseBranchId = Integer.parseInt(branchId);
+
+		return rentalServices.getVehiclesForHire(parseBranchId);
+	}
 }

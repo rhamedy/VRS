@@ -149,4 +149,10 @@ public class RentalServices {
 		}
 		rentalDao.addVehicleBooking(username, vin, startDate, endDate, insurance, totalCost); 
 	}
+	
+	public List<Vehicle> getVehiclesForHire(int branchId) { 
+		logger.info("entry getVehiclesForHire()"); 
+		
+		return rentalDao.getVehiclesForHire(branchId); 
+	}
 }
