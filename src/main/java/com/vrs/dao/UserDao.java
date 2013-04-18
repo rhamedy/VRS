@@ -244,4 +244,12 @@ public class UserDao {
 
 		return (result > 0) ? true : false;
 	}
+	
+	public String getPasswordByUsername(String username) { 
+		logger.info("entry getPasswordByUsername()"); 
+		
+		String SQL = "SELECT password FROM auth.user WHERE username = ?"; 
+		
+		return jdbcTemplate.queryForObject(SQL, new Object[]{ username }, String.class); 
+	}
 }

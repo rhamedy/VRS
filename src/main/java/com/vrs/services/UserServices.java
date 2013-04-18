@@ -149,4 +149,10 @@ public class UserServices {
 			userDao.insertUserRole(user, r); 
 		}	
 	}
+	
+	public String getPasswordByUsername(String username) { 
+		logger.info("entry getPasswordByUsername()"); 
+		
+		return userDao.getPasswordByUsername(username);
+	}
 }
