@@ -13,6 +13,8 @@ import com.vrs.dao.RentalDao;
 import com.vrs.model.Branch;
 import com.vrs.model.Vehicle;
 import com.vrs.util.KeyValuePair;
+import com.vrs.util.MailClient;
+import com.vrs.util.MailTemplate;
 
 /**
  * Is used by Controller class to communicate with dao's and views.
@@ -139,15 +141,20 @@ public class RentalServices {
 		return rentalDao.getCountryByCity(cityId);
 	}
 
-	public void addVehicleBooking(String vin, String username, Date startDate,
-			Date endDate, boolean insurance) {
+	public void addVehicleBooking(String uuid, String vin, String username, Date startDate,
+			Date endDate, boolean insurance, final String systemPassword) {
 		int days = (int)((endDate.getTime() - startDate.getTime())/86400000); 
 		Vehicle vehicle = rentalDao.findVehicle(vin); 
+		vehicle = setMakeAndModel(vehicle); 
 		double totalCost = days * vehicle.getDailyCost(); 
 		if(insurance) { 
 			totalCost += 110; //assuming £110 is the standard insurance amount
 		}
-		rentalDao.addVehicleBooking(username, vin, startDate, endDate, insurance, totalCost); 
+		rentalDao.addVehicleBooking(uuid, username, vin, startDate, endDate, insurance, totalCost); 
+		vehicle.setAvailable(false); //this will mark vehicle as unavailable
+		rentalDao.updateVehicle(vehicle); 
+		String emailBody = MailTemplate.getBookingTemplate(uuid, vehicle, startDate, endDate, insurance, totalCost); 
+		MailClient.sendEmail(username, systemPassword, "Vehicle Booking Iternity", emailBody); //send email
 	}
 	
 	public List<Vehicle> getVehiclesForHire(int branchId) { 

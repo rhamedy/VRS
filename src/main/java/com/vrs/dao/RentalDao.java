@@ -368,14 +368,14 @@ public class RentalDao {
 		return country;
 	}
 
-	public void addVehicleBooking(String username, String vin, Date startDate,
+	public void addVehicleBooking(String uuid, String username, String vin, Date startDate,
 			Date endDate, boolean insurance, double hireCost) {
 		logger.info("entry addVehicleBooking()");
 
-		String SQL = "INSERT INTO rental.customer_vehicle(vehicle_vin, username,"
-				+ "start_date,end_date,insurance,hire_cost) VALUES(?,?,?,?,?,?)";
+		String SQL = "INSERT INTO rental.customer_vehicle(id, vehicle_vin, username,"
+				+ "start_date,end_date,insurance,hire_cost) VALUES(?,?,?,?,?,?,?)";
 
-		jdbcTemplate.update(SQL, new Object[] { vin, username, startDate,
+		jdbcTemplate.update(SQL, new Object[] { uuid, vin, username, startDate,
 				endDate, insurance, hireCost });
 	}
 	

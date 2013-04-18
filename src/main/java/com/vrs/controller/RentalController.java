@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -234,8 +235,10 @@ public class RentalController {
 
 		String username = userServices.getCurrentUsername();
 		boolean insuranceBool = insurance.equals("yes") ? true : false;
-		rentalServices.addVehicleBooking(vin, username, sqlStartDate,
-				sqlEndDate, insuranceBool);
+		String uuid = UUID.randomUUID().toString(); 
+		String systemPassword = userServices.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
+		rentalServices.addVehicleBooking(uuid, vin, username, sqlStartDate,
+				sqlEndDate, insuranceBool, systemPassword);
 
 		return JSONUtil
 				.createSuccessResponse("The booking has been added to the system.");

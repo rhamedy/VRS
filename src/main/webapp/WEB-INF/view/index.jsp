@@ -345,10 +345,10 @@
 										data[i].dailyCost +"</td><td><a id='vehicleHire" + 
 										data[i].vin +"' href='#'>Book</a></td></tr>"); 
 										
-										$("#vehicleHire" + vinNumber).click(function() {
+										$("#vehicleHire" + vinNumber).click(function(event) {
 											$.ajax({ 
 												url: "/VRS/vehicle/getVehicle", 
-												data: "vin=" + vinNumber, 
+												data: "vin=" + (event.target.id).substring(11,(event.target.id).length),  
 												success: function(data) {
 													$('#hireVehicleModalDialog table').empty();
 													$('#hireVehicleModalDialog table').append("<tbody>"); 
