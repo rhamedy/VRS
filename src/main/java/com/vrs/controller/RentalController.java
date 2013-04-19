@@ -235,8 +235,9 @@ public class RentalController {
 
 		String username = userServices.getCurrentUsername();
 		boolean insuranceBool = insurance.equals("yes") ? true : false;
-		String uuid = UUID.randomUUID().toString(); 
-		String systemPassword = userServices.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
+		String uuid = UUID.randomUUID().toString();
+		String systemPassword = userServices
+				.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
 		rentalServices.addVehicleBooking(uuid, vin, username, sqlStartDate,
 				sqlEndDate, insuranceBool, systemPassword);
 
@@ -342,7 +343,7 @@ public class RentalController {
 					.createSuccessResponse("The branch information is added/updated to the system.");
 		}
 	}
-	
+
 	@RequestMapping(value = "/vehicle/vehiclesForHire", method = RequestMethod.GET)
 	public @ResponseBody
 	List<Vehicle> getVehiclesForHire(@RequestParam String branchId) {
@@ -351,5 +352,43 @@ public class RentalController {
 		int parseBranchId = Integer.parseInt(branchId);
 
 		return rentalServices.getVehiclesForHire(parseBranchId);
+	}
+
+	@RequestMapping(value = "/vehicle/cancelBooking", method = RequestMethod.GET)
+	public @ResponseBody
+	JSONResponse cancelBooking(@RequestParam(required = true) String vin) {
+		Vehicle vehicle = rentalServices.findVehicle(vin);
+		if (vehicle == null) {
+			return JSONUtil
+					.createFailureResponse("Error.Vehicle cannot be found.");
+		}
+		rentalServices.cancelBooking(vin);
+		// send an email saying booking has been cancelled.
+		return JSONUtil
+				.createSuccessResponse("The booking has been cancelled successfully.");
+	}
+
+	@RequestMapping(value = "/vehicle/extendBooking", method = RequestMethod.GET)
+	public @ResponseBody
+	JSONResponse cancelBooking(@RequestParam(required = true) String vin,
+			@RequestParam(required = true) String days) {
+		Vehicle vehicle = rentalServices.findVehicle(vin);
+		if (vehicle == null) {
+			return JSONUtil
+					.createFailureResponse("Error. Vehicle cannot be found.");
+		}
+		
+		int daysInt; 
+		
+		try {
+			daysInt = Integer.parseInt(days);
+		} catch(NumberFormatException nfe) { 
+			return JSONUtil
+					.createFailureResponse("Error. Provide valid number of days (in number).");
+		}
+		
+		rentalServices.extendBooking(vin, daysInt); 
+		//send an email about the hire period extension.
+		return JSONUtil.createSuccessResponse("Vehicle hire period extended successfully."); 
 	}
 }

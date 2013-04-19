@@ -18,6 +18,24 @@
 	<body>
 		<div id="main">
 			<c:if test="${userType == 'staff'}">
+				<div id="userDetails">
+					<table border="1"">
+						<tbody id="userListBody">
+								<tr>
+									<td>First name</td><td>${user.firstName}</td>
+								</tr>
+								<tr>
+									<td>Last name</td><td>${user.lastName}</td>
+								</tr>
+								<tr>
+									<td>Date of birth</td><td>${user.dob}</td>
+								</tr>
+								<tr>
+									<td>Mobile</td><td>${user.mobile}</td>
+								</tr>
+						</tbody>
+					</table>
+				</div><br /><br />
 				<div id="branchDetails">
 					<table border="1">
 						<thead>
@@ -148,9 +166,18 @@
 									<td>${vehicle.fuel}</td>
 									<td>${vehicle.model}</td>
 									<td>${branch.name}</td>
-									<td><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit|</a>
-										<a id="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete|</a>
-									</td>
+									<c:choose>
+										<c:when test="${vehicle.available}">
+											<td><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit|</a>
+												<a id="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete</a>
+											</td>
+										</c:when>
+										<c:otherwise>
+											<td><a id="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?vin=${vehicle.vin}">Cancel booking|</a>
+												<a id="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?vin=${vehicle.vin}">Extend Hire</a>
+											</td>
+										</c:otherwise>
+									</c:choose>
 								</tr>
 							</c:forEach>
 						</tobdy>
@@ -239,6 +266,13 @@
 		</div>
 		<div id="customAlertModalDialog">
 		</div>
+		<div id="cancelVehicleBookingModalDialog" title="Cancel booking">
+			<p>Do you wish to conitnue deleting current booking?</p>
+		</div>
+		<div id="extendVehicleHirePeriodModalDialog" title="Extend booking">
+			<label for='extendNoOfDays'>No of days to extend </label>
+			<input type='text' name='extendNoOfDays' id='extendNoOfDays' />
+		</div>
 	</body>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
@@ -298,7 +332,7 @@
 								$.each(value, function(key, v) { 
 									if(key == "id") { 
 										id = v; 
-									} else if(key == "name") { 
+									extendVehicleHirePeriodModalDialog} else if(key == "name") { 
 										name = v; 
 									} else if(key == "streetName") { 
 										streetName = v; 
@@ -446,7 +480,7 @@
 			$('#deleteModalDialog').dialog({
 				modal: true, 
 				autoOpen: false, 
-				width: 'auto', 
+				width: 'auto',
 				resizable: false, 
 				buttons: { 
 					Yes: function() {
@@ -601,6 +635,76 @@
 				.data('link',this)
 				.dialog('open');
 				return false; 
+			}); 
+			
+			$('#cancelVehicleBookingModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: {
+					Yes: function() { 
+						$.ajax({
+							type: 'GET', 
+							url: '/VRS/vehicle/cancelBooking', 
+							data: 'vin=' + (($(this).data('link').href).split('=')[1]), 
+							dataType: 'json', 
+							success: function() { 
+								alert("the booking has been cancelled successfully.");
+								$(this).dialog('close');
+							}, 
+							error: function() { 
+								alert("cancelling the booking failed.");
+								$(this).dialog('close');
+							}
+						}); 
+					}, 
+					No: function() {
+						$(this).dialog('close'); 
+					}
+				}
+			}); 
+			
+			$('#extendVehicleHirePeriodModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: {
+					Yes: function() { 
+						$.ajax({
+							type: 'GET', 
+							url: '/VRS/vehicle/extendBooking', 
+							data: 'vin=' + (($(this).data('link').href).split('=')[1]) +'&days=' + $('#extendNoOfDays').val(), 
+							dataType: 'json', 
+							success: function() { 
+								alert("the booking has been extended successfully.");
+								$(this).dialog('close');
+							}, 
+							error: function() { 
+								alert("Extending the booking has failed.");
+								$(this).dialog('close');
+							}
+						}); 
+					}, 
+					No: function() {
+						$(this).dialog('close'); 
+					}
+				}
+			}); 
+			
+			$('#cancelVehicleBooking').click(function() { 
+				 $('#cancelVehicleBookingModalDialog')
+				 .data('link',this)
+				 .dialog('open');
+				 return false; 
+			}); 
+			
+			$('#extendVehicleHirePeriod').click(function() { 
+				 $('#extendVehicleHirePeriodModalDialog')
+				 .data('link',this)
+				 .dialog('open');
+				 return false; 
 			}); 
 		}); 
 	</script>

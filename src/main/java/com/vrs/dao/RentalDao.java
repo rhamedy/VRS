@@ -3,6 +3,7 @@ package com.vrs.dao;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -388,5 +389,37 @@ public class RentalDao {
 				new Object[] { branchId }, new BeanPropertyRowMapper<Vehicle>(
 						Vehicle.class));
 		return vehicles;
+	}
+	
+	public void cancelBooking(String vin) { 
+		String SQL = "DELETE FROM rental.customer_vehicle WHERE vehicle_vin = ?"; 
+		
+		/*
+		 * Currently deleting based on vin but, will have to make use of booking id 
+		 * later on in order to avoid confusion with expiring bookings for same 
+		 * vehicle.
+		 * 
+		 */
+		
+		jdbcTemplate.update(SQL, new Object[]{ vin }); 
+	}
+	
+	public void extendBooking(String vin, int days) { 
+		String SQL1 = "SELECT end_date FROM rental.customer_vehicle WHERE vehicle_vin = ?"; 
+		String SQL2 = "UPDATE rental.customer_vehicle SET end_date = ? WHERE vehicle_vin = ?";
+		/*
+		 * Currently deleting based on vin but, will have to make use of booking id 
+		 * later on in order to avoid confusion with expiring bookings for same 
+		 * vehicle.
+		 * 
+		 */
+		
+		Date endDate = jdbcTemplate.queryForObject(SQL1, new Object[]{ vin }, Date.class);
+		Calendar c = Calendar.getInstance(); 
+		c.setTime(endDate); 
+		c.add(Calendar.DATE, days); 
+		endDate = new Date(c.getTimeInMillis()); 
+		
+		jdbcTemplate.update(SQL2, new Object[]{ endDate, vin}); 
 	}
 }

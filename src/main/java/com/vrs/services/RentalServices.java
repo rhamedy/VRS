@@ -168,4 +168,15 @@ public class RentalServices {
 
 		return vehicles;
 	}
+	
+	public void cancelBooking(String vin) { 
+		rentalDao.cancelBooking(vin);
+		Vehicle vehicle = rentalDao.findVehicle(vin); 
+		vehicle.setAvailable(true); 
+		rentalDao.updateVehicle(vehicle); 
+	}
+	
+	public void extendBooking(String vin, int days) { 
+		rentalDao.extendBooking(vin, days); 
+	}
 }
