@@ -20,6 +20,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
+import com.vrs.model.Booking;
 import com.vrs.model.Branch;
 import com.vrs.model.Vehicle;
 import com.vrs.util.KeyValuePair;
@@ -369,20 +370,23 @@ public class RentalDao {
 		return country;
 	}
 
-	public void addVehicleBooking(String uuid, String username, String vin, Date startDate,
-			Date endDate, boolean insurance, double hireCost) {
+	public void addVehicleBooking(Booking booking) {
 		logger.info("entry addVehicleBooking()");
 
 		String SQL = "INSERT INTO rental.customer_vehicle(id, vehicle_vin, username,"
 				+ "start_date,end_date,insurance,hire_cost) VALUES(?,?,?,?,?,?,?)";
 
-		jdbcTemplate.update(SQL, new Object[] { uuid, vin, username, startDate,
-				endDate, insurance, hireCost });
+		jdbcTemplate.update(
+				SQL,
+				new Object[] { booking.getId(), booking.getVehicleVin(),
+						booking.getUsername(), booking.getStartDate(),
+						booking.getEndDate(), booking.isInsurance(),
+						booking.getHireCost() });
 	}
-	
-	public List<Vehicle> getVehiclesForHire(int branchId) { 
-		logger.info("entry getVehiclesFroHire()"); 
-		
+
+	public List<Vehicle> getVehiclesForHire(int branchId) {
+		logger.info("entry getVehiclesFroHire()");
+
 		String SQL = "SELECT * FROM rental.vehicle WHERE branch_id = ? AND available = true";
 
 		List<Vehicle> vehicles = jdbcTemplate.query(SQL,
@@ -390,36 +394,54 @@ public class RentalDao {
 						Vehicle.class));
 		return vehicles;
 	}
-	
-	public void cancelBooking(String vin) { 
-		String SQL = "DELETE FROM rental.customer_vehicle WHERE vehicle_vin = ?"; 
-		
+
+	public void cancelBooking(String vin) {
+		String SQL = "DELETE FROM rental.customer_vehicle WHERE vehicle_vin = ?";
+
 		/*
-		 * Currently deleting based on vin but, will have to make use of booking id 
-		 * later on in order to avoid confusion with expiring bookings for same 
-		 * vehicle.
-		 * 
+		 * Currently deleting based on vin but, will have to make use of booking
+		 * id later on in order to avoid confusion with expiring bookings for
+		 * same vehicle.
 		 */
-		
-		jdbcTemplate.update(SQL, new Object[]{ vin }); 
+
+		jdbcTemplate.update(SQL, new Object[] { vin });
 	}
-	
-	public void extendBooking(String vin, int days) { 
-		String SQL1 = "SELECT end_date FROM rental.customer_vehicle WHERE vehicle_vin = ?"; 
+
+	public void extendBooking(String vin, int days) {
+		String SQL1 = "SELECT end_date FROM rental.customer_vehicle WHERE vehicle_vin = ?";
 		String SQL2 = "UPDATE rental.customer_vehicle SET end_date = ? WHERE vehicle_vin = ?";
 		/*
-		 * Currently deleting based on vin but, will have to make use of booking id 
-		 * later on in order to avoid confusion with expiring bookings for same 
-		 * vehicle.
-		 * 
+		 * Currently deleting based on vin but, will have to make use of booking
+		 * id later on in order to avoid confusion with expiring bookings for
+		 * same vehicle.
 		 */
+
+		Date endDate = jdbcTemplate.queryForObject(SQL1, new Object[] { vin },
+				Date.class);
+		Calendar c = Calendar.getInstance();
+		c.setTime(endDate);
+		c.add(Calendar.DATE, days);
+		endDate = new Date(c.getTimeInMillis());
+
+		jdbcTemplate.update(SQL2, new Object[] { endDate, vin });
+	}
+	
+	public List<Booking> vehicleBookings(String vin) { 
+		logger.info("entry vehicleBookings()");
+		String SQL = "SELECT * FROM rental.customer_vehicle WHERE vehicle_vin = ?";
+		List<Booking> bookings = null;
 		
-		Date endDate = jdbcTemplate.queryForObject(SQL1, new Object[]{ vin }, Date.class);
-		Calendar c = Calendar.getInstance(); 
-		c.setTime(endDate); 
-		c.add(Calendar.DATE, days); 
-		endDate = new Date(c.getTimeInMillis()); 
+		try {
+			bookings = jdbcTemplate.query(SQL,
+			new Object[] { vin }, new BeanPropertyRowMapper<Booking>(
+					Booking.class));
+		} catch (EmptyResultDataAccessException ex) {
+			ex.printStackTrace(); 
+			return null;
+		} catch(Exception ex) { 
+			ex.printStackTrace(); 
+		}
 		
-		jdbcTemplate.update(SQL2, new Object[]{ endDate, vin}); 
+		return bookings;
 	}
 }

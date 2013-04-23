@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.vrs.model.Booking;
 import com.vrs.model.Branch;
 import com.vrs.model.Role;
 import com.vrs.model.User;
@@ -90,6 +91,7 @@ public class RentalController {
 			 */
 
 			mav.addObject("users", userServices.listUsers());
+			logger.info("end of admin block - ...");
 
 		} else if (roleType.equals("staff")) {
 			/*
@@ -238,8 +240,16 @@ public class RentalController {
 		String uuid = UUID.randomUUID().toString();
 		String systemPassword = userServices
 				.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
-		rentalServices.addVehicleBooking(uuid, vin, username, sqlStartDate,
-				sqlEndDate, insuranceBool, systemPassword);
+
+		Booking booking = new Booking();
+		booking.setId(uuid);
+		booking.setUsername(username);
+		booking.setVehicleVin(vin);
+		booking.setStartDate(sqlStartDate);
+		booking.setEndDate(sqlEndDate);
+		booking.setInsurance(insuranceBool);
+
+		rentalServices.addVehicleBooking(booking, systemPassword);
 
 		return JSONUtil
 				.createSuccessResponse("The booking has been added to the system.");
@@ -370,25 +380,35 @@ public class RentalController {
 
 	@RequestMapping(value = "/vehicle/extendBooking", method = RequestMethod.GET)
 	public @ResponseBody
-	JSONResponse cancelBooking(@RequestParam(required = true) String vin,
+	JSONResponse extendBooking(@RequestParam(required = true) String vin,
 			@RequestParam(required = true) String days) {
 		Vehicle vehicle = rentalServices.findVehicle(vin);
 		if (vehicle == null) {
 			return JSONUtil
 					.createFailureResponse("Error. Vehicle cannot be found.");
 		}
-		
-		int daysInt; 
-		
+
+		int daysInt;
+
 		try {
 			daysInt = Integer.parseInt(days);
-		} catch(NumberFormatException nfe) { 
+		} catch (NumberFormatException nfe) {
 			return JSONUtil
 					.createFailureResponse("Error. Provide valid number of days (in number).");
 		}
+
+		rentalServices.extendBooking(vin, daysInt);
+		// send an email about the hire period extension.
+		return JSONUtil
+				.createSuccessResponse("Vehicle hire period extended successfully.");
+	}
+	
+	@RequestMapping(value = "/vehicle/bookingDates", method = RequestMethod.GET)
+	public @ResponseBody List<String> unAvailableDates(@RequestParam String vin) { 
+		logger.info("entry unAvailableDates()");
 		
-		rentalServices.extendBooking(vin, daysInt); 
-		//send an email about the hire period extension.
-		return JSONUtil.createSuccessResponse("Vehicle hire period extended successfully."); 
+		//returning only the list part of map for specific user which contains 
+		//bookings for other users also
+		return rentalServices.vehicleBookings(vin).get("rhamedy@student.bradford.ac.uk"); 
 	}
 }

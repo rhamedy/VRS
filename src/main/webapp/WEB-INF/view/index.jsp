@@ -270,8 +270,10 @@
 			<p>Do you wish to conitnue deleting current booking?</p>
 		</div>
 		<div id="extendVehicleHirePeriodModalDialog" title="Extend booking">
-			<label for='extendNoOfDays'>No of days to extend </label>
-			<input type='text' name='extendNoOfDays' id='extendNoOfDays' />
+			<label for='extensionStartDate'>Start date</label>
+			<input type='text' name='extensionStartDate' id='extensionStartDate' /><br /><br />
+			<label for='extensionEndDate'>End date</label>
+			<input type='text' name='extensionEndDate' id='extensionEndDate' />
 		</div>
 	</body>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -332,7 +334,7 @@
 								$.each(value, function(key, v) { 
 									if(key == "id") { 
 										id = v; 
-									extendVehicleHirePeriodModalDialog} else if(key == "name") { 
+									} else if(key == "name") { 
 										name = v; 
 									} else if(key == "streetName") { 
 										streetName = v; 
@@ -369,7 +371,7 @@
 								console.log("failed ..."); 
 							}
 							if(data.length > 0) { 
-								for(i=0; i< data.length; i++) { 
+								for(i=0; i< data.length;i++) { 
 									if('${userType}' == 'customer') {
 										var vinNumber = data[i].vin; 
 										var dailyCost = data[i].dailyCost; 
@@ -386,7 +388,7 @@
 												success: function(data) {
 													$('#hireVehicleModalDialog table').empty();
 													$('#hireVehicleModalDialog table').append("<tbody>"); 
-													$('#hireVehicleModalDialog').append("<input type='hidden' value='" + vinNumber +"' id='hireVinNumber' />");
+													$('#hireVehicleModalDialog').append("<input type='hidden' value='" + data.vin +"' id='hireVinNumber' />");
 													$('#hireVehicleModalDialog table').append("<tr><td>Make</td><td>" + data.make +"</td></tr>");
 													$('#hireVehicleModalDialog table').append("<tr><td>Model</td><td>" + data.model +"</td></tr>");
 													$('#hireVehicleModalDialog table').append("<tr><td>Max Speed</td><td>" + data.maxSpeed +"</td></tr>");
@@ -505,6 +507,7 @@
 						var endDate = $('#hireEndDate').datepicker({dateFormat:'yy-mm-dd'}).val();
 						
 						var vinNumber = $('#hireVinNumber').val(); 
+						alert('vin number is : ' + vinNumber);
 						var insurance = $("input[type='radio'][name='insurance']:checked"); 
 						var diff =  $('#hireEndDate').datepicker('getDate').getTime() - 
 							$('#hireStartDate').datepicker('getDate').getTime(); 
@@ -669,7 +672,52 @@
 				modal: true, 
 				autoOpen: false, 
 				width: 'auto', 
-				resizable: false, 
+				resizable: false,  
+				open: function() {
+					var unavailable;  
+					$.ajax({ 
+						method: 'GET', 
+						url: '/VRS/vehicle/bookingDates',
+						data: 'vin=' + (($(this).data('link').href).split('=')[1]),
+						contentType: 'application/json; charset=utf-8', 
+						dataType: 'json',
+						success: function(data) { 
+							unavailable = data; 
+							
+							$('#extensionStartDate, #extensionEndDate').datepicker({
+								changeMonth: true, 
+								changeYear: true, 
+								dateFormat: 'yy-mm-dd', 
+								minDate: unavailable[0], 
+								beforeShowDay: function(date) { 
+									alert("date : " + date);
+									function addZero(no) { 
+										if(no < 10) { 
+											return "0" + no;
+										} else { 
+											return no; 
+										}
+									}
+									var d = [
+										addZero(date.getFullYear()), 
+										addZero(date.getMonth()), 
+										addZero(date.getDate())
+									].join('-');  
+									
+									if($.inArray(d, unavailable) != -1) { 
+										return [false, 'taken date', 'this date is unavailable']; 
+									} else { 
+										return [true, 'date available', 'this date is available']; 
+									}
+								}
+							}); 
+						},
+						error: function() {
+							console.log("call failed."); 
+						} 
+					}); 
+					
+				}, 
 				buttons: {
 					Yes: function() { 
 						$.ajax({

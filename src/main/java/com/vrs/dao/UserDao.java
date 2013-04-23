@@ -196,6 +196,8 @@ public class UserDao {
 		List<User> users = jdbcTemplate.query(SQL,
 				new BeanPropertyRowMapper<User>(User.class));
 
+		logger.info("users.size = " + users.size());
+		
 		return users;
 	}
 

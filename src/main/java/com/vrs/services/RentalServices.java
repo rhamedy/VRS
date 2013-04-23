@@ -1,6 +1,9 @@
 package com.vrs.services;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.vrs.dao.RentalDao;
+import com.vrs.model.Booking;
 import com.vrs.model.Branch;
 import com.vrs.model.Vehicle;
 import com.vrs.util.KeyValuePair;
@@ -141,42 +145,72 @@ public class RentalServices {
 		return rentalDao.getCountryByCity(cityId);
 	}
 
-	public void addVehicleBooking(String uuid, String vin, String username, Date startDate,
-			Date endDate, boolean insurance, final String systemPassword) {
-		int days = (int)((endDate.getTime() - startDate.getTime())/86400000); 
-		Vehicle vehicle = rentalDao.findVehicle(vin); 
-		vehicle = setMakeAndModel(vehicle); 
-		double totalCost = days * vehicle.getDailyCost(); 
-		if(insurance) { 
-			totalCost += 110; //assuming £110 is the standard insurance amount
+	public void addVehicleBooking(Booking booking, final String systemPassword) {
+		int days = (int) ((booking.getEndDate().getTime() - booking
+				.getStartDate().getTime()) / 86400000);
+		Vehicle vehicle = rentalDao.findVehicle(booking.getVehicleVin());
+		vehicle = setMakeAndModel(vehicle);
+		double totalCost = days * vehicle.getDailyCost();
+		if (booking.isInsurance()) {
+			totalCost += 110; // assuming £110 is the standard insurance amount
 		}
-		rentalDao.addVehicleBooking(uuid, username, vin, startDate, endDate, insurance, totalCost); 
-		vehicle.setAvailable(false); //this will mark vehicle as unavailable
-		rentalDao.updateVehicle(vehicle); 
-		String emailBody = MailTemplate.getBookingTemplate(uuid, vehicle, startDate, endDate, insurance, totalCost); 
-		MailClient.sendEmail(username, systemPassword, "Vehicle Booking Iternity", emailBody); //send email
+		booking.setHireCost(totalCost);
+		rentalDao.addVehicleBooking(booking);
+		vehicle.setAvailable(false); // this will mark vehicle as unavailable
+		rentalDao.updateVehicle(vehicle);
+		String emailBody = MailTemplate.getBookingTemplate(vehicle, booking);
+		MailClient.sendEmail(booking.getUsername(), systemPassword,
+				"Vehicle Booking Iternity", emailBody); // send email
 	}
-	
-	public List<Vehicle> getVehiclesForHire(int branchId) { 
-		logger.info("entry getVehiclesForHire()"); 
-		
-		List<Vehicle> vehicles = rentalDao.getVehiclesForHire(branchId); 
-		
+
+	public List<Vehicle> getVehiclesForHire(int branchId) {
+		logger.info("entry getVehiclesForHire()");
+
+		List<Vehicle> vehicles = rentalDao.getVehiclesForHire(branchId);
+
 		for (Vehicle v : vehicles) {
 			v = setMakeAndModel(v);
 		}
 
 		return vehicles;
 	}
-	
-	public void cancelBooking(String vin) { 
+
+	public void cancelBooking(String vin) {
 		rentalDao.cancelBooking(vin);
-		Vehicle vehicle = rentalDao.findVehicle(vin); 
-		vehicle.setAvailable(true); 
-		rentalDao.updateVehicle(vehicle); 
+		Vehicle vehicle = rentalDao.findVehicle(vin);
+		vehicle.setAvailable(true);
+		rentalDao.updateVehicle(vehicle);
 	}
-	
-	public void extendBooking(String vin, int days) { 
-		rentalDao.extendBooking(vin, days); 
+
+	public void extendBooking(String vin, int days) {
+		rentalDao.extendBooking(vin, days);
+	}
+
+	public Map<String, List<String>> vehicleBookings(String vin) {
+		logger.info("entry vehicleBookings()");
+		List<Booking> bookings = rentalDao.vehicleBookings(vin);
+		Map<String, List<String>> unAvailableDates = new HashMap<String, List<String>>();
+		List<String> dates = new ArrayList<String>();
+
+		if (bookings != null) {
+			for (Booking booking : bookings) {
+				dates = new ArrayList<String>(); 
+				int days = (int) ((booking.getEndDate().getTime() - booking
+						.getStartDate().getTime()) / 86400000);
+				Date startDate = booking.getStartDate();
+				Calendar cal = Calendar.getInstance();
+				cal.setTimeInMillis(startDate.getTime());
+
+				for (int i = 0; i <= days; i++) {
+					dates.add(cal.get(Calendar.YEAR) + "-"
+							+ cal.get(Calendar.MONTH) + "-"
+							+ cal.get(Calendar.DAY_OF_MONTH));
+					cal.add(Calendar.DATE, 1); 
+				}
+				unAvailableDates.put(booking.getUsername(), dates); 
+			}
+		}
+
+		return unAvailableDates;
 	}
 }
