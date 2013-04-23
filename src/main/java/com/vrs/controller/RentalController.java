@@ -104,6 +104,7 @@ public class RentalController {
 					rentalServices.findBranch(user.getBranchId()));
 			mav.addObject("vehicles",
 					rentalServices.getVehicles(user.getBranchId()));
+			mav.addObject("bookings", rentalServices.listBookings());
 
 		} else if (roleType.equals("technical")) {
 			/*
@@ -209,7 +210,9 @@ public class RentalController {
 			@RequestParam(required = true) String endDate,
 			@RequestParam(required = true) String insurance) {
 
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-mm-dd");
+		logger.info("entry hireVehicle()"); 
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		Date sqlStartDate = null;
 		Date sqlEndDate = null;
 		try {
@@ -240,7 +243,7 @@ public class RentalController {
 		String uuid = UUID.randomUUID().toString();
 		String systemPassword = userServices
 				.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
-
+		
 		Booking booking = new Booking();
 		booking.setId(uuid);
 		booking.setUsername(username);
@@ -381,34 +384,30 @@ public class RentalController {
 	@RequestMapping(value = "/vehicle/extendBooking", method = RequestMethod.GET)
 	public @ResponseBody
 	JSONResponse extendBooking(@RequestParam(required = true) String vin,
-			@RequestParam(required = true) String days) {
+			@RequestParam(required = true) String startDate,
+			@RequestParam(required = true) String endDate) {
 		Vehicle vehicle = rentalServices.findVehicle(vin);
 		if (vehicle == null) {
 			return JSONUtil
 					.createFailureResponse("Error. Vehicle cannot be found.");
 		}
 
-		int daysInt;
+		
 
-		try {
-			daysInt = Integer.parseInt(days);
-		} catch (NumberFormatException nfe) {
-			return JSONUtil
-					.createFailureResponse("Error. Provide valid number of days (in number).");
-		}
-
-		rentalServices.extendBooking(vin, daysInt);
+		//rentalServices.extendBooking(vin, daysInt);
 		// send an email about the hire period extension.
 		return JSONUtil
 				.createSuccessResponse("Vehicle hire period extended successfully.");
 	}
-	
+
 	@RequestMapping(value = "/vehicle/bookingDates", method = RequestMethod.GET)
-	public @ResponseBody List<String> unAvailableDates(@RequestParam String vin) { 
+	public @ResponseBody
+	List<String> unAvailableDates(@RequestParam String vin) {
 		logger.info("entry unAvailableDates()");
-		
-		//returning only the list part of map for specific user which contains 
-		//bookings for other users also
-		return rentalServices.vehicleBookings(vin).get("rhamedy@student.bradford.ac.uk"); 
+
+		// returning only the list part of map for specific user which contains
+		// bookings for other users also
+		return rentalServices.vehicleBookings(vin).get(
+				"rhamedy@student.bradford.ac.uk");
 	}
 }

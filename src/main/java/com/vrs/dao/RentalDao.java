@@ -374,14 +374,15 @@ public class RentalDao {
 		logger.info("entry addVehicleBooking()");
 
 		String SQL = "INSERT INTO rental.customer_vehicle(id, vehicle_vin, username,"
-				+ "start_date,end_date,insurance,hire_cost) VALUES(?,?,?,?,?,?,?)";
+				+ "start_date,end_date,insurance,hire_cost,driver,damage_cost) VALUES(?,?,?,?,?,?,?,?,?)";
 
 		jdbcTemplate.update(
 				SQL,
 				new Object[] { booking.getId(), booking.getVehicleVin(),
 						booking.getUsername(), booking.getStartDate(),
 						booking.getEndDate(), booking.isInsurance(),
-						booking.getHireCost() });
+						booking.getHireCost(), booking.isDriver(),
+						booking.getDamageCost() });
 	}
 
 	public List<Vehicle> getVehiclesForHire(int branchId) {
@@ -425,23 +426,41 @@ public class RentalDao {
 
 		jdbcTemplate.update(SQL2, new Object[] { endDate, vin });
 	}
-	
-	public List<Booking> vehicleBookings(String vin) { 
+
+	public List<Booking> vehicleBookings(String vin) {
 		logger.info("entry vehicleBookings()");
 		String SQL = "SELECT * FROM rental.customer_vehicle WHERE vehicle_vin = ?";
 		List<Booking> bookings = null;
-		
+
+		try {
+			bookings = jdbcTemplate.query(SQL, new Object[] { vin },
+					new BeanPropertyRowMapper<Booking>(Booking.class));
+		} catch (EmptyResultDataAccessException ex) {
+			ex.printStackTrace();
+			return null;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return bookings;
+	}
+
+	public List<Booking> listBookings() {
+		logger.info("entry listBookings()");
+
+		String SQL = "SELECT * FROM rental.customer_vehicle";
+		List<Booking> bookings = null;
+
 		try {
 			bookings = jdbcTemplate.query(SQL,
-			new Object[] { vin }, new BeanPropertyRowMapper<Booking>(
-					Booking.class));
+					new BeanPropertyRowMapper<Booking>(Booking.class));
 		} catch (EmptyResultDataAccessException ex) {
-			ex.printStackTrace(); 
+			ex.printStackTrace();
 			return null;
-		} catch(Exception ex) { 
-			ex.printStackTrace(); 
+		} catch (Exception ex) {
+			ex.printStackTrace();
 		}
-		
+
 		return bookings;
 	}
 }

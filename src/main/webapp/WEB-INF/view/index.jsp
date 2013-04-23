@@ -166,21 +166,43 @@
 									<td>${vehicle.fuel}</td>
 									<td>${vehicle.model}</td>
 									<td>${branch.name}</td>
-									<c:choose>
-										<c:when test="${vehicle.available}">
-											<td><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit|</a>
-												<a id="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete</a>
-											</td>
-										</c:when>
-										<c:otherwise>
-											<td><a id="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?vin=${vehicle.vin}">Cancel booking|</a>
-												<a id="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?vin=${vehicle.vin}">Extend Hire</a>
-											</td>
-										</c:otherwise>
-									</c:choose>
+									<td><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit|</a>
+										<a id="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete</a>
+									</td>
 								</tr>
 							</c:forEach>
 						</tobdy>
+					</table><br /><br />
+					<label for="bookingList"> Bookings </label><br />
+					<table border="1" id="bookingList">
+						<thead>
+							<tr>
+								<th>Vehicle Vin No</th>
+								<th>Username</th>
+								<th>Start date</th>
+								<th>End date</th>
+								<th>Insurance</th>
+								<th>Driver</th>
+								<th>Total cost</th>
+								<th>Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<c:forEach items="${bookings}" var="booking">
+								<tr>
+									<td>${booking.vehicleVin}</td>
+									<td>${booking.username}</td>
+									<td>${booking.startDate}</td>
+									<td>${booking.endDate}</td>
+									<td>${booking.insurance}</td>
+									<td>${booking.driver}</td>
+									<td>${booking.hireCost}</td>
+									<td><a id="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?vin=${booking.vehicleVin}">Cancel booking|</a>
+										<a id="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?vin=${booking.vehicleVin}">Extend Hire</a>
+									</td>
+								</tr>
+							</c:forEach>
+						</tbody>
 					</table>
 				</div>
 			</c:if>
@@ -212,7 +234,7 @@
 						</tbody>
 					</table>
 				</div><br /><br />
-				<div id="vehiclesForHire">
+				<div id="vehiclesForHire">add
 					<label for="countriesList"> Countries </label>
 					<select id="countryList">
 						<option value="" selected></option>
@@ -382,6 +404,41 @@
 										data[i].vin +"' href='#'>Book</a></td></tr>"); 
 										
 										$("#vehicleHire" + vinNumber).click(function(event) {
+											var unavailable;  
+											
+											function addZero(no) { 
+												if(no < 10) { 
+													return "0" + no; 
+												} else { 
+													return no; 
+												}
+											}
+											
+											function unavailableDates(date) { 
+												var dmy = date.getFullYear() + "-" + addZero(date.getMonth()) + "-" + addZero(date.getDate()); 
+												console.log('dmy is : ' + dmy); 
+												if($.inArray(dmy, unavailable) == -1) { 
+													console.log("it is unavailable!"); 
+													return [true, ""]; 
+												} else { 
+													console.log("it is available!");
+													return [false, ""]; 
+												}
+											} 
+											
+											$.ajax({ 
+												method: 'GET', 
+												url: '/VRS/vehicle/bookingDates',
+												data: 'vin=' + (event.target.id).substring(11,(event.target.id).length),
+												contentType: 'application/json; charset=utf-8', 
+												dataType: 'json',
+												success: function(data) { 
+													unavailable = data;
+												}, 
+												error: function() { 
+												}
+											}); 
+											
 											$.ajax({ 
 												url: "/VRS/vehicle/getVehicle", 
 												data: "vin=" + (event.target.id).substring(11,(event.target.id).length),  
@@ -403,18 +460,19 @@
 													
 													$('#hireStartDate').datepicker({
 														changeMonth: true, 
-														changeYear: false,
-														minDate: 1,
-														maxDate: 3,  
-														dateFormat: 'yy-mm-dd'
+														changeYear: true,
+														minDate: new Date(),  
+														dateFormat: 'yy-mm-dd',
+														beforeShowDay: unavailableDates
 													}); 
 													
 													$('#hireEndDate').datepicker({
 														changeMonth: true, 
 														changeYear: true,
-														minDate: 2,
-														dateFormat: 'yy-mm-dd'
-													}); 
+														minDate: new Date(),
+														dateFormat: 'yy-mm-dd', 
+														beforeShowDay: unavailableDates
+													}); 													
 													
 													$("#hireStartDate, #hireEndDate, input[type='radio'][name='insurance']").change(function(){ 
 														console.log("event triggered ..."); 
@@ -605,8 +663,8 @@
 					OK: function() { 
 						$(this).dialog("close");
 						if($('#hireVehicleModalDialog').is(':visible')) {
-							$('#hireVehicleModalDialog').dialog('close');
-							location.reload(); 
+							//$('#hireVehicleModalDialog').dialog('close');
+							//location.reload(); 
 						}
 					}
 				}
@@ -684,38 +742,49 @@
 						success: function(data) { 
 							unavailable = data; 
 							
-							$('#extensionStartDate, #extensionEndDate').datepicker({
+							var realEndDate = new Date(unavailable[unavailable.length -1].split('-')[0], 
+							unavailable[unavailable.length -1].split('-')[1],
+							unavailable[unavailable.length -1].split('-')[2]); 
+							
+							var realStartDate = new Date(unavailable[0].split('-')[0], 
+							unavailable[0].split('-')[1],
+							unavailable[0].split('-')[2]); 
+							
+							
+							$('#extensionEndDate').datepicker({
 								changeMonth: true, 
 								changeYear: true, 
 								dateFormat: 'yy-mm-dd', 
-								minDate: unavailable[0], 
-								beforeShowDay: function(date) { 
-									alert("date : " + date);
-									function addZero(no) { 
-										if(no < 10) { 
-											return "0" + no;
-										} else { 
-											return no; 
-										}
-									}
-									var d = [
-										addZero(date.getFullYear()), 
-										addZero(date.getMonth()), 
-										addZero(date.getDate())
-									].join('-');  
-									
-									if($.inArray(d, unavailable) != -1) { 
-										return [false, 'taken date', 'this date is unavailable']; 
-									} else { 
-										return [true, 'date available', 'this date is available']; 
-									}
-								}
+								minDate: realEndDate,
+								beforeShowDay: unavailableDates
 							}); 
+							
+							$('#extensionStartDate').datepicker({
+								changeMonth: true, 
+								changeYear: true, 
+								dateFormat: 'yy-mm-dd', 
+								minDate: realStartDate,
+								maxDate: realStartDate
+							}); 
+														
+							$('#extensionStartDate').datepicker('setDate',realStartDate);
+							$('#extensionEndDate').datepicker('setDate',realEndDate); 
 						},
 						error: function() {
 							console.log("call failed."); 
 						} 
-					}); 
+					});
+					
+					function unavailableDates(date) { 
+						var dmy = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate(); 
+						if($.inArray(dmy, unavailable) == -1) { 
+							console.log("it is unavailable!"); 
+							return [true, ""]; 
+						} else { 
+							console.log("it is available!");
+							return [false, ""]; 
+						}
+					} 
 					
 				}, 
 				buttons: {
@@ -723,7 +792,7 @@
 						$.ajax({
 							type: 'GET', 
 							url: '/VRS/vehicle/extendBooking', 
-							data: 'vin=' + (($(this).data('link').href).split('=')[1]) +'&days=' + $('#extendNoOfDays').val(), 
+							data: 'vin=' + (($(this).data('link').href).split('=')[1]) + '&endDate=' + $('#extensionEndDate').val(), 
 							dataType: 'json', 
 							success: function() { 
 								alert("the booking has been extended successfully.");

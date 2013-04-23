@@ -155,9 +155,11 @@ public class RentalServices {
 			totalCost += 110; // assuming £110 is the standard insurance amount
 		}
 		booking.setHireCost(totalCost);
+		booking.setDriver(false); 
+		booking.setDamageCost(0);
 		rentalDao.addVehicleBooking(booking);
-		vehicle.setAvailable(false); // this will mark vehicle as unavailable
-		rentalDao.updateVehicle(vehicle);
+		//vehicle.setAvailable(false); // this will mark vehicle as unavailable
+		//rentalDao.updateVehicle(vehicle);
 		String emailBody = MailTemplate.getBookingTemplate(vehicle, booking);
 		MailClient.sendEmail(booking.getUsername(), systemPassword,
 				"Vehicle Booking Iternity", emailBody); // send email
@@ -202,9 +204,11 @@ public class RentalServices {
 				cal.setTimeInMillis(startDate.getTime());
 
 				for (int i = 0; i <= days; i++) {
-					dates.add(cal.get(Calendar.YEAR) + "-"
-							+ cal.get(Calendar.MONTH) + "-"
-							+ cal.get(Calendar.DAY_OF_MONTH));
+					int day = cal.get(Calendar.DAY_OF_MONTH); 
+					int month = cal.get(Calendar.MONTH);
+					
+					dates.add(cal.get(Calendar.YEAR) + "-" +
+					((month >= 10) ? month : "0" + month) + "-" + ((day >= 10) ? day : "0" + day)); 
 					cal.add(Calendar.DATE, 1); 
 				}
 				unAvailableDates.put(booking.getUsername(), dates); 
@@ -212,5 +216,11 @@ public class RentalServices {
 		}
 
 		return unAvailableDates;
+	}
+	
+	public List<Booking> listBookings() { 
+		logger.info("entry listBookings()"); 
+		
+		return rentalDao.listBookings(); 
 	}
 }
