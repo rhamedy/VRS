@@ -194,6 +194,8 @@ public class RentalServices {
 		Map<String, List<String>> unAvailableDates = new HashMap<String, List<String>>();
 		List<String> dates = new ArrayList<String>();
 
+		logger.info("bookings.size : " + bookings.size());
+		
 		if (bookings != null) {
 			for (Booking booking : bookings) {
 				dates = new ArrayList<String>(); 
@@ -211,7 +213,14 @@ public class RentalServices {
 					((month >= 10) ? month : "0" + month) + "-" + ((day >= 10) ? day : "0" + day)); 
 					cal.add(Calendar.DATE, 1); 
 				}
-				unAvailableDates.put(booking.getUsername(), dates); 
+				if(unAvailableDates.get(booking.getUsername()) != null) {
+					List<String> merger = new ArrayList<String>(); 
+					merger.addAll(unAvailableDates.get(booking.getUsername())); 
+					merger.addAll(dates); 
+					unAvailableDates.put(booking.getUsername(), merger); 
+				} else {
+					unAvailableDates.put(booking.getUsername(), dates); 
+				}
 			}
 		}
 
