@@ -197,8 +197,8 @@
 									<td>${booking.insurance}</td>
 									<td>${booking.driver}</td>
 									<td>${booking.hireCost}</td>
-									<td><a id="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?vin=${booking.vehicleVin}">Cancel booking|</a>
-										<a id="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?vin=${booking.vehicleVin}">Extend Hire</a>
+									<td><a class="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?bookingId=${booking.id}">Cancel booking|</a>
+										<a class="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?bookingId=${booking.id}">Extend Hire</a>
 									</td>
 								</tr>
 							</c:forEach>
@@ -708,7 +708,7 @@
 						$.ajax({
 							type: 'GET', 
 							url: '/VRS/vehicle/cancelBooking', 
-							data: 'vin=' + (($(this).data('link').href).split('=')[1]), 
+							data: 'bookingId=' + (($(this).data('link').href).split('=')[1]), 
 							dataType: 'json', 
 							success: function() { 
 								alert("the booking has been cancelled successfully.");
@@ -732,51 +732,79 @@
 				width: 'auto', 
 				resizable: false,  
 				open: function() {
-					var unavailable;  
+					var unavailable;
+					var currentBookingStartDate; 
+					var currentBookingEndDate;   
+					var bookingId = (($(this).data('link').href).split('=')[1]); 
+					
 					$.ajax({ 
 						method: 'GET', 
-						url: '/VRS/vehicle/bookingDates',
-						data: 'vin=' + (($(this).data('link').href).split('=')[1]),
+						url: '/VRS/vehicle/booking',
+						data: 'bookingId=' + bookingId,
 						contentType: 'application/json; charset=utf-8', 
 						dataType: 'json',
-						success: function(data) { 
-							unavailable = data; 
+						success: function(bookingData) { 
+							currentBookingStartDate = bookingData.startDate; 
+							currentBookingEndDate = bookingData.endDate; 
 							
-							var realEndDate = new Date(unavailable[unavailable.length -1].split('-')[0], 
-							unavailable[unavailable.length -1].split('-')[1],
-							unavailable[unavailable.length -1].split('-')[2]); 
-							
-							var realStartDate = new Date(unavailable[0].split('-')[0], 
-							unavailable[0].split('-')[1],
-							unavailable[0].split('-')[2]); 
-							
-							
-							$('#extensionEndDate').datepicker({
-								changeMonth: true, 
-								changeYear: true, 
-								dateFormat: 'yy-mm-dd', 
-								minDate: realEndDate,
-								beforeShowDay: unavailableDates
-							}); 
-							
-							$('#extensionStartDate').datepicker({
-								changeMonth: true, 
-								changeYear: true, 
-								dateFormat: 'yy-mm-dd', 
-								minDate: realStartDate,
-								maxDate: realStartDate
-							}); 
-														
-							$('#extensionStartDate').datepicker('setDate',realStartDate);
-							$('#extensionEndDate').datepicker('setDate',realEndDate); 
+							$.ajax({ 
+								method: 'GET', 
+								url: '/VRS/vehicle/bookingDates',
+								data: 'bookingId=' + bookingId,
+								contentType: 'application/json; charset=utf-8', 
+								dataType: 'json',
+								success: function(data) { 
+									unavailable = data; 
+									
+									var realEndDate = new Date(currentBookingEndDate.split('-')[0], 
+									(currentBookingEndDate.split('-')[1] - 1),
+									currentBookingEndDate.split('-')[2]); 
+									
+									var realStartDate = new Date(currentBookingStartDate.split('-')[0], 
+									(currentBookingStartDate.split('-')[1] -1),
+									currentBookingStartDate.split('-')[2]); 
+									
+									
+									$('#extensionEndDate').datepicker({
+										changeMonth: true, 
+										changeYear: true, 
+										dateFormat: 'yy-mm-dd', 
+										minDate: realEndDate,
+										beforeShowDay: unavailableDates
+									}); 
+									
+									$('#extensionStartDate').datepicker({
+										changeMonth: true, 
+										changeYear: true, 
+										dateFormat: 'yy-mm-dd', 
+										minDate: realStartDate,
+										maxDate: realStartDate
+									}); 
+																
+									$('#extensionStartDate').datepicker('setDate',realStartDate);
+									$('#extensionEndDate').datepicker('setDate',realEndDate); 
+								},
+								error: function() {
+									console.log("call failed."); 
+								} 
+							});
 						},
-						error: function() {
-							console.log("call failed."); 
-						} 
+						error: function() { 
+							alert("failed to fetch current booking dates. "); 
+						}
 					});
 					
+					function addZero(no) { 
+						if(no < 10) { 
+							return "0" + no; 
+						} else { 
+							return no; 
+						}
+					}
+					
 					function unavailableDates(date) { 
-						var dmy = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate(); 
+						var dmy = date.getFullYear() + "-" + addZero(date.getMonth()) + "-" + addZero(date.getDate()); 
+						console.log('dmy : ' + dmy);
 						if($.inArray(dmy, unavailable) == -1) { 
 							console.log("it is unavailable!"); 
 							return [true, ""]; 
@@ -792,7 +820,7 @@
 						$.ajax({
 							type: 'GET', 
 							url: '/VRS/vehicle/extendBooking', 
-							data: 'vin=' + (($(this).data('link').href).split('=')[1]) + '&endDate=' + $('#extensionEndDate').val(), 
+							data: 'bookingId=' + (($(this).data('link').href).split('=')[1]) + '&endDate=' + $('#extensionEndDate').val(), 
 							dataType: 'json', 
 							success: function() { 
 								alert("the booking has been extended successfully.");
@@ -810,14 +838,14 @@
 				}
 			}); 
 			
-			$('#cancelVehicleBooking').click(function() { 
+			$('.cancelVehicleBooking').click(function() { 
 				 $('#cancelVehicleBookingModalDialog')
 				 .data('link',this)
 				 .dialog('open');
 				 return false; 
 			}); 
 			
-			$('#extendVehicleHirePeriod').click(function() { 
+			$('.extendVehicleHirePeriod').click(function() { 
 				 $('#extendVehicleHirePeriodModalDialog')
 				 .data('link',this)
 				 .dialog('open');

@@ -210,12 +210,12 @@ public class RentalController {
 			@RequestParam(required = true) String endDate,
 			@RequestParam(required = true) String insurance) {
 
-		logger.info("entry hireVehicle()"); 
-		
+		logger.info("entry hireVehicle()");
+
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		Date sqlStartDate = null;
 		Date sqlEndDate = null;
-		
+
 		try {
 			sqlStartDate = new Date(formatter.parse(startDate).getTime());
 			sqlEndDate = new Date(formatter.parse(endDate).getTime());
@@ -224,16 +224,18 @@ public class RentalController {
 					.createFailureResponse("Error# Invalid date format selected.");
 		}
 
-		if(!rentalServices.validateBookingDates(sqlStartDate, sqlEndDate)) { 
+		if (!rentalServices.validateBookingDates(sqlStartDate, sqlEndDate)) {
 			return JSONUtil
 					.createFailureResponse("Error# Invalid date range selection.");
 		} else if (vin == null || vin.length() <= 0) {
-			return JSONUtil.createFailureResponse("Error# Missing vehicle identity.");
+			return JSONUtil
+					.createFailureResponse("Error# Missing vehicle identity.");
 		} else if (startDate == null) {
 			return JSONUtil
 					.createFailureResponse("Error# startDate is not specified.");
 		} else if (endDate == null) {
-			return JSONUtil.createFailureResponse("Error# endDate is not specificed.");
+			return JSONUtil
+					.createFailureResponse("Error# endDate is not specificed.");
 		} else if ((sqlEndDate.getTime() - sqlStartDate.getTime()) < 1) {
 			return JSONUtil
 					.createFailureResponse("Error# Invalid start date and end date choosen.");
@@ -247,7 +249,7 @@ public class RentalController {
 		String uuid = UUID.randomUUID().toString();
 		String systemPassword = userServices
 				.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
-		
+
 		Booking booking = new Booking();
 		booking.setId(uuid);
 		booking.setUsername(username);
@@ -373,31 +375,50 @@ public class RentalController {
 
 	@RequestMapping(value = "/vehicle/cancelBooking", method = RequestMethod.GET)
 	public @ResponseBody
-	JSONResponse cancelBooking(@RequestParam(required = true) String vin) {
-		Vehicle vehicle = rentalServices.findVehicle(vin);
-		if (vehicle == null) {
+	JSONResponse cancelBooking(@RequestParam(required = true) String bookingId) {
+		Booking booking = rentalServices.findBooking(bookingId); 
+		if (booking == null) {
 			return JSONUtil
-					.createFailureResponse("Error.Vehicle cannot be found.");
+					.createFailureResponse("Error# Booking cannot be found.");
 		}
-		rentalServices.cancelBooking(vin);
-		// send an email saying booking has been cancelled.
+		
+		String systemPassword = userServices.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
+		rentalServices.cancelBooking(booking, systemPassword);
 		return JSONUtil
 				.createSuccessResponse("The booking has been cancelled successfully.");
 	}
 
 	@RequestMapping(value = "/vehicle/extendBooking", method = RequestMethod.GET)
 	public @ResponseBody
-	JSONResponse extendBooking(@RequestParam(required = true) String vin,
-			@RequestParam(required = true) String startDate,
+	JSONResponse extendBooking(@RequestParam(required = true) String bookingId,
 			@RequestParam(required = true) String endDate) {
-		Vehicle vehicle = rentalServices.findVehicle(vin);
-		if (vehicle == null) {
+		Booking booking = rentalServices.findBooking(bookingId);
+		if (booking == null) {
 			return JSONUtil
-					.createFailureResponse("Error. Vehicle cannot be found.");
+					.createFailureResponse("Error# Booking cannot be found.");
 		}
 
-	
-		//rentalServices.extendBooking(vin, daysInt);
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date sqlEndDate = null;
+
+		try {
+			sqlEndDate = new Date(formatter.parse(endDate).getTime());
+		} catch (ParseException pe) {
+			return JSONUtil
+					.createFailureResponse("Error# Invalid date format selected.");
+		}
+
+		if (!rentalServices.validateBookingDates(booking.getStartDate(),
+				sqlEndDate)) {
+			return JSONUtil
+					.createFailureResponse("Error# Invalid date range selection.");
+		}
+
+		booking.setEndDate(sqlEndDate);
+		String systemPassword = userServices
+				.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
+
+		rentalServices.extendBooking(booking, systemPassword);
 		// send an email about the hire period extension.
 		return JSONUtil
 				.createSuccessResponse("Vehicle hire period extended successfully.");
@@ -405,12 +426,17 @@ public class RentalController {
 
 	@RequestMapping(value = "/vehicle/bookingDates", method = RequestMethod.GET)
 	public @ResponseBody
-	List<String> unAvailableDates(@RequestParam String vin) {
+	List<String> unAvailableDates(@RequestParam String bookingId) {
 		logger.info("entry unAvailableDates()");
-
+		Booking booking = rentalServices.findBooking(bookingId); 
 		// returning only the list part of map for specific user which contains
 		// bookings for other users also
-		return rentalServices.vehicleBookings(vin).get(
+		return rentalServices.vehicleBookings(booking.getVehicleVin()).get(
 				"rhamedy@student.bradford.ac.uk");
+	}
+	
+	@RequestMapping(value = "/vehicle/booking", method = RequestMethod.GET)
+	public @ResponseBody Booking getBooking(@RequestParam String bookingId) { 
+		return rentalServices.findBooking(bookingId); 
 	}
 }

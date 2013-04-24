@@ -155,12 +155,11 @@ public class RentalServices {
 			totalCost += 110; // assuming £110 is the standard insurance amount
 		}
 		booking.setHireCost(totalCost);
-		booking.setDriver(false); 
+		booking.setDriver(false);
 		booking.setDamageCost(0);
 		rentalDao.addVehicleBooking(booking);
-		//vehicle.setAvailable(false); // this will mark vehicle as unavailable
-		//rentalDao.updateVehicle(vehicle);
-		String emailBody = MailTemplate.getBookingTemplate(vehicle, booking);
+		String emailBody = MailTemplate.getBookingTemplate(vehicle, booking, "Vehicle Booking Iternity", 
+				"You have successfully booked a vehicle of the following details.");
 		MailClient.sendEmail(booking.getUsername(), systemPassword,
 				"Vehicle Booking Iternity", emailBody); // send email
 	}
@@ -177,15 +176,37 @@ public class RentalServices {
 		return vehicles;
 	}
 
-	public void cancelBooking(String vin) {
-		rentalDao.cancelBooking(vin);
-		Vehicle vehicle = rentalDao.findVehicle(vin);
-		vehicle.setAvailable(true);
-		rentalDao.updateVehicle(vehicle);
+	public void cancelBooking(Booking booking, String systemPassword) {
+		rentalDao.cancelBooking(booking);
+		Vehicle vehicle = rentalDao.findVehicle(booking.getVehicleVin()); 
+		String emailBody = MailTemplate
+				.getBookingTemplate(vehicle, booking,
+						"Vehicle Booking Cancellation Iternity",
+						"Your request for cancellation of the following booking is been confirmed.");
+		MailClient.sendEmail(booking.getUsername(), systemPassword,
+				"Vehicle Booking Cancellation Iternity", emailBody); // send email
 	}
 
-	public void extendBooking(String vin, int days) {
-		rentalDao.extendBooking(vin, days);
+	public void extendBooking(Booking booking, String systemPassword) {
+		int days = (int) ((booking.getEndDate().getTime() - booking
+				.getStartDate().getTime()) / 86400000);
+		Vehicle vehicle = rentalDao.findVehicle(booking.getVehicleVin());
+		vehicle = setMakeAndModel(vehicle);
+		double totalCost = days * vehicle.getDailyCost();
+		if (booking.isInsurance()) {
+			totalCost += 110; // assuming £110 is the standard insurance amount
+		}
+		booking.setHireCost(totalCost);
+		booking.setDriver(false);
+		booking.setDamageCost(0);
+		rentalDao.extendBooking(booking);
+
+		String emailBody = MailTemplate
+				.getBookingTemplate(vehicle, booking,
+						"Vehicle Booking Extension Iternity",
+						"Your request for extension of the following booking is been confirmed.");
+		MailClient.sendEmail(booking.getUsername(), systemPassword,
+				"Vehicle Booking Extension Iternity", emailBody); // send email
 	}
 
 	public Map<String, List<String>> vehicleBookings(String vin) {
@@ -195,10 +216,10 @@ public class RentalServices {
 		List<String> dates = new ArrayList<String>();
 
 		logger.info("bookings.size : " + bookings.size());
-		
+
 		if (bookings != null) {
 			for (Booking booking : bookings) {
-				dates = new ArrayList<String>(); 
+				dates = new ArrayList<String>();
 				int days = (int) ((booking.getEndDate().getTime() - booking
 						.getStartDate().getTime()) / 86400000);
 				Date startDate = booking.getStartDate();
@@ -206,36 +227,43 @@ public class RentalServices {
 				cal.setTimeInMillis(startDate.getTime());
 
 				for (int i = 0; i <= days; i++) {
-					int day = cal.get(Calendar.DAY_OF_MONTH); 
+					int day = cal.get(Calendar.DAY_OF_MONTH);
 					int month = cal.get(Calendar.MONTH);
-					
-					dates.add(cal.get(Calendar.YEAR) + "-" +
-					((month >= 10) ? month : "0" + month) + "-" + ((day >= 10) ? day : "0" + day)); 
-					cal.add(Calendar.DATE, 1); 
+
+					dates.add(cal.get(Calendar.YEAR) + "-"
+							+ ((month >= 10) ? month : "0" + month) + "-"
+							+ ((day >= 10) ? day : "0" + day));
+					cal.add(Calendar.DATE, 1);
 				}
-				if(unAvailableDates.get(booking.getUsername()) != null) {
-					List<String> merger = new ArrayList<String>(); 
-					merger.addAll(unAvailableDates.get(booking.getUsername())); 
-					merger.addAll(dates); 
-					unAvailableDates.put(booking.getUsername(), merger); 
+				if (unAvailableDates.get(booking.getUsername()) != null) {
+					List<String> merger = new ArrayList<String>();
+					merger.addAll(unAvailableDates.get(booking.getUsername()));
+					merger.addAll(dates);
+					unAvailableDates.put(booking.getUsername(), merger);
 				} else {
-					unAvailableDates.put(booking.getUsername(), dates); 
+					unAvailableDates.put(booking.getUsername(), dates);
 				}
 			}
 		}
 
 		return unAvailableDates;
 	}
-	
-	public List<Booking> listBookings() { 
-		logger.info("entry listBookings()"); 
-		
-		return rentalDao.listBookings(); 
+
+	public List<Booking> listBookings() {
+		logger.info("entry listBookings()");
+
+		return rentalDao.listBookings();
 	}
-	
-	public boolean validateBookingDates(Date startDate, Date endDate) { 
-		logger.info("entry validateBookingDates()"); 
-		
-		return rentalDao.validateBookingDates(startDate, endDate); 
+
+	public boolean validateBookingDates(Date startDate, Date endDate) {
+		logger.info("entry validateBookingDates()");
+
+		return rentalDao.validateBookingDates(startDate, endDate);
+	}
+
+	public Booking findBooking(String bookingId) {
+		logger.info("entry findBooking()");
+
+		return rentalDao.findBooking(bookingId);
 	}
 }

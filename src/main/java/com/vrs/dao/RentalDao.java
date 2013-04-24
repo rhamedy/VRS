@@ -3,7 +3,6 @@ package com.vrs.dao;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -396,35 +395,20 @@ public class RentalDao {
 		return vehicles;
 	}
 
-	public void cancelBooking(String vin) {
-		String SQL = "DELETE FROM rental.customer_vehicle WHERE vehicle_vin = ?";
+	public void cancelBooking(Booking booking) {
+		String SQL = "DELETE FROM rental.customer_vehicle WHERE id = ?";
 
-		/*
-		 * Currently deleting based on vin but, will have to make use of booking
-		 * id later on in order to avoid confusion with expiring bookings for
-		 * same vehicle.
-		 */
-
-		jdbcTemplate.update(SQL, new Object[] { vin });
+		jdbcTemplate.update(SQL, new Object[] { booking.getId() });
 	}
 
-	public void extendBooking(String vin, int days) {
-		String SQL1 = "SELECT end_date FROM rental.customer_vehicle WHERE vehicle_vin = ?";
-		String SQL2 = "UPDATE rental.customer_vehicle SET end_date = ? WHERE vehicle_vin = ?";
-		/*
-		 * Currently deleting based on vin but, will have to make use of booking
-		 * id later on in order to avoid confusion with expiring bookings for
-		 * same vehicle.
-		 */
+	public void extendBooking(Booking booking) {
+		String SQL = "UPDATE rental.customer_vehicle SET end_date = ?, driver = ?, extension_count = ?, hire_cost = ? WHERE id = ?";
 
-		Date endDate = jdbcTemplate.queryForObject(SQL1, new Object[] { vin },
-				Date.class);
-		Calendar c = Calendar.getInstance();
-		c.setTime(endDate);
-		c.add(Calendar.DATE, days);
-		endDate = new Date(c.getTimeInMillis());
-
-		jdbcTemplate.update(SQL2, new Object[] { endDate, vin });
+		jdbcTemplate.update(
+				SQL,
+				new Object[] { booking.getEndDate(), booking.isDriver(),
+						(booking.getExtensionCount() + 1),
+						booking.getHireCost(), booking.getId() });
 	}
 
 	public List<Booking> vehicleBookings(String vin) {
@@ -463,14 +447,32 @@ public class RentalDao {
 
 		return bookings;
 	}
-	
-	public boolean validateBookingDates(Date startDate, Date endDate) { 
-		logger.info("entry validateBookingDates()"); 
-		
-		String SQL = "SELECT count(id) FROM rental.customer_vehicle WHERE (? < start_date AND ? > end_date)"; 
-		
-		int result = jdbcTemplate.queryForInt(SQL, new Object[]{ startDate , endDate }); 
-		
-		return result > 0 ? false: true; 
+
+	public boolean validateBookingDates(Date startDate, Date endDate) {
+		logger.info("entry validateBookingDates()");
+
+		String SQL = "SELECT count(id) FROM rental.customer_vehicle WHERE (? < start_date AND ? > end_date)";
+
+		int result = jdbcTemplate.queryForInt(SQL, new Object[] { startDate,
+				endDate });
+
+		return result > 0 ? false : true;
+	}
+
+	public Booking findBooking(String bookingId) {
+		logger.info("entry findBooking()");
+
+		String SQL = "SELECT * from rental.customer_vehicle WHERE id = ?";
+
+		try {
+			Booking booking = jdbcTemplate.queryForObject(SQL,
+					new Object[] { bookingId },
+					new BeanPropertyRowMapper<Booking>(Booking.class));
+
+			return booking;
+		} catch (EmptyResultDataAccessException ex) {
+			// exception thrown if no result is found
+			return null;
+		}
 	}
 }

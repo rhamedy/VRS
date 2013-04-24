@@ -4,12 +4,11 @@ import com.vrs.model.Booking;
 import com.vrs.model.Vehicle;
 
 public class MailTemplate {
-	public static String getBookingTemplate(Vehicle vehicle, Booking booking) {
+	public static String getBookingTemplate(Vehicle vehicle, Booking booking, String title, String msg) {
 		StringBuffer eMail = new StringBuffer();
-
-		eMail.append("Vehicle Booking Details \n\n");
+		eMail.append(title + " \n\n");
 		eMail.append("Dear Customer, \n\n");
-		eMail.append("You hired the following vehicle. Should you wish to make any change to the booking, contact us. \n\n");
+		eMail.append( msg + "; \n\n");
 		eMail.append("<html><body>");
 		eMail.append("<table border='1' cellspacing='0' cellpadding='0'>");
 		eMail.append("<tr><td>Booking ID</td><td>" + booking.getId()
@@ -36,7 +35,7 @@ public class MailTemplate {
 		eMail.append("</table>");
 		eMail.append("<br /><br /><p> Thank you for using our services</p><br /><br /><p>Oscar VRS team</p>");
 		eMail.append("</body></html>");
+		
 		return eMail.toString();
-
 	}
 }
