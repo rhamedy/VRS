@@ -232,4 +232,10 @@ public class RentalServices {
 		
 		return rentalDao.listBookings(); 
 	}
+	
+	public boolean validateBookingDates(Date startDate, Date endDate) { 
+		logger.info("entry validateBookingDates()"); 
+		
+		return rentalDao.validateBookingDates(startDate, endDate); 
+	}
 }

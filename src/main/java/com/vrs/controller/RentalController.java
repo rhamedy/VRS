@@ -215,27 +215,31 @@ public class RentalController {
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 		Date sqlStartDate = null;
 		Date sqlEndDate = null;
+		
 		try {
 			sqlStartDate = new Date(formatter.parse(startDate).getTime());
 			sqlEndDate = new Date(formatter.parse(endDate).getTime());
 		} catch (ParseException pe) {
 			return JSONUtil
-					.createFailureResponse("Invalid date format selected.");
+					.createFailureResponse("Error# Invalid date format selected.");
 		}
 
-		if (vin == null || vin.length() <= 0) {
-			return JSONUtil.createFailureResponse("Missing vehicle identity.");
+		if(!rentalServices.validateBookingDates(sqlStartDate, sqlEndDate)) { 
+			return JSONUtil
+					.createFailureResponse("Error# Invalid date range selection.");
+		} else if (vin == null || vin.length() <= 0) {
+			return JSONUtil.createFailureResponse("Error# Missing vehicle identity.");
 		} else if (startDate == null) {
 			return JSONUtil
-					.createFailureResponse("startDate is not specified.");
+					.createFailureResponse("Error# startDate is not specified.");
 		} else if (endDate == null) {
-			return JSONUtil.createFailureResponse("endDate is not specificed.");
+			return JSONUtil.createFailureResponse("Error# endDate is not specificed.");
 		} else if ((sqlEndDate.getTime() - sqlStartDate.getTime()) < 1) {
 			return JSONUtil
-					.createFailureResponse("Invalid start date and end date choosen.");
+					.createFailureResponse("Error# Invalid start date and end date choosen.");
 		} else if (insurance.length() <= 0) {
 			return JSONUtil
-					.createFailureResponse("Whether insurance required is not specified.");
+					.createFailureResponse("Error# Answer insurance related question.");
 		}
 
 		String username = userServices.getCurrentUsername();
@@ -392,8 +396,7 @@ public class RentalController {
 					.createFailureResponse("Error. Vehicle cannot be found.");
 		}
 
-		
-
+	
 		//rentalServices.extendBooking(vin, daysInt);
 		// send an email about the hire period extension.
 		return JSONUtil

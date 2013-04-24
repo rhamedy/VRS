@@ -463,4 +463,14 @@ public class RentalDao {
 
 		return bookings;
 	}
+	
+	public boolean validateBookingDates(Date startDate, Date endDate) { 
+		logger.info("entry validateBookingDates()"); 
+		
+		String SQL = "SELECT count(id) FROM rental.customer_vehicle WHERE (? < start_date AND ? > end_date)"; 
+		
+		int result = jdbcTemplate.queryForInt(SQL, new Object[]{ startDate , endDate }); 
+		
+		return result > 0 ? false: true; 
+	}
 }
