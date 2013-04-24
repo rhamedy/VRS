@@ -17,7 +17,7 @@
 		<intercept-url pattern="/**" access="isAuthenticated()" />
 		<form-login login-page="/resources/html/login.html"
 			default-target-url="/home" authentication-failure-url="/resources/html/loginError.html" />
-		<logout logout-url="/logout" logout-success-url="/VRS" />
+		<logout logout-url="/logout" logout-success-url="/home/public" />
 	</http>
 
 	<authentication-manager alias="authenticationManager">
