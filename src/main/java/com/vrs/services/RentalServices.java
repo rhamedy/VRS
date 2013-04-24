@@ -255,15 +255,27 @@ public class RentalServices {
 		return rentalDao.listBookings();
 	}
 
-	public boolean validateBookingDates(Date startDate, Date endDate) {
+	public boolean validateBookingDates(Date startDate, Date endDate, String vin) {
 		logger.info("entry validateBookingDates()");
 
-		return rentalDao.validateBookingDates(startDate, endDate);
+		return rentalDao.validateBookingDates(startDate, endDate, vin);
 	}
 
 	public Booking findBooking(String bookingId) {
 		logger.info("entry findBooking()");
 
 		return rentalDao.findBooking(bookingId);
+	}
+	
+	public void deleteBookings(String vin) { 
+		logger.info("entry deleteBooking()"); 
+		
+		rentalDao.deleteBookings(vin); 
+	}
+	
+	public void deleteVehicle(String vin) { 
+		logger.info("entry deleteVehicle()"); 
+		
+		rentalDao.deleteVehicle(vin); 
 	}
 }

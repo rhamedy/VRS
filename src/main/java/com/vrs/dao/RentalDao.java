@@ -448,12 +448,12 @@ public class RentalDao {
 		return bookings;
 	}
 
-	public boolean validateBookingDates(Date startDate, Date endDate) {
+	public boolean validateBookingDates(Date startDate, Date endDate, String vin) {
 		logger.info("entry validateBookingDates()");
 
-		String SQL = "SELECT count(id) FROM rental.customer_vehicle WHERE (? < start_date AND ? > end_date)";
+		String SQL = "SELECT count(id) FROM rental.customer_vehicle WHERE vehicle_vin = ? AND (? < start_date AND ? > end_date)";
 
-		int result = jdbcTemplate.queryForInt(SQL, new Object[] { startDate,
+		int result = jdbcTemplate.queryForInt(SQL, new Object[] { vin, startDate,
 				endDate });
 
 		return result > 0 ? false : true;
@@ -474,5 +474,13 @@ public class RentalDao {
 			// exception thrown if no result is found
 			return null;
 		}
+	}
+	
+	public void deleteBookings(String vin) { 
+		logger.info("entry deleteBookings()"); 
+		
+		String SQL = "DELETE FROM rental.customer_vehicle WHERE vehicle_vin = ?";
+		
+		jdbcTemplate.update(SQL, new Object[]{ vin });
 	}
 }

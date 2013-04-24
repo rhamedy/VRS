@@ -59,8 +59,6 @@ public class RentalController {
 
 		List<Role> roles = userServices.getUserRole(user);
 
-		logger.info("rentalController home roles.size = " + roles.size());
-
 		for (Role role : roles) {
 			if (role.getRoleName().equals("admin")) {
 				roleType = "admin";
@@ -224,7 +222,7 @@ public class RentalController {
 					.createFailureResponse("Error# Invalid date format selected.");
 		}
 
-		if (!rentalServices.validateBookingDates(sqlStartDate, sqlEndDate)) {
+		if (!rentalServices.validateBookingDates(sqlStartDate, sqlEndDate, vin)) {
 			return JSONUtil
 					.createFailureResponse("Error# Invalid date range selection.");
 		} else if (vin == null || vin.length() <= 0) {
@@ -261,7 +259,7 @@ public class RentalController {
 		rentalServices.addVehicleBooking(booking, systemPassword);
 
 		return JSONUtil
-				.createSuccessResponse("The booking has been added to the system.");
+				.createSuccessResponse("The vehicle has been successfully booked.");
 
 	}
 
@@ -376,13 +374,14 @@ public class RentalController {
 	@RequestMapping(value = "/vehicle/cancelBooking", method = RequestMethod.GET)
 	public @ResponseBody
 	JSONResponse cancelBooking(@RequestParam(required = true) String bookingId) {
-		Booking booking = rentalServices.findBooking(bookingId); 
+		Booking booking = rentalServices.findBooking(bookingId);
 		if (booking == null) {
 			return JSONUtil
 					.createFailureResponse("Error# Booking cannot be found.");
 		}
-		
-		String systemPassword = userServices.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
+
+		String systemPassword = userServices
+				.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
 		rentalServices.cancelBooking(booking, systemPassword);
 		return JSONUtil
 				.createSuccessResponse("The booking has been cancelled successfully.");
@@ -409,7 +408,7 @@ public class RentalController {
 		}
 
 		if (!rentalServices.validateBookingDates(booking.getStartDate(),
-				sqlEndDate)) {
+				sqlEndDate, booking.getVehicleVin())) {
 			return JSONUtil
 					.createFailureResponse("Error# Invalid date range selection.");
 		}
@@ -419,7 +418,6 @@ public class RentalController {
 				.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
 
 		rentalServices.extendBooking(booking, systemPassword);
-		// send an email about the hire period extension.
 		return JSONUtil
 				.createSuccessResponse("Vehicle hire period extended successfully.");
 	}
@@ -428,15 +426,41 @@ public class RentalController {
 	public @ResponseBody
 	List<String> unAvailableDates(@RequestParam String bookingId) {
 		logger.info("entry unAvailableDates()");
-		Booking booking = rentalServices.findBooking(bookingId); 
+		Booking booking = rentalServices.findBooking(bookingId);
 		// returning only the list part of map for specific user which contains
 		// bookings for other users also
+
+		// why only display bookings for a single user
 		return rentalServices.vehicleBookings(booking.getVehicleVin()).get(
 				"rhamedy@student.bradford.ac.uk");
 	}
-	
+
+	@RequestMapping(value = "/vehicle/bookingDatesByVehicle", method = RequestMethod.GET)
+	public @ResponseBody
+	List<String> unAvailableDatesByVehicle(@RequestParam String vin) {
+		logger.info("entry unAvailableDatesByVehicle()");
+		// returning only the list part of map for specific user which contains
+		// bookings for other users also
+
+		// why only display bookings for a single user
+		return rentalServices.vehicleBookings(vin).get(
+				"rhamedy@student.bradford.ac.uk");
+	}
+
 	@RequestMapping(value = "/vehicle/booking", method = RequestMethod.GET)
-	public @ResponseBody Booking getBooking(@RequestParam String bookingId) { 
-		return rentalServices.findBooking(bookingId); 
+	public @ResponseBody
+	Booking getBooking(@RequestParam String bookingId) {
+		return rentalServices.findBooking(bookingId);
+	}
+
+	@RequestMapping(value = "/vehicle/delete", method = RequestMethod.GET)
+	public @ResponseBody
+	JSONResponse deleteVehicle(@RequestParam String vin) {
+		logger.info("entry deleteVehicle()");
+		
+		rentalServices.deleteBookings(vin);
+		rentalServices.deleteVehicle(vin); 
+		return JSONUtil
+				.createSuccessResponse("Vehicle and its bookings has been deleted successfully.");
 	}
 }

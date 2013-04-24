@@ -167,7 +167,7 @@
 									<td>${vehicle.model}</td>
 									<td>${branch.name}</td>
 									<td><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit|</a>
-										<a id="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete</a>
+										<a class="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete</a>
 									</td>
 								</tr>
 							</c:forEach>
@@ -276,7 +276,7 @@
 			<p> The selected branch and all assets and its users will be deleted permanently. Do you want to proceed? </p>
 		</div>
 		<div id="deleteVehicleModalDialog" title="Delete vehicle">
-			<p> The selected vehicle will be deleted permanently. Do you want to proceed? </p>
+			<p> The selected vehicle and it's booking records will be deleted permanently. Do you want to proceed? </p>
 		</div>
 		<div id="resetModalDialog" title="Reset password">
 			<p> Do you wish to proceed with reseting this user's password? </p>
@@ -287,6 +287,8 @@
 			 </table> 
 		</div>
 		<div id="customAlertModalDialog">
+		</div>
+		<div id="customSuccessAlertModalDialog">
 		</div>
 		<div id="cancelVehicleBookingModalDialog" title="Cancel booking">
 			<p>Do you wish to conitnue deleting current booking?</p>
@@ -428,7 +430,7 @@
 											
 											$.ajax({ 
 												method: 'GET', 
-												url: '/VRS/vehicle/bookingDates',
+												url: '/VRS/vehicle/bookingDatesByVehicle',
 												data: 'vin=' + (event.target.id).substring(11,(event.target.id).length),
 												contentType: 'application/json; charset=utf-8', 
 												dataType: 'json',
@@ -581,21 +583,20 @@
 									endDate + '&insurance=' + insurance.val(),
 								dataType: 'json', 
 								success: function(data) {  
-									
-									$('#customAlertModalDialog').empty(); 
-									$('#customAlertModalDialog').append('<p> The booking has been added to the system. Press OK to reload.</p>'); 
-									$('#customAlertModalDialog').dialog('open');
-									$(this).dialog("close");
-									
+									if(data.status == "success") { 
+										$('#customSuccessAlertModalDialog').empty(); 
+										$('#customSuccessAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+										$('#customSuccessAlertModalDialog').dialog('open');	
+									} else { 
+										$('#customAlertModalDialog').empty(); 
+										$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+										$('#customAlertModalDialog').dialog('open');	
+									}		
 								}, 
-								error: function() { 
-									
+								error: function(data) { 
 									$('#customAlertModalDialog').empty(); 
-									$('#customAlertModalDialog').append('<p> The booking process failed. </p>'); 
+									$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
 									$('#customAlertModalDialog').dialog('open');
-									$(this).dialog('close'); 
-									
-									//fix the dissapearing dialog issue.
 								}	
 							}); 
 						}
@@ -645,8 +646,28 @@
 				resizable: false, 
 				buttons: { 
 					Yes: function() {
-						window.location.href= $(this).data('link').href; 
-						$(this).dialog("close"); 
+						$.ajax({
+							method: 'GET', 
+							url: '/VRS/vehicle/delete', 
+							data: 'vin=' + (($(this).data('link').href).split('=')[1]),
+							dataType: 'json', 
+							success: function(data) {
+							 if(data.status == "success") { 
+									$('#customSuccessAlertModalDialog').empty(); 
+									$('#customSuccessAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customSuccessAlertModalDialog').dialog('open');	
+								} else { 
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customAlertModalDialog').dialog('open');	
+								}		
+							}, 
+							error: function(data) { 
+								$('#customAlertModalDialog').empty(); 
+								$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+								$('#customAlertModalDialog').dialog('open');	
+							}
+						}); 
 					}, 
 					No: function() { 
 						$(this).dialog("close"); 
@@ -662,9 +683,33 @@
 				buttons: {
 					OK: function() { 
 						$(this).dialog("close");
+					}
+				}
+			}); 
+			
+			$('#customSuccessAlertModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: {
+					OK: function() { 
+						$(this).dialog("close");
 						if($('#hireVehicleModalDialog').is(':visible')) {
-							//$('#hireVehicleModalDialog').dialog('close');
-							//location.reload(); 
+							$('#hireVehicleModalDialog').dialog('close');
+							location.reload(); 
+						}
+						if($('#hireVehicleModalDialog').is(':visible')) {
+							$('#hireVehicleModalDialog').dialog('close');
+							location.reload(); 
+						}
+						if($('#extendVehicleHirePeriodModalDialog').is(':visible')) { 
+							$('#extendVehicleHirePeriodModalDialog').dialog('close');
+							location.reload(); 
+						}
+						if($('#deleteVehicleModalDialog').is(':visible')) { 
+							$('#deleteVehicleModalDialog').dialog('close'); 
+							location.reload(); 
 						}
 					}
 				}
@@ -684,7 +729,7 @@
 				return false; 
 			});  
 			
-			$('#deleteVehicle').click(function() {
+			$('.deleteVehicle').click(function() {
 				$('#deleteVehicleModalDialog')
 				.data('link',this)
 				.dialog('open');
@@ -710,13 +755,21 @@
 							url: '/VRS/vehicle/cancelBooking', 
 							data: 'bookingId=' + (($(this).data('link').href).split('=')[1]), 
 							dataType: 'json', 
-							success: function() { 
-								alert("the booking has been cancelled successfully.");
-								$(this).dialog('close');
+							success: function(data) { 
+								if(data.status == "success") {  
+									$('#customSuccessAlertModalDialog').empty(); 
+									$('#customSuccessAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customSuccessAlertModalDialog').dialog('open');
+								} else { 
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customAlertModalDialog').dialog('open');
+								}
 							}, 
-							error: function() { 
-								alert("cancelling the booking failed.");
-								$(this).dialog('close');
+							error: function(data) { 
+								$('#customAlertModalDialog').empty(); 
+								$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+								$('#customAlertModalDialog').dialog('open');
 							}
 						}); 
 					}, 
@@ -822,13 +875,21 @@
 							url: '/VRS/vehicle/extendBooking', 
 							data: 'bookingId=' + (($(this).data('link').href).split('=')[1]) + '&endDate=' + $('#extensionEndDate').val(), 
 							dataType: 'json', 
-							success: function() { 
-								alert("the booking has been extended successfully.");
-								$(this).dialog('close');
+							success: function(data) {
+								if(data.status == "success") {  
+									$('#customSuccessAlertModalDialog').empty(); 
+									$('#customSuccessAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customSuccessAlertModalDialog').dialog('open');
+								} else { 
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customAlertModalDialog').dialog('open');
+								}
 							}, 
 							error: function() { 
-								alert("Extending the booking has failed.");
-								$(this).dialog('close');
+								$('#customAlertModalDialog').empty(); 
+								$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+								$('#customAlertModalDialog').dialog('open');
 							}
 						}); 
 					}, 
