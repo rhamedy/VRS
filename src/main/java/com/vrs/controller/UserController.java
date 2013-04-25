@@ -86,7 +86,7 @@ public class UserController {
 
 	@RequestMapping(value = "/user/editUser", method = RequestMethod.GET)
 	public ModelAndView editUser(@RequestParam(required = false) String username) {
-		
+
 		ModelAndView mav = new ModelAndView();
 		mav.setViewName("editUser");
 
@@ -104,9 +104,9 @@ public class UserController {
 					.getCityId());
 			KeyValuePair<Integer, String> country = rentalServices
 					.getCountryByCity(branch.getCityId());
-			
-			mav.addObject("branch", branch); 
-			mav.addObject("city", city); 
+
+			mav.addObject("branch", branch);
+			mav.addObject("city", city);
 			mav.addObject("country", country);
 		}
 
@@ -127,7 +127,7 @@ public class UserController {
 		mav.addObject("username", user.getUsername());
 		mav.addObject("userRoles", userRoles);
 		mav.addObject("nonUserRoles", nonUserRoles);
-		mav.addObject("countries", rentalServices.getCountries()); 
+		mav.addObject("countries", rentalServices.getCountries());
 
 		return mav;
 	}
@@ -145,7 +145,7 @@ public class UserController {
 		} else if (request.getParameter("role") == null) {
 			return JSONUtil
 					.createFailureResponse("Select atleast one role for this user.");
-		} else if(user.getBranchId() == 0) { 
+		} else if (user.getBranchId() == 0) {
 			return JSONUtil
 					.createFailureResponse("Select a branch for the user.");
 		} else {
@@ -207,5 +207,25 @@ public class UserController {
 		} else {
 			return JSONUtil.createSuccessResponse();
 		}
+	}
+
+	@RequestMapping(value = "/user/deleteUser", method = RequestMethod.GET)
+	public @ResponseBody
+	JSONResponse deleteUser(@RequestParam String username) {
+		logger.info("entry deleteUser()");
+		User user = userServices.findUser(username);
+		List<Role> roles = userServices.getUserRole(user);
+		for (Role role : roles) {
+			userServices.deleteUserRole(user, role);
+		}
+		
+		//in case the user booking history to be preserved then username should not be a 
+		//primary key to the customer_vehicle (booking) table otherwise, the booking 
+		//history cannot be preserved. 
+		
+		userServices.deleteUser(user);
+
+		return JSONUtil
+				.createSuccessResponse("The user and it's associated roles has been deleted successfully.");
 	}
 }

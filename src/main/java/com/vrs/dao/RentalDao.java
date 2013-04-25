@@ -507,6 +507,13 @@ public class RentalDao {
 		}
 
 		return bookings;
+	}
+	
+	public void deleteCityBranches(int cityId) { 
+		logger.info("entry deleteCityBranches()"); 
 		
+		String SQL = "DELETE FROM rental.branch WHERE city_id = ?";
+		
+		jdbcTemplate.update(SQL, new Object[]{ cityId }); 
 	}
 }

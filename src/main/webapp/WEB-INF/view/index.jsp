@@ -80,8 +80,8 @@
 									<td>${user.licenseNo}</td>
 									<td>${user.licenseValidity}</td>
 									<td><a href="/VRS/user/editUser?username=${user.username}">Edit|</a>
-										<a id="deleteUser" href="/VRS/user/deleteUser?username=${user.username}">Delete|</a>
-										<a id="resetPassword" href="/VRS/user/resetPassword?username=${user.username}">Reset password</a>
+										<a class="deleteUser" href="/VRS/user/deleteUserFromSystem?username=${user.username}">Delete|</a>
+										<a class="resetPassword" href="/VRS/user/resetUserPassword?username=${user.username}">Reset password</a>
 									</td>
 								</tr>
 							</c:forEach>
@@ -546,8 +546,28 @@
 				resizable: false, 
 				buttons: { 
 					Yes: function() {
-						window.location.href= $(this).data('link').href; 
-						$(this).dialog("close"); 
+						$.ajax({
+							method: 'GET', 
+							url: '/VRS/user/deleteUser', 
+							data: 'username=' + ($(this).data('link').href).split('=')[1],
+							dataType: 'json', 
+							success: function(data) { 
+								if(data.status == "success") { 
+									$('#customSuccessAlertModalDialog').empty(); 
+									$('#customSuccessAlertModalDialog').append('<p>' + data.message + '</p>'); 
+									$('#customSuccessAlertModalDialog').dialog('open');
+								} else { 
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p>' + data.message + '</p>'); 
+									$('#customAlertModalDialog').dialog('open');
+								}
+							}, 
+							error: function(data) { 
+								$('#customAlertModalDialog').empty(); 
+								$('#customAlertModalDialog').append('<p>Deleting the user failed. Try again later.</p>'); 
+								$('#customAlertModalDialog').dialog('open');
+							}
+						}); 
 					}, 
 					No: function() { 
 						$(this).dialog("close"); 
@@ -740,18 +760,22 @@
 							$('#cancelVehicleBookingModalDialog').dialog('close'); 
 							location.reload();
 						}
+						if($('#deleteModalDialog').is(':visible')) { 
+							$('#deleteModalDialog').dialog('close'); 
+							location.reload();
+						}
 					}
 				}
 			}); 
 			
-			$('#deleteUser').click(function() {
+			$('.deleteUser').click(function() {
 				$('#deleteModalDialog')
 				.data('link',this)
 				.dialog('open');
 				return false; 
 			});  
 			
-			$('#resetPassword').click(function() {
+			$('.resetPassword').click(function() {
 				$('#resetModalDialog')
 				.data('link',this)
 				.dialog('open');

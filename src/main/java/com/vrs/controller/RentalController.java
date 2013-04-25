@@ -468,19 +468,43 @@ public class RentalController {
 	@RequestMapping(value = "/vehicle/bookingRecords", method = RequestMethod.GET)
 	public @ResponseBody
 	Map<String, Integer> vehicleBookingRecords(@RequestParam String vin) {
-		logger.info("entry vehicleBookingRecords()"); 
-		
-		Calendar cal = Calendar.getInstance(); 
-		cal.setTime(new java.util.Date()); 
-		Date d = new Date(cal.getTimeInMillis()); 
-		
-		List<Booking> pastBookings = rentalServices.retrieveVehicleBookingsRecords(vin, d, false); 
-		List<Booking> presentBookings = rentalServices.retrieveVehicleBookingsRecords(vin, d, true); 
-		
-		Map<String, Integer> bookings = new HashMap<String, Integer>(); 
-		bookings.put("current", presentBookings.size()); 
-		bookings.put("past", pastBookings.size()); 
-		
+		logger.info("entry vehicleBookingRecords()");
+
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(new java.util.Date());
+		Date d = new Date(cal.getTimeInMillis());
+
+		List<Booking> pastBookings = rentalServices
+				.retrieveVehicleBookingsRecords(vin, d, false);
+		List<Booking> presentBookings = rentalServices
+				.retrieveVehicleBookingsRecords(vin, d, true);
+
+		Map<String, Integer> bookings = new HashMap<String, Integer>();
+		bookings.put("current", presentBookings.size());
+		bookings.put("past", pastBookings.size());
+
 		return bookings;
+	}
+
+	@RequestMapping(value = "/delete/city", method = RequestMethod.GET)
+	public @ResponseBody
+	JSONResponse deleteCity(@RequestParam String cityId) {
+		logger.info("entry deleteCity()");
+
+		//rentalServices.deleteCity(cityId);
+
+		return JSONUtil
+				.createSuccessResponse("The selected city and it's branch has been deleted.");
+	}
+
+	@RequestMapping(value = "/delete/branch", method = RequestMethod.GET)
+	public @ResponseBody
+	JSONResponse deleteBranch(@RequestParam String branchId) {
+		logger.info("entry deleteCity()");
+
+		//rentalServices.deleteBranch(branchId);
+
+		return JSONUtil
+				.createSuccessResponse("The selected branch and it's vehicles has been deleted.");
 	}
 }

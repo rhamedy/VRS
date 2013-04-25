@@ -284,4 +284,23 @@ public class RentalServices {
 		
 		return rentalDao.retrieveVehicleBookingsRecords(vin, date, current); 
 	}
+	
+	public void deleteCity(int cityId) { 
+		logger.info("entry deleteCity()"); 
+		
+		//List<Branch> cityBranches = rentalServices.cityBranches(cityId); 
+		//loop through each branch, delete its vehicles. then delete the branch itself
+		//after that delete city
+		
+		//rentalDao.deleteBranchVehicles(branchId); 
+		//rentalDao.deleteBranch(branchId); 
+		//rentalDao.deleteCity(cityId); 
+	}
+	
+	public void deleteBranch(int branchId) { 
+		logger.info("entry deleteBranch()"); 
+		
+		//rentalDao.deleteBranchVehicles(branchId); 
+		//rentalDao.deleteBranch(branchId); 
+	}
 }
