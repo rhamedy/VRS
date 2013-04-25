@@ -644,8 +644,33 @@
 				autoOpen: false, 
 				width: 'auto', 
 				resizable: false, 
+				open: function() { 
+					$.ajax({
+						method: 'GET', 
+						url: '/VRS/vehicle/bookingRecords', 
+						data: 'vin=' + (($(this).data('link').href).split('=')[1]),
+						success: function(data) { 
+							if(data.current > 0) { 
+								$('#deleteVehicleModalDialog').empty(); 
+								$('#deleteVehicleModalDialog').append('<p> There are current bookings for this vehicle. Cancel the bookings first.</p>'); 
+								$(":button:contains('Delete')").prop("disabled",true).addClass('ui-state-disabled'); 
+							} else if(data.past > 0) { 
+								$('#deleteVehicleModalDialog').empty(); 
+								$('#deleteVehicleModalDialog').append('<p> There are expired bookings for this vehicle. Do you wish to proceed.</p>'); 
+							} else { 
+								$('#deleteVehicleModalDialog').empty(); 
+								$('#deleteVehicleModalDialog').append('<p> Are you sure, you wish to delete this vehicle? </p>'); 
+							}
+						}, 
+						error: function(data) { 
+							$('#deleteVehicleModalDialog').empty(); 
+							$('#deleteVehicleModalDialog').append('<p> Failed to retrieve vehicle booking history. Try later.</p>'); 
+							$(":button:contains('Delete')").prop("disabled",true).addClass('ui-state-disabled');
+						}
+					}); 
+				}, 
 				buttons: { 
-					Yes: function() {
+					Delete: function() {
 						$.ajax({
 							method: 'GET', 
 							url: '/VRS/vehicle/delete', 
@@ -711,6 +736,10 @@
 							$('#deleteVehicleModalDialog').dialog('close'); 
 							location.reload(); 
 						}
+						if($('#cancelVehicleBookingModalDialog').is(':visible')) { 
+							$('#cancelVehicleBookingModalDialog').dialog('close'); 
+							location.reload();
+						}
 					}
 				}
 			}); 
@@ -729,11 +758,11 @@
 				return false; 
 			});  
 			
-			$('.deleteVehicle').click(function() {
+			$('.deleteVehicle').click(function() {	
 				$('#deleteVehicleModalDialog')
-				.data('link',this)
-				.dialog('open');
-				return false; 
+					.data('link',this)
+					.dialog('open');
+					return false; 
 			});  
 			
 			$('#deleteBranch').click(function() {

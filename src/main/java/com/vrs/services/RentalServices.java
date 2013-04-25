@@ -278,4 +278,10 @@ public class RentalServices {
 		
 		rentalDao.deleteVehicle(vin); 
 	}
+	
+	public List<Booking> retrieveVehicleBookingsRecords(String vin, Date date, boolean current) { 
+		logger.info("entry retrieveVehicleBookingByDate()"); 
+		
+		return rentalDao.retrieveVehicleBookingsRecords(vin, date, current); 
+	}
 }

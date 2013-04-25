@@ -4,6 +4,7 @@ import java.sql.Date;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -457,10 +458,29 @@ public class RentalController {
 	public @ResponseBody
 	JSONResponse deleteVehicle(@RequestParam String vin) {
 		logger.info("entry deleteVehicle()");
-		
+
 		rentalServices.deleteBookings(vin);
-		rentalServices.deleteVehicle(vin); 
+		rentalServices.deleteVehicle(vin);
 		return JSONUtil
 				.createSuccessResponse("Vehicle and its bookings has been deleted successfully.");
+	}
+
+	@RequestMapping(value = "/vehicle/bookingRecords", method = RequestMethod.GET)
+	public @ResponseBody
+	Map<String, Integer> vehicleBookingRecords(@RequestParam String vin) {
+		logger.info("entry vehicleBookingRecords()"); 
+		
+		Calendar cal = Calendar.getInstance(); 
+		cal.setTime(new java.util.Date()); 
+		Date d = new Date(cal.getTimeInMillis()); 
+		
+		List<Booking> pastBookings = rentalServices.retrieveVehicleBookingsRecords(vin, d, false); 
+		List<Booking> presentBookings = rentalServices.retrieveVehicleBookingsRecords(vin, d, true); 
+		
+		Map<String, Integer> bookings = new HashMap<String, Integer>(); 
+		bookings.put("current", presentBookings.size()); 
+		bookings.put("past", pastBookings.size()); 
+		
+		return bookings;
 	}
 }

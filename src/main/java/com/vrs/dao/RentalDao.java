@@ -483,4 +483,30 @@ public class RentalDao {
 		
 		jdbcTemplate.update(SQL, new Object[]{ vin });
 	}
+	
+	public List<Booking> retrieveVehicleBookingsRecords(String vin, Date date, boolean current) { 
+		logger.info("entry retrieveVehicleBookingsByEndDate()"); 
+		String SQL = ""; 
+		
+		if(current) { 
+			SQL = "SELECT * FROM rental.customer_vehicle WHERE vehicle_vin = ? AND end_date > ?"; 
+		} else { 
+			SQL = "SELECT * FROM rental.customer_vehicle WHERE vehicle_vin = ? AND end_date <= ?"; 
+		}
+		
+		List<Booking> bookings = null;
+
+		try {
+			bookings = jdbcTemplate.query(SQL, new Object[]{ vin, date},
+					new BeanPropertyRowMapper<Booking>(Booking.class));
+		} catch (EmptyResultDataAccessException ex) {
+			ex.printStackTrace();
+			return null;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return bookings;
+		
+	}
 }
