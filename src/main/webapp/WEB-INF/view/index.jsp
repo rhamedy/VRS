@@ -7,42 +7,49 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title> Oscar Vehicle Rental System </title> 
 		<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.0/themes/ui-lightness/jquery-ui.css" type="text/css" />
+		<link rel="stylesheet" href="/VRS/resources/css/style.css" type="text/css" />
 	</head>
-	<style>
-		#vehicleDiv { 
-			border: 1px solid black; 
-			padding: 5px 5px 5px 5px;
-			margin-top: 10px; 
-		}
-	</style> 
 	<body>
-		<div id="main">
+		<div id="container">
+			<div id="public_menu_bar">
+				<ul class="public_menu_bar">
+					<li><a href="/VRS/logout"> Logout </a></li>
+				</ul>
+			</div><br />
 			<c:if test="${userType == 'staff'}">
-				<div id="userDetails">
-					<table border="1"">
+				<div class="section_title">
+					<p>Staff personal details</p>
+				</div>
+				<div id="user_details" align="center" style="width:400px;height:110px;">
+					<br />
+					<table border="0" style="width:230px;margin-left:30px;">
 						<tbody id="userListBody">
 								<tr>
-									<td>First name</td><td>${user.firstName}</td>
+									<td align="left">First name</td><td>${user.firstName}</td>
 								</tr>
 								<tr>
-									<td>Last name</td><td>${user.lastName}</td>
+									<td align="left">Last name</td><td>${user.lastName}</td>
 								</tr>
 								<tr>
-									<td>Date of birth</td><td>${user.dob}</td>
+									<td align="left">Date of birth</td><td>${user.dob}</td>
 								</tr>
 								<tr>
-									<td>Mobile</td><td>${user.mobile}</td>
+									<td align="left">Mobile</td><td>${user.mobile}</td>
 								</tr>
 						</tbody>
 					</table>
-				</div><br /><br />
-				<div id="branchDetails">
-					<table border="1">
+				</div>
+				<div class="section_title">
+					<p>Staff branch details</p>
+				</div>
+				<div id="branch_details" align="center" style="width:400px;height:90px;">
+					<br />
+					<table border="0" style="width:330px;">
 						<thead>
 							<tr>
-								<th>Branch name</th>
-								<th>Street name</th>
-								<th>Postcode</th>
+								<th align="left">Branch name</th>
+								<th align="left"> Street name</th>
+								<th align="left">Postcode</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -56,41 +63,55 @@
 				</div>
 			</c:if> 
 			<c:if test="${userType == 'admin'}">
-				<div id="usersDiv">
-					<a href="/VRS/user/editUser"> Add new user</a>
-					<table border="1" id="userList">
-						<thead>
-							<tr>
-								<th>First name</th>
-								<th>Last name</th>
-								<th>Date of birth</th>
-								<th>Mobile</th>
-								<th>License no</th>
-								<th>License validity</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody id="userListBody">
-							<c:forEach items="${users}" var="user">
-								<tr>
-									<td>${user.firstName}</td>
-									<td>${user.lastName}</td>
-									<td>${user.dob}</td>
-									<td>${user.mobile}</td>
-									<td>${user.licenseNo}</td>
-									<td>${user.licenseValidity}</td>
-									<td><a href="/VRS/user/editUser?username=${user.username}">Edit|</a>
-										<a class="deleteUser" href="/VRS/user/deleteUserFromSystem?username=${user.username}">Delete|</a>
-										<a class="resetPassword" href="/VRS/user/resetUserPassword?username=${user.username}">Reset password</a>
-									</td>
-								</tr>
-							</c:forEach>
-						</tobdy>
-					</table>
+				<div class="section_title">
+					<p>User management</p>
 				</div>
-				<br /><br />
-				<div class="all">
-					<label for="countriesList"> Countries </label>
+				<div id="users_div" style="height:150px;">
+					<div>
+						<a style="margin-left:300px;" href="/VRS/user/editUser"> Add new user</a><br><br />
+					</div>
+					<div id="usersListDiv">
+						<table border="0" id="userList" cellspacing="0" cellpadding="0" style="width:660px;margin-left:5px;">
+							<thead>
+								<tr>
+									<th>Full name</th>
+									<th>DOB &nbsp;&nbsp;</th>
+									<th>Mobile</th>
+									<th>License no &nbsp;</th>
+									<th>License validity</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody id="userListBody">
+								<c:forEach items="${users}" var="user" varStatus="rowCounter">
+									<c:choose>
+										<c:when test="${rowCounter.count%2==1}">
+											<tr bgcolor="#BDEDFF">
+										</c:when>
+										<c:otherwise>
+											<tr>
+										</c:otherwise>
+									</c:choose>
+										<td align="center">${user.firstName} ${user.lastName}</td>
+										<td align="center">${user.dob}</td>
+										<td align="center">${user.mobile}</td>
+										<td align="center">${user.licenseNo}</td>
+										<td align="center">${user.licenseValidity}</td>
+										<td align="center"><a href="/VRS/user/editUser?username=${user.username}">Edit|</a>
+											<a class="deleteUser" href="/VRS/user/deleteUserFromSystem?username=${user.username}">Delete|</a>
+											<a class="resetPassword" href="/VRS/user/resetUserPassword?username=${user.username}">Reset password</a>
+										</td>
+									</tr>
+								</c:forEach>
+							</tobdy>
+						</table>
+					</div><br /><br />
+				</div>
+				<div class="section_title">
+					<p>Branch data management</p>
+				</div>
+				<div id="vehicle_div" align="center">
+					<br /><label for="countriesList"> Select country </label>
 					<select id="countryList">
 						<option value="" selected></option>
 						<c:forEach var="entry" items="${countries}">
@@ -98,7 +119,7 @@
 								<option class="" value="${e.key}">${e.value}</option>
 							</c:forEach>
 						</c:forEach>
-					</select><br />
+					</select><br />					
 					<table id="countriesListTable" border="1">
 						<thead>
 						</thead>
@@ -106,169 +127,222 @@
 						</tbody>
 					</table>
 					<br />
-					<label for="cityList">Cities</label>
+					<label for="cityList">Select city</label>
 					<select id="cityList">
-					</select><br />
-					<table id="cityListTable" border="1">
-						<thead>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
+					</select><br /><br />
+					<div id="tableCityListDiv">
+						<table id="cityListTable">
+							<thead>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
 					<br />
-					<label for="branchList">Branches</label>
+					<label for="branchList">Select branch</label>
 					<select id="branchList">
 					</select><br /><br />
-					<table id="branchListTable" border="1">
-					</table><br /><br />
-					<label for="vehicleList">Vehicles list</label><br />
-					<table id="vehicleList" border="1">
-						<thead>
-							<tr>
-								<th>Make</th>
-								<th>Model</th>
-								<th>Max Speed</th>
-								<th>Fuel</th>
-								<th>Seating</th>
-								<th>Available</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody id="vehicleData">
-						</tbody>
-					</table>
-				</div>
-			</c:if>
-			<br /><br />
-			<c:if test="${userType == 'staff'}">
-				<a href="/VRS/vehicle/editVehicle">Add new vehicle</a>
-				<div id="vehiclesDiv">
-					<table border="1" id="vehicleList">
-						<thead>
-							<tr>
-								<th>Vin No</th>
-								<th>Plate No</th>
-								<th>Max speed</th>
-								<th>Seating</th>
-								<th>Fuel</th>
-								<th>Model</th>
-								<th>Branch</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody id="vehicleListBody">
-							<c:forEach items="${vehicles}" var="vehicle">
+					<div id="tableBranchListDiv">
+						<table id="branchListTable" border="0">
+						</table><br />
+					</div><br /><br />
+					<label for="vehicleList"><b>Vehicles list</b></label><br />
+					<div id="tableVehicleListDiv">
+						<table id="vehicleList" border="0">
+							<thead>
 								<tr>
-									<td>${vehicle.vin}</td>
-									<td>${vehicle.numberPlate}</td>
-									<td>${vehicle.maxSpeed}</td>
-									<td>${vehicle.seating}</td>
-									<td>${vehicle.fuel}</td>
-									<td>${vehicle.model}</td>
-									<td>${branch.name}</td>
-									<td><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit|</a>
-										<a class="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete</a>
-									</td>
+									<th align="left">Make</th>
+									<th align="left">Model</th>
+									<th align="left">Max Speed</th>
+									<th align="left">Fuel</th>
+									<th align="left">Seating</th>
+									<th align="left">Available</th>
+									<th align="left">Action</th>
 								</tr>
-							</c:forEach>
-						</tobdy>
-					</table><br /><br />
-					<label for="bookingList"> Bookings </label><br />
-					<table border="1" id="bookingList">
-						<thead>
-							<tr>
-								<th>Vehicle Vin No</th>
-								<th>Username</th>
-								<th>Start date</th>
-								<th>End date</th>
-								<th>Insurance</th>
-								<th>Driver</th>
-								<th>Total cost</th>
-								<th>Action</th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach items="${bookings}" var="booking">
-								<tr>
-									<td>${booking.vehicleVin}</td>
-									<td>${booking.username}</td>
-									<td>${booking.startDate}</td>
-									<td>${booking.endDate}</td>
-									<td>${booking.insurance}</td>
-									<td>${booking.driver}</td>
-									<td>${booking.hireCost}</td>
-									<td><a class="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?bookingId=${booking.id}">Cancel booking|</a>
-										<a class="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?bookingId=${booking.id}">Extend Hire</a>
-									</td>
-								</tr>
-							</c:forEach>
-						</tbody>
-					</table>
-				</div>
-			</c:if>
-			<br />
-		</div>
-		<c:if test="${userType == 'customer'}">
-			<div id="customerDiv">
-				<div id="userDetails">
-					<table border="1" id="userList">
-						<tbody id="userListBody">
-								<tr>
-									<td>First name</td><td>${user.firstName}</td>
-								</tr>
-								<tr>
-									<td>Last name</td><td>${user.lastName}</td>
-								</tr>
-								<tr>
-									<td>Date of birth</td><td>${user.dob}</td>
-								</tr>
-								<tr>
-									<td>Mobile</td><td>${user.mobile}</td>
-								</tr>
-								<tr>
-									<td>License no</td><td>${user.licenseNo}</td>
-								</tr>
-								<tr>
-									<td>License validity</td><td>${user.licenseValidity}</td>
-								</tr>	
-						</tbody>
-					</table>
+							</thead>
+							<tbody id="vehicleData">
+							</tbody>
+						</table>
+					</div><br /><br />
 				</div><br /><br />
-				<div id="vehiclesForHire">add
-					<label for="countriesList"> Countries </label>
-					<select id="countryList">
-						<option value="" selected></option>
-						<c:forEach var="entry" items="${countries}">
-							<c:forEach var="e" items="${entry}">
-								<option class="" value="${e.key}">${e.value}</option>
-							</c:forEach>
-						</c:forEach>
-					</select><br />
-					<label for="cityListNoTable">Cities</label>
-					<select id="cityList">
-					</select><br />
-					<label for="branchList">Branches</label>
-					<select id="branchList">
-					</select><br /><br />
-					<label for="vehicleList">Vehicles list</label><br />
-					<table id="vehicleList" border="1">
+			</c:if>
+			<c:if test="${userType == 'staff'}">
+				<div class="section_title">
+					<p>Registered vehicles</p>
+				</div>
+				<div id="vehicles_div">
+					<div>
+						<center><b><a href="/VRS/vehicle/editVehicle">Add new vehicle</a></b></center><br />
+					</div>
+					<div id="tableVehicleListDiv">
+						<table border="0" id="vehicleList">
+							<thead>
+								<tr>
+									<th align="left">Vin No</th>
+									<th align="left">Plate No</th>
+									<th align="left">Max speed</th>
+									<th align="left">Seating</th>
+									<th align="left">Fuel</th>
+									<th align="left">Model</th>
+									<th align="left">Branch</th>
+									<th align="left">Action</th>
+								</tr>
+							</thead>
+							<tbody id="vehicleListBody">
+								<c:forEach items="${vehicles}" var="vehicle" varStatus="rowCounter">
+									<c:choose>
+										<c:when test="${rowCounter.count%2==1}">
+											<tr bgcolor="#BDEDFF">
+										</c:when>
+										<c:otherwise>
+											<tr>
+										</c:otherwise>
+									</c:choose>
+										<td align="left">${vehicle.vin}</td>
+										<td align="left">${vehicle.numberPlate}</td>
+										<td align="left">${vehicle.maxSpeed}</td>
+										<td align="left">${vehicle.seating}</td>
+										<td align="left">${vehicle.fuel}</td>
+										<td align="left">${vehicle.model}</td>
+										<td align="left">${branch.name}</td>
+										<td align="left"><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit|</a>
+											<a class="deleteVehicle" href="/VRS/vehicle/deleteVehicle?vin=${vehicle.vin}">Delete</a>
+										</td>
+									</tr>
+								</c:forEach>
+							</tobdy>
+						</table><br />
+					</div><br />
+				</div><br />
+				<div class="section_title">
+					<p>Booking list</p>
+				</div>
+				<div id="booking_div">
+					<div id="tableBookingListDiv"  style="height:180px;">
+						<table border="0" id="bookingList">
+							<thead>
+								<tr>
+									<th align="left">Vehicle Vin No</th>
+									<th align="left">Username</th>
+									<th align="left">Start date</th>
+									<th align="left">End date</th>
+									<th align="left">Insurance</th>
+									<th align="left">Driver</th>
+									<th align="left">Total cost</th>
+									<th align="left">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${bookings}" var="booking" varStatus="rowCounter">
+									<c:choose>
+										<c:when test="${rowCounter.count%2==1}">
+											<tr bgcolor="#BDEDFF">
+										</c:when>
+										<c:otherwise>
+											<tr>
+										</c:otherwise>
+									</c:choose>
+										<td align="left">${booking.vehicleVin}</td>
+										<td align="left">${booking.username}</td>
+										<td align="left">${booking.startDate}</td>
+										<td align="left">${booking.endDate}</td>
+										<td align="left">${booking.insurance}</td>
+										<td align="left">${booking.driver}</td>
+										<td align="left">${booking.hireCost}</td>
+										<td align="left"><a class="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?bookingId=${booking.id}">Cancel booking|</a>
+											<a class="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?bookingId=${booking.id}">Extend Hire</a>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</c:if>
+		<c:if test="${userType == 'customer'}">
+			<div class="section_title">
+				<p>Customer personal details</p>
+			</div>
+			<div id="user_details" align="center" style="width:410px;height:150px;">
+				<br />
+				<table border="0" id="usersList" style="width:230px;">
+					<tbody id="userListBody">
+							<tr>
+								<td align="left">First name</td><td>${user.firstName}</td>
+							</tr>
+							<tr>
+								<td align="left">Last name</td><td>${user.lastName}</td>
+							</tr>
+							<tr>
+								<td align="left">Date of birth</td><td>${user.dob}</td>
+							</tr>
+							<tr>
+								<td align="left">Mobile</td><td>${user.mobile}</td>
+							</tr>
+							<tr>
+								<td align="left">License no</td><td>${user.licenseNo}</td>
+							</tr>
+							<tr>
+								<td align="left">License validity</td><td>${user.licenseValidity}</td>
+							</tr>	
+					</tbody>
+				</table>
+			</div><br />
+			<div class="section_title">
+				<p>Find a vehicle for booking</p>
+			</div>
+			<div id="vehicle_for_hire">
+				<br />
+				<table align="center">
+					<tr>
+						<td><label for="countriesList"> Select a country </label></td>
+						<td>
+							<select id="countryList">
+								<option value="" selected></option>
+								<c:forEach var="entry" items="${countries}">
+									<c:forEach var="e" items="${entry}">
+										<option class="" value="${e.key}">${e.value}</option>
+									</c:forEach>
+								</c:forEach>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<td><label for="cityList">Choose a city</label></td>
+						<td>
+							<select id="cityList">
+							</select><br />
+						</td>
+					</tr>
+					<tr>
+						<td><label for="branchList">Choose a branche</label></td>
+						<td>
+							<select id="branchList">
+							</select><br /><br />
+						</td>
+					</tr>
+				</table><br />
+				<center><label for="vehicleList"><b>Vehicles list</b></label></center><br /><br />
+				<div id="tableVehicleListDiv">
+					<table id="vehicleList" border="0" cellspacing="0" cellpadding="0">
 						<thead>
 							<tr>
-								<th>Make</th>
-								<th>Model</th>
-								<th>Max Speed</th>
-								<th>Fuel</th>
-								<th>Seating</th>
-								<th>Available</th>
-								<th>Action</th>
+								<th align="left">Make</th>
+								<th align="left">Model</th>
+								<th align="left">Max Speed</th>
+								<th align="left">Fuel</th>
+								<th align="left">Seating</th>
+								<th align="left">Available</th>
+								<th align="left">Action</th>
 							</tr>
 						</thead>
 						<tbody id="vehicleData">
 						</tbody>
 					</table>
 				</div>
-			</div>
+			</div><br />
 		</c:if>
+		<br />
 		<div id="deleteModalDialog" title="Delete user">
 			<p> The selected user will be deleted permanently. Do you want to proceed? </p>
 		</div>
@@ -316,7 +390,7 @@
 						data: "countryId=" + $(this).children(":selected").val(), 
 						success: function(data) {
 							var flag = false;
-							$("table#cityListTable").append('<thead><tr><th>City name</th><th>Action</th></tr></thead>');  
+							$("table#cityListTable").append("<thead><tr><th align='left'>City name</th><th align='left'>Action</th></tr></thead>");  
 							$("table#cityListTable").append('<tbody>');  
 							$.each(data, function(k,value) {
 								$.each(value, function(key, v) {
@@ -352,7 +426,7 @@
 							var streetName; 
 							var postcode; 
 							
-							$("table#branchListTable").append('<thead><tr><th>Branch name</th><th>Street name</th><th>postcode</th><th>Action</th></tr></thead>');  
+							$("table#branchListTable").append("<thead><tr><th align='left'>Branch name</th><th align='left'>Street name</th><th align='left'>postcode</th><th align='left'>Action</th></tr></thead>");  
 							$("table#branchListTable").append('<tbody>');  
 							$.each(data, function(k,value) {
 								$.each(value, function(key, v) { 

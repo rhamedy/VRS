@@ -65,6 +65,12 @@ public class UserController {
 				dateFormat, true));
 	}
 
+	@RequestMapping(value = "/home/login")
+	public ModelAndView login() { 
+		ModelAndView mav = new ModelAndView("login"); 
+		return mav; 
+	}
+	
 	@RequestMapping(value = "/home/public")
 	public ModelAndView showHomepage() {
 		logger.info("entry showHomepage()");

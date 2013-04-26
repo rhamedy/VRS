@@ -45,7 +45,7 @@ public class UserDao {
 				+ "password, dob, mobile, disabled, created_date, branch_id) VALUES (?,?,?,?,?,?,?,?,?)";
 
 		logger.info("updateUser branchId = " + user.getBranchId());
-		
+
 		jdbcTemplate.update(
 				SQL,
 				new Object[] { user.getUsername(), user.getFirstName(),
@@ -191,13 +191,12 @@ public class UserDao {
 	public List<User> listUsers() {
 		logger.info("entry listUsers()");
 
-		String SQL = "SELECT * FROM auth.user";
+		String SQL = "SELECT * FROM auth.user WHERE username != ?";
 
 		List<User> users = jdbcTemplate.query(SQL,
+				new Object[] { "oscar.vehicle.rental.system@gmail.com" },
 				new BeanPropertyRowMapper<User>(User.class));
 
-		logger.info("users.size = " + users.size());
-		
 		return users;
 	}
 
@@ -219,7 +218,7 @@ public class UserDao {
 				+ "disabled = ?, license_no = ?, license_validity = ?, branch_id = ? WHERE username = ?";
 
 		logger.info("updateUser branchId = " + user.getBranchId());
-		
+
 		jdbcTemplate.update(
 				SQL,
 				new Object[] { user.getFirstName(), user.getLastName(),
@@ -246,12 +245,13 @@ public class UserDao {
 
 		return (result > 0) ? true : false;
 	}
-	
-	public String getPasswordByUsername(String username) { 
-		logger.info("entry getPasswordByUsername()"); 
-		
-		String SQL = "SELECT password FROM auth.user WHERE username = ?"; 
-		
-		return jdbcTemplate.queryForObject(SQL, new Object[]{ username }, String.class); 
+
+	public String getPasswordByUsername(String username) {
+		logger.info("entry getPasswordByUsername()");
+
+		String SQL = "SELECT password FROM auth.user WHERE username = ?";
+
+		return jdbcTemplate.queryForObject(SQL, new Object[] { username },
+				String.class);
 	}
 }

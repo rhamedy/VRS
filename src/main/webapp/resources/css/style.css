@@ -1,0 +1,154 @@
+html, body{ 
+	font-family: Calibri, Arial; 
+	font-size: 14px; 
+	margin: 0px; 
+	padding: 0px; 
+	background-color: #FFFFFF 
+}
+#container{
+	width: 800px; 
+	height: auto; 
+	background: #FFFFFF;
+	margin-bottom: auto;
+	margin-left: auto; 
+	margin-right: auto;
+	box-shadow:0 0 1em #3BB9FF;
+	-webkit-box-shadow:0 0 1em #3BB9FF;
+	-moz-box-shadow:0 0 1em #3BB9FF;
+	border-radius:15px; 
+	-moz-border-radius:15px; 
+	-webkit-border-radius:15px;
+}
+.section_title{
+    font-family: calibri; 
+    font-size: 16px; 
+    text-align: center; 
+    margin-bottom: -14px;
+    margin-left: 250px; 
+    width: 300px; 
+    background-color: #C3FDB8;
+	-moz-box-shadow: 0 0 0.5em #3BB9FF;
+	-webkit-box-shadow: 0 0 0.5em #3BB9FF;
+	box-shadow: 0 0 0.5em #3BB9FF;  
+}
+#login, #account, #user_details, #branch_details{
+    width: 450px; 
+    height: 200px; 
+    margin-left: 200px; 
+	margin-bottom: 30px; 
+	background-color: #FFFFFF;
+	-moz-border-radius: 15px;
+	-webkit-border-radius:15px;
+	border-radius: 15px;
+	-moz-box-shadow: 0 0 0.5em #3BB9FF;
+	-webkit-box-shadow: 0 0 0.5em #3BB9FF;
+	box-shadow: 0 0 0.5em #3BB9FF;
+}
+#login_div, #vehicle_div, #account_div{
+   	position: absolute;
+   	margin-left: 80px; 
+   	margin-top: 30px; 
+}
+
+.error_title{
+    width: 250px; 
+    font-family: calibri; 
+    font-size: 16px; 
+    text-align: center; 
+    margin-left: 280px; 
+    margin-bottom: -18px;
+    background-color: #C3FDB8;
+    -moz-box-shadow: 0 0 0.5em #3BB9FF;
+	-webkit-box-shadow: 0 0 0.5em #3BB9FF;
+	box-shadow: 0 0 0.5em #3BB9FF; 
+}
+.error{
+	width: 450px; 
+    margin-left: 200px; 
+    margin-top: 20px; 
+    background-color: #FFFFFF;
+	-moz-border-radius: 15px;
+	-webkit-border-radius:15px;
+	border-radius: 15px;
+	-moz-box-shadow: 0 0 0.5em #3BB9FF;
+	-webkit-box-shadow: 0 0 0.5em #3BB9FF;
+	box-shadow: 0 0 0.5em #3BB9FF;
+}
+.error_content{
+	padding: 5px 10px 5px 10px; 
+	font-family: calibri;
+	font-size: 14px; 	 
+	text-align: justify; 
+}
+#public_menu_bar{
+    font-family: calibri, Arial;
+	font-weight: bold;
+	width: 800px;
+	height: 20px;
+	margin-top: 10px; 
+	background-color: #C3FDB8;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	border-radius: 5px;
+	-moz-box-shadow: 0 0 0.5em #3BB9FF;
+	-webkit-box-shadow: 0 0 0.5em #3BB9FF;
+	box-shadow: 0 0 0.5em #3BB9FF;
+}
+.public_menu_bar li, .public_menu_bar a{
+    display: inline;
+	font-family: Calibri,"Comic Sans MS";
+	color: #000000;
+	font-weight: normal; 
+	font-size: 15px;
+	text-decoration: none;
+	margin-top: 5px; 
+}
+.public_menu_bar a:hover{  
+	font-weight: bold;
+}
+#loginForm label, #addUserForm label{
+ 	margin-bottom: 5px; 
+ 	margin-right: 5px; 
+ 	font-family: calibri; 
+ 	font-size: 14px; 
+}
+button{
+	font-family: calibri; 
+	font-size: 13px; 
+	background-color: #BDEDFF; 
+	margin-bottom: 5px; 
+	border-color: 1px solid #000000; 
+}
+
+#vehicleList, #userList, table#cityListTable, table#branchListTable {
+	overflow: scroll;
+	overflow-x: hidden;  
+	height: 80px;
+	margin-left: 10px; 
+	width: 600px; 
+}
+#vehicle_div, #account_div, #users_div, #edit_user_div, #vehicle_for_hire, #vehicles_div, #booking_div, #edit_vehicle{
+	position: relative; 
+	margin-left: 50px;
+	margin-top: 20px; 
+	margin-bottom: 20px; 
+	width: 700px; 
+	background-color: #FFFFFF;
+	-moz-border-radius: 15px;
+	-webkit-border-radius:15px;
+	border-radius: 15px;
+	-moz-box-shadow: 0 0 0.5em #3BB9FF;
+	-webkit-box-shadow: 0 0 0.5em #3BB9FF;
+	box-shadow: 0 0 0.5em #3BB9FF; 
+}
+
+#usersListDiv, #tableVehicleListDiv, #tableCityListDiv, #tableBranchListDiv, #tableBookingListDiv{
+	overflow: scroll;
+	overflow-x: hidden;  
+	height: 100px;
+	margin-left: 10px; 
+	width: 690px; 
+}
+
+
+
