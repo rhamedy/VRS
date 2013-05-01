@@ -208,10 +208,10 @@
 			}); 
 			
 			$('#update').click(function() { 
-				if($('#username').val().trim().length <= 0) {
-					 alert("provide a valid email address!"); 
-				} else if($('#firstName').val().trim().length <= 0 || $('#lastName').val().trim().length <= 0) { 
-					alert("provide valid first and last names"); 
+				if($('#vin').val().trim().length <= 0) {
+					 alert("Error# Provide a valid vin number!"); 
+				} else if($('#numberPlate').val().trim().length <= 0 || $('#maxSpeed').val() == 0) { 
+					alert("Error#Provide a valid number plate and max speed"); 
 				} else { 
 					$.ajax({ 
 						url: '/VRS/vehicle/editVehicle', 

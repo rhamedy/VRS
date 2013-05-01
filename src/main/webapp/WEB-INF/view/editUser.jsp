@@ -286,10 +286,18 @@
 				$('#username').text('');
 			}
 			
-			$('.dateControl').datepicker({
+			$('#licenseValidity').datepicker({
 				changeMonth: true, 
 				changeYear: true, 
+				minDate: new Date(2014,1,1),
 				dateFormat: 'yy-mm-dd'
+			}); 
+			
+			$('#dob').datepicker({
+				changeMonth: true, 
+				changeYear: true, 
+				dateFormat: 'yy-mm-dd',
+				maxDate: new Date(1993,1,1)
 			}); 
 			
 			$('#update').click(function() { 

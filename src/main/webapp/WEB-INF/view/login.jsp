@@ -29,7 +29,7 @@
 				        <input style="margin-left:5px;" id="password" type="password" name="j_password"/><br><br> 
 				    </form>
 				    <button style="margin-left:130px;" onclick="javascript:document.getElementById('loginForm').submit()">Sign in</button><br />
-				     <button style="margin-left:110px;" onclick="">Forgot password</button><br />
+				     <!-- <button style="margin-left:110px;" onclick="">Forgot password</button><br /> -->
 				    <br><br>
 			    </div>
 			</div>

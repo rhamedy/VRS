@@ -179,7 +179,7 @@
 			<div class="error" style="width:700px;margin-left:50px;" id="updateStatus">
 				<div class="error_content" align="center">
 					<p id="updateStatusTitle"></p>
-					<table id="errorsTable">
+					<table id="errorsTable">.dateControl
 					</table> 
 				</div>
 			</div><br /><br />

@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.taglibs.standard.extra.spath.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,7 +155,34 @@ public class UserController {
 		} else if (user.getBranchId() == 0) {
 			return JSONUtil
 					.createFailureResponse("Select a branch for the user.");
+		} else if(user.getUsername().length() <= 0) { 
+			return JSONUtil
+					.createFailureResponse("Please input a valid username (email address)!");
+		} else if(user.getFirstName().length() <= 0 || user.getLastName().length() <= 0) { 
+			return JSONUtil
+					.createFailureResponse("Please input a valid first name and last name!");
+		}else if(user.getMobile().length() <= 0) { 
+			return JSONUtil
+					.createFailureResponse("Please input a valid mobile number!");
+		} else if(user.getLicenseNo().length() <= 0) {
+			return JSONUtil
+					.createFailureResponse("Please input a valid license number!");
 		} else {
+			
+			try{
+				if(user.getMobile().length() > 11) { 
+					return JSONUtil
+							.createFailureResponse("Mobile number too long!");
+				}
+				
+				long mobile = Long.parseLong(user.getMobile()); 
+				
+			} catch(NumberFormatException pe) { 
+				pe.printStackTrace(); 
+				return JSONUtil
+						.createFailureResponse("Mobile number is not a valid data type!");
+			}
+			
 			user.setUsername(username);
 			if (userServices.findUser(username) == null) {
 				// in case new user is added

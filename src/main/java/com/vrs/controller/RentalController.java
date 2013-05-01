@@ -277,6 +277,18 @@ public class RentalController {
 			return JSONUtil.createFailureResponse(
 					"Please provide valid data to the corresponding fields.",
 					ErrorUtil.listErrors(binding));
+		} else if(vehicle.getModel() == null) { 
+			return JSONUtil
+					.createFailureResponse("Error# Please select a model.");
+		} else if(vehicle.getDailyCost() == 0) { 
+			return JSONUtil
+					.createFailureResponse("Error# Please insert a cost per day.");
+		} else if(vehicle.getFuel().trim().length() <= 0) { 
+			return JSONUtil
+					.createFailureResponse("Error# Please select the fuel type.");
+		} else if(vehicle.getSeating() < 2) { 
+			return JSONUtil
+					.createFailureResponse("Error# Please identify seating.");
 		} else if (vehicle.getVin() != null
 				&& vehicle.getVin().trim().length() <= 0) {
 			return JSONUtil
@@ -553,6 +565,7 @@ public class RentalController {
 		}
 		booking.setChargedAmount(amountPayingDouble); 
 		booking.setRemainingAmount(amountRemainingDouble); 
+		booking.setEndDate(sqlEndDate);
 		
 		if(booking.isInsurance()) { 
 			int days = (int)(booking.getEndDate().getTime() - booking.getStartDate().getTime())/86400000; 
