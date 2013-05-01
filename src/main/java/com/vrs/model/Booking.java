@@ -21,9 +21,23 @@ public class Booking {
 	private boolean driver = false; 
 	private boolean insurance = false; 
 	private int extensionCount; 
-	private double hireCost; 
-	private double damageCost;
+	private double hireCost = 0; 
+	private double damageCost = 0;
+	private double chargedAmount = 0; 
+	private double remainingAmount = 0; 
 	
+	public double getChargedAmount() {
+		return chargedAmount;
+	}
+	public void setChargedAmount(double chargedAmount) {
+		this.chargedAmount = chargedAmount;
+	}
+	public double getRemainingAmount() {
+		return remainingAmount;
+	}
+	public void setRemainingAmount(double remainingAmount) {
+		this.remainingAmount = remainingAmount;
+	}
 	public String getId() {
 		return id;
 	}

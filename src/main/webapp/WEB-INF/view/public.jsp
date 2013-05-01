@@ -11,7 +11,7 @@
 	</head>
 	<body>
 		<br />
-		<h2><center>Oscar Vehicle Rental System</center></h2>
+		<h1><center>Oscar Vehicle Rental System</center></h1><br>
 		<div id="container">
 			<div id="public_menu_bar">
 				<ul class="public_menu_bar">
@@ -123,7 +123,7 @@
 										<form:label path="dob" cssClass="dateTitle">Date of birth</form:label>
 									</td>
 									<td>
-										<form:input path="dob" cssClass="dateControl" />
+										<form:input path="dob" cssClass="" />
 									</td>
 									<td>
 										<form:errors path="dob" cssClass="dateError"/>  
@@ -156,7 +156,7 @@
 										<form:label path="licenseValidity" cssClass="dateTitle">License validity</form:label>
 									</td>
 									<td>
-										<form:input path="licenseValidity" cssClass="dateControl" />
+										<form:input path="licenseValidity" cssClass="" />
 									</td>
 									<td>
 										<form:errors path="licenseValidity" cssClass="dateError"/>  
@@ -278,9 +278,10 @@
 				}
 			}); 
 			
-			$('.dateControl').datepicker({
+			$('#licenseValidity').datepicker({
 				changeMonth: true, 
 				changeYear: true, 
+				minDate: new Date(2014,1,1),
 				dateFormat: 'yy-mm-dd'
 			}); 
 			
@@ -329,6 +330,13 @@
 					});
 				}
 				return false;
+			}); 
+			
+			$('#dob').datepicker({
+				changeMonth: true, 
+				changeYear: true, 
+				dateFormat: 'yy-mm-dd',
+				maxDate: new Date(1993,1,1)
 			}); 
 			
 			$('input#username').change(function() { 

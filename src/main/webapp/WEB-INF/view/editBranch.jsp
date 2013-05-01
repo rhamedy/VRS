@@ -10,6 +10,8 @@
 	</head>
 	
 	<body>
+		<br />
+		<h1><center>Oscar Vehicle Rental System</center></h1><br>
 		<div id="main">
 			<div id="editBranch">
 				<form:form action="/VRS/branch/editBranch" method="POST" commandName="branch">

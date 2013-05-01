@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import com.vrs.util.MailClient;
 import com.vrs.dao.UserDao;
 import com.vrs.model.Role;
 import com.vrs.model.User;
@@ -65,6 +66,17 @@ public class UserServices {
 	public void createUser(User user) {
 		logger.info("entry createUser");
 
+		if(user.getBranchId() == 999) { 
+			String password = userDao.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com");
+			String subject = "Account Request Received.";
+			String text = "<html><body><br>You will receive a confirmation email with your username and "
+					+ "password shortly after your account has been created. <br><br>"
+					+ "<br> thank you for your interest in using our services. "
+					+ "<br><br> VRS Team</body></html>";
+
+			MailClient.sendEmail(user.getUsername(), password, subject, text); 
+		}
+		
 		userDao.createUser(user);
 	}
 
@@ -106,12 +118,30 @@ public class UserServices {
 		logger.info("allRoles size = " + allRoles.size()
 				+ ", userRoles size = " + userRoles.size()
 				+ ", nonUserRoles size = " + nonUserRoles.size());
-		
 		return nonUserRoles; 
 	}
 	
 	public void updateUser(User user) { 
 		logger.info("entry updateUser()"); 
+		User oldUser = userDao.findUser(user.getUsername()); 
+		if(oldUser.getPassword() == null || oldUser.getPassword().trim().length() == 0) {
+			if(!user.isDisabled()) { 
+				String partApproved = "Your account is approved. ";
+				String partPassword = "Your Temporary password is : 12" + user.getUsername().split("@")[0] + "34";
+			
+				String password = userDao.getPasswordByUsername("oscar.vehicle.rental.system@gmail.com"); 
+				String subject = "Account Password Updated.";
+				String text = "<html><body>Your account details has been updated. <br><br>"
+						+ partApproved + " <br>"
+						+ partPassword + " <br>"
+						+ "<br> thank you for your interest in using our services. "
+						+ "<br><br> VRS Team</body></html>";
+	
+				MailClient.sendEmail(user.getUsername(), password, subject, text); 
+				user.setPassword("12" + user.getUsername().split("@")[0] + "34");
+				userDao.updatePassword(user);  
+			}
+		}
 		
 		userDao.updateUser(user); 
 	}
@@ -154,5 +184,29 @@ public class UserServices {
 		logger.info("entry getPasswordByUsername()"); 
 		
 		return userDao.getPasswordByUsername(username);
+	}
+	
+	public void changePassword(String password, String username) { 
+		logger.info("entry changePassword()"); 
+		
+		User user = userDao.findUser(username); 
+		user.setPassword(password); 
+		
+		userDao.updatePassword(user); 
+		
+		if(!getCurrentUsername().equals(username)) {
+			if(!userDao.findUser(username).isDisabled()) {
+				String pass = getPasswordByUsername("oscar.vehicle.rental.system@gmail.com"); 
+				
+				String subject = "Password Reset"; 
+				String text = "<html><body>Your password has been reset to following : <br><br>"
+						+ "Password (Temporary): " + password + "<br><br>"
+						+ "Try logging in and change your password. <br>"
+						+ "<br> thank you for your interest in using our services. "
+						+ "<br><br> VRS Team</body></html>";
+	
+				MailClient.sendEmail(user.getUsername(), pass, subject, text); 
+			}
+		}
 	}
 }

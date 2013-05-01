@@ -3,7 +3,6 @@ package com.vrs.services;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -179,6 +178,7 @@ public class RentalServices {
 	public void cancelBooking(Booking booking, String systemPassword) {
 		rentalDao.cancelBooking(booking);
 		Vehicle vehicle = rentalDao.findVehicle(booking.getVehicleVin()); 
+		setMakeAndModel(vehicle); 
 		String emailBody = MailTemplate
 				.getBookingTemplate(vehicle, booking,
 						"Vehicle Booking Cancellation Iternity",
@@ -209,10 +209,10 @@ public class RentalServices {
 				"Vehicle Booking Extension Iternity", emailBody); // send email
 	}
 
-	public Map<String, List<String>> vehicleBookings(String vin) {
+	public List<String> vehicleBookings(String vin) {
 		logger.info("entry vehicleBookings()");
 		List<Booking> bookings = rentalDao.vehicleBookings(vin);
-		Map<String, List<String>> unAvailableDates = new HashMap<String, List<String>>();
+		List<String> unAvailableDates = new ArrayList<String>();
 		List<String> dates = new ArrayList<String>();
 
 		logger.info("bookings.size : " + bookings.size());
@@ -235,14 +235,7 @@ public class RentalServices {
 							+ ((day >= 10) ? day : "0" + day));
 					cal.add(Calendar.DATE, 1);
 				}
-				if (unAvailableDates.get(booking.getUsername()) != null) {
-					List<String> merger = new ArrayList<String>();
-					merger.addAll(unAvailableDates.get(booking.getUsername()));
-					merger.addAll(dates);
-					unAvailableDates.put(booking.getUsername(), merger);
-				} else {
-					unAvailableDates.put(booking.getUsername(), dates);
-				}
+				unAvailableDates.addAll(dates); 
 			}
 		}
 
@@ -302,5 +295,27 @@ public class RentalServices {
 		
 		//rentalDao.deleteBranchVehicles(branchId); 
 		//rentalDao.deleteBranch(branchId); 
+	}
+	
+	public void completeBooking(Booking booking) { 
+		logger.info("entry completeBooking()"); 
+		
+		rentalDao.completeBooking(booking); 
+	}
+	
+	public List<Booking> listActiveBookings(boolean active) {
+		logger.info("entry listActiveBookings()");
+
+		return rentalDao.listActiveBookings(active);
+	}
+	
+	public List<Vehicle> getUnAvailableVehicleList(int branchId) { 
+		List<Vehicle> vehicles = rentalDao.getUnAvailableVehicleList(branchId); 
+
+		for (Vehicle v : vehicles) {
+			v = setMakeAndModel(v);
+		}
+
+		return vehicles;
 	}
 }

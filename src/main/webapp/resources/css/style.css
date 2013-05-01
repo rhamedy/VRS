@@ -127,7 +127,7 @@ button{
 	margin-left: 10px; 
 	width: 600px; 
 }
-#vehicle_div, #account_div, #users_div, #edit_user_div, #vehicle_for_hire, #vehicles_div, #booking_div, #edit_vehicle{
+#vehicle_div, #account_div, #users_div, #edit_user_div, #vehicle_for_hire, #vehicles_div, #booking_div, #booking_div_past, #edit_vehicle, #vehicles_div_unavailable{
 	position: relative; 
 	margin-left: 50px;
 	margin-top: 20px; 
@@ -142,7 +142,7 @@ button{
 	box-shadow: 0 0 0.5em #3BB9FF; 
 }
 
-#usersListDiv, #tableVehicleListDiv, #tableCityListDiv, #tableBranchListDiv, #tableBookingListDiv{
+#usersListDiv, #tableVehicleListDiv, #tableCityListDiv, #tableBranchListDiv, #tableBookingListDiv, #tableBookingListDiv_past, #tableVehicleListDiv_unavailable{
 	overflow: scroll;
 	overflow-x: hidden;  
 	height: 100px;

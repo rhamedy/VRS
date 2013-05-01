@@ -106,6 +106,7 @@ public class UserDao {
 			logger.info("found user : ");
 			logger.info("user.username = " + user.getUsername());
 			logger.info("user.lastName = " + user.getLastName());
+			logger.info("user password = " + user.getPassword());
 
 			return user;
 

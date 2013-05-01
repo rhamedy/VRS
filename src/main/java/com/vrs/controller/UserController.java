@@ -66,11 +66,11 @@ public class UserController {
 	}
 
 	@RequestMapping(value = "/home/login")
-	public ModelAndView login() { 
-		ModelAndView mav = new ModelAndView("login"); 
-		return mav; 
+	public ModelAndView login() {
+		ModelAndView mav = new ModelAndView("login");
+		return mav;
 	}
-	
+
 	@RequestMapping(value = "/home/public")
 	public ModelAndView showHomepage() {
 		logger.info("entry showHomepage()");
@@ -192,11 +192,17 @@ public class UserController {
 			return JSONUtil.createFailureResponse(
 					"Please provide valid data to the corresponding fields.",
 					ErrorUtil.listErrors(binding));
-		} else if (user.getUsername() == null) {
+		} else if (user.getUsername() == null || user.getUsername().trim().length() == 0) {
 			return JSONUtil
 					.createFailureResponse("Please provide a valid email address as username.");
+		} else if(user.getFirstName().length() == 0 || 
+				user.getLastName().length() == 0 || 
+				user.getDob() == null || user.getMobile().length() == 0) { 
+			return JSONUtil
+					.createFailureResponse("There are fields with no values, please provide the info required.");
 		} else {
 			user.setDisabled(true);
+			user.setBranchId(999);
 			userServices.createUser(user);
 			return JSONUtil
 					.createSuccessResponse("Your account request is stored. You will "
@@ -224,14 +230,53 @@ public class UserController {
 		for (Role role : roles) {
 			userServices.deleteUserRole(user, role);
 		}
-		
-		//in case the user booking history to be preserved then username should not be a 
-		//primary key to the customer_vehicle (booking) table otherwise, the booking 
-		//history cannot be preserved. 
-		
+
+		// in case the user booking history to be preserved then username should
+		// not be a
+		// primary key to the customer_vehicle (booking) table otherwise, the
+		// booking
+		// history cannot be preserved.
+
 		userServices.deleteUser(user);
 
 		return JSONUtil
 				.createSuccessResponse("The user and it's associated roles has been deleted successfully.");
+	}
+
+	@RequestMapping(value = "/user/changePassword", method = RequestMethod.GET)
+	public @ResponseBody
+	JSONResponse changePassword(@RequestParam String currentPassword,
+			@RequestParam String newPassword,
+			@RequestParam String newPasswordRetyped) {
+		String username = userServices.getCurrentUsername(); 
+		User user = userServices.findUser(username); 
+		 
+		logger.info("entry user.getPasswrod = " + user.getPassword()); 
+		
+		if(!user.getPassword().equals(currentPassword)) { 
+			return JSONUtil
+					.createFailureResponse("Current password is not correct!");
+		} 
+		if(newPassword.length() < 6 || newPasswordRetyped.length() < 6) { 
+			return JSONUtil
+					.createFailureResponse("Passowrd lenght should be at least six characters!");
+		}
+		if(!newPassword.equals(newPasswordRetyped)) { 
+			return JSONUtil
+					.createFailureResponse("Passowrd and Retyped Password does not match!");
+		}
+		userServices.changePassword(newPassword, username); 
+		
+		return JSONUtil
+				.createSuccessResponse("Your password is changed successfully!");
+	}
+	
+	@RequestMapping(value = "/user/resetPassword", method = RequestMethod.GET)
+	public @ResponseBody JSONResponse resetPassword(@RequestParam String username) { 
+		String password = "1213" + username.split("@")[0] + "3121"; 
+		userServices.changePassword(password, username); 
+		
+		return JSONUtil
+				.createSuccessResponse("Password for the selected user is reset successfully.");
 	}
 }

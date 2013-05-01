@@ -3,6 +3,7 @@ package com.vrs.dao;
 import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -260,7 +261,7 @@ public class RentalDao {
 	public List<Vehicle> getVehicleList(int branchId) {
 		logger.info("entry getVehicleList()");
 
-		String SQL = "SELECT * FROM rental.vehicle WHERE branch_id = ?";
+		String SQL = "SELECT * FROM rental.vehicle WHERE branch_id = ? AND available = true";
 
 		List<Vehicle> vehicles = jdbcTemplate.query(SQL,
 				new Object[] { branchId }, new BeanPropertyRowMapper<Vehicle>(
@@ -453,8 +454,8 @@ public class RentalDao {
 
 		String SQL = "SELECT count(id) FROM rental.customer_vehicle WHERE vehicle_vin = ? AND (? < start_date AND ? > end_date)";
 
-		int result = jdbcTemplate.queryForInt(SQL, new Object[] { vin, startDate,
-				endDate });
+		int result = jdbcTemplate.queryForInt(SQL, new Object[] { vin,
+				startDate, endDate });
 
 		return result > 0 ? false : true;
 	}
@@ -475,29 +476,78 @@ public class RentalDao {
 			return null;
 		}
 	}
-	
-	public void deleteBookings(String vin) { 
-		logger.info("entry deleteBookings()"); 
-		
+
+	public void deleteBookings(String vin) {
+		logger.info("entry deleteBookings()");
+
 		String SQL = "DELETE FROM rental.customer_vehicle WHERE vehicle_vin = ?";
-		
-		jdbcTemplate.update(SQL, new Object[]{ vin });
+
+		jdbcTemplate.update(SQL, new Object[] { vin });
+	}
+
+	public List<Booking> retrieveVehicleBookingsRecords(String vin, Date date,
+			boolean current) {
+		logger.info("entry retrieveVehicleBookingsByEndDate()");
+		String SQL = "";
+
+		if (current) {
+			SQL = "SELECT * FROM rental.customer_vehicle WHERE vehicle_vin = ? AND end_date > ?";
+		} else {
+			SQL = "SELECT * FROM rental.customer_vehicle WHERE vehicle_vin = ? AND end_date <= ?";
+		}
+
+		List<Booking> bookings = null;
+
+		try {
+			bookings = jdbcTemplate.query(SQL, new Object[] { vin, date },
+					new BeanPropertyRowMapper<Booking>(Booking.class));
+		} catch (EmptyResultDataAccessException ex) {
+			ex.printStackTrace();
+			return null;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+
+		return bookings;
+	}
+
+	public void deleteCityBranches(int cityId) {
+		logger.info("entry deleteCityBranches()");
+
+		String SQL = "DELETE FROM rental.branch WHERE city_id = ?";
+
+		jdbcTemplate.update(SQL, new Object[] { cityId });
+	}
+
+	public void completeBooking(Booking booking) {
+		logger.info("entry completeBooking()");
+
+		String SQL = "UPDATE rental.customer_vehicle SET end_date = ?, hire_cost = ?, "
+				+ "damage_cost = ?, charged_amount = ?, remaining_amount = ? WHERE id = ?";
+		jdbcTemplate.update(SQL,
+				new Object[] { booking.getEndDate(), booking.getHireCost(),
+						booking.getDamageCost(), booking.getChargedAmount(),
+						booking.getRemainingAmount(), booking.getId() });
 	}
 	
-	public List<Booking> retrieveVehicleBookingsRecords(String vin, Date date, boolean current) { 
-		logger.info("entry retrieveVehicleBookingsByEndDate()"); 
-		String SQL = ""; 
+	public List<Booking> listActiveBookings(boolean active) {
+		logger.info("entry listActiveBookings()");
 		
-		if(current) { 
-			SQL = "SELECT * FROM rental.customer_vehicle WHERE vehicle_vin = ? AND end_date > ?"; 
+		String SQL; 
+		
+		if(active) { 
+			SQL = "SELECT * FROM rental.customer_vehicle WHERE end_date >= ?";
 		} else { 
-			SQL = "SELECT * FROM rental.customer_vehicle WHERE vehicle_vin = ? AND end_date <= ?"; 
+			SQL = "SELECT * FROM rental.customer_vehicle WHERE end_date < ?";
 		}
 		
 		List<Booking> bookings = null;
 
+		Calendar cal = Calendar.getInstance(); 
+		Date d = new Date(cal.getTimeInMillis()); 
+		
 		try {
-			bookings = jdbcTemplate.query(SQL, new Object[]{ vin, date},
+			bookings = jdbcTemplate.query(SQL, new Object[]{ d },
 					new BeanPropertyRowMapper<Booking>(Booking.class));
 		} catch (EmptyResultDataAccessException ex) {
 			ex.printStackTrace();
@@ -509,11 +559,14 @@ public class RentalDao {
 		return bookings;
 	}
 	
-	public void deleteCityBranches(int cityId) { 
-		logger.info("entry deleteCityBranches()"); 
-		
-		String SQL = "DELETE FROM rental.branch WHERE city_id = ?";
-		
-		jdbcTemplate.update(SQL, new Object[]{ cityId }); 
+	public List<Vehicle> getUnAvailableVehicleList(int branchId) {
+		logger.info("entry getVehicleList()");
+
+		String SQL = "SELECT * FROM rental.vehicle WHERE branch_id = ? AND available = false";
+
+		List<Vehicle> vehicles = jdbcTemplate.query(SQL,
+				new Object[] { branchId }, new BeanPropertyRowMapper<Vehicle>(
+						Vehicle.class));
+		return vehicles;
 	}
 }

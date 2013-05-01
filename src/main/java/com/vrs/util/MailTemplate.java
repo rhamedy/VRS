@@ -6,10 +6,10 @@ import com.vrs.model.Vehicle;
 public class MailTemplate {
 	public static String getBookingTemplate(Vehicle vehicle, Booking booking, String title, String msg) {
 		StringBuffer eMail = new StringBuffer();
-		eMail.append(title + " \n\n");
-		eMail.append("Dear Customer, \n\n");
-		eMail.append( msg + "; \n\n");
 		eMail.append("<html><body>");
+		eMail.append("<br><p><b>" + title + "</b></p><br>");
+		eMail.append("<p>Dear Customer</p><br>");
+		eMail.append("<p>" + msg + "</p><br><br>");
 		eMail.append("<table border='1' cellspacing='0' cellpadding='0'>");
 		eMail.append("<tr><td>Booking ID</td><td>" + booking.getId()
 				+ "</td></tr>");
@@ -26,14 +26,14 @@ public class MailTemplate {
 				+ "</td></tr>");
 		eMail.append("<tr><td>You Choose Insurance</td><td>"
 				+ (booking.isInsurance() == true ? "Yes" : "No") + "</td></tr>");
-		eMail.append("<tr><td>Total cost (£)</td><td>" + booking.getHireCost()
+		eMail.append("<tr><td>Total cost (Pounds)</td><td>" + booking.getHireCost()
 				+ "</td></tr>");
 		eMail.append("<tr><td>Start date</td><td>"
 				+ booking.getStartDate().toString() + "</td></tr>");
 		eMail.append("<tr><td>End date</td><td>"
 				+ booking.getEndDate().toString() + "</td></tr>");
 		eMail.append("</table>");
-		eMail.append("<br /><br /><p> Thank you for using our services</p><br /><br /><p>Oscar VRS team</p>");
+		eMail.append("<br /><p> Thank you for using our services</p><br><p>Oscar VRS team</p>");
 		eMail.append("</body></html>");
 		
 		return eMail.toString();

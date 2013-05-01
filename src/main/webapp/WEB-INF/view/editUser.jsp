@@ -11,6 +11,8 @@
 	</head>
 	
 	<body>
+		<br />
+		<h1><center>Oscar Vehicle Rental System</center></h1><br>
 		<div id="container">
 			<div id="public_menu_bar">
 				<ul class="public_menu_bar">

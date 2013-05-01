@@ -103,7 +103,10 @@ public class RentalController {
 					rentalServices.findBranch(user.getBranchId()));
 			mav.addObject("vehicles",
 					rentalServices.getVehicles(user.getBranchId()));
-			mav.addObject("bookings", rentalServices.listBookings());
+			mav.addObject("damagedVehicles",
+					rentalServices.getUnAvailableVehicleList(user.getBranchId()));
+			mav.addObject("bookings", rentalServices.listActiveBookings(true));
+			mav.addObject("pastBookings", rentalServices.listActiveBookings(false)); 
 
 		} else if (roleType.equals("technical")) {
 			/*
@@ -432,8 +435,7 @@ public class RentalController {
 		// bookings for other users also
 
 		// why only display bookings for a single user
-		return rentalServices.vehicleBookings(booking.getVehicleVin()).get(
-				"rhamedy@student.bradford.ac.uk");
+		return rentalServices.vehicleBookings(booking.getVehicleVin());
 	}
 
 	@RequestMapping(value = "/vehicle/bookingDatesByVehicle", method = RequestMethod.GET)
@@ -444,8 +446,7 @@ public class RentalController {
 		// bookings for other users also
 
 		// why only display bookings for a single user
-		return rentalServices.vehicleBookings(vin).get(
-				"rhamedy@student.bradford.ac.uk");
+		return rentalServices.vehicleBookings(vin);
 	}
 
 	@RequestMapping(value = "/vehicle/booking", method = RequestMethod.GET)
@@ -491,7 +492,7 @@ public class RentalController {
 	JSONResponse deleteCity(@RequestParam String cityId) {
 		logger.info("entry deleteCity()");
 
-		//rentalServices.deleteCity(cityId);
+		// rentalServices.deleteCity(cityId);
 
 		return JSONUtil
 				.createSuccessResponse("The selected city and it's branch has been deleted.");
@@ -502,9 +503,73 @@ public class RentalController {
 	JSONResponse deleteBranch(@RequestParam String branchId) {
 		logger.info("entry deleteCity()");
 
-		//rentalServices.deleteBranch(branchId);
+		// rentalServices.deleteBranch(branchId);
 
 		return JSONUtil
 				.createSuccessResponse("The selected branch and it's vehicles has been deleted.");
+	}
+
+	@RequestMapping(value = "/vehicle/vehicleDailyCost", method = RequestMethod.GET)
+	public @ResponseBody
+	Map<String, String> getVehicleCost(@RequestParam String vin) {
+		Vehicle vehicle = rentalServices.findVehicle(vin);
+		Map<String, String> returnValue = new HashMap<String, String>();
+		returnValue.put("cost", String.valueOf(vehicle.getDailyCost()));
+		return returnValue;
+	}
+
+	@RequestMapping(value = "/vehicle/returnedVehicle", method = RequestMethod.POST)
+	public @ResponseBody
+	JSONResponse returnedVehicle(@RequestParam String bookingId,
+			@RequestParam String endDate, @RequestParam String damaged,
+			@RequestParam String damageCost, @RequestParam String amountPaying,
+			@RequestParam String amountRemaining) {
+		
+		Booking booking = rentalServices.findBooking(bookingId); 
+		Vehicle vehicle = rentalServices.findVehicle(booking.getVehicleVin()); 
+		
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+		Date sqlEndDate = null;
+		
+		boolean damagedBool;
+		double damageCostDouble;
+		double amountPayingDouble;
+		double amountRemainingDouble;
+		
+		try {
+			sqlEndDate = new Date(formatter.parse(endDate).getTime());
+			damagedBool = Boolean.parseBoolean(damaged); 
+			damageCostDouble = Double.parseDouble(damageCost); 
+			amountPayingDouble = Double.parseDouble(amountPaying); 
+			amountRemainingDouble = Double.parseDouble(amountRemaining);
+		} catch (ParseException pe) {
+			return JSONUtil
+					.createFailureResponse("Error# Invalid date type provided (check fields damage cost, amount paying, amount remaining)!");
+		}
+		
+		booking.setEndDate(sqlEndDate);
+		if(damagedBool) { 
+			booking.setDamageCost(damageCostDouble); 
+		}
+		booking.setChargedAmount(amountPayingDouble); 
+		booking.setRemainingAmount(amountRemainingDouble); 
+		
+		if(booking.isInsurance()) { 
+			int days = (int)(booking.getEndDate().getTime() - booking.getStartDate().getTime())/86400000; 
+			booking.setHireCost(days * vehicle.getDailyCost() + 110); //110 is insurance 
+		} else { 
+			int days = (int)(booking.getEndDate().getTime() - booking.getStartDate().getTime())/86400000; 
+			booking.setHireCost((days * vehicle.getDailyCost()) + damageCostDouble); 
+		}
+		
+		rentalServices.completeBooking(booking); 
+		
+		if(damagedBool) { 
+			vehicle.setAvailable(false); 
+			rentalServices.updateVehicle(vehicle);
+		}
+		
+		return JSONUtil
+				.createSuccessResponse("The booking updates are stored in database.");
 	}
 }

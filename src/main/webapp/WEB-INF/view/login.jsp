@@ -8,6 +8,8 @@
 	<title>Oscars Vehicle Rental System</title>
 	<link rel="stylesheet" href="/VRS/resources/css/style.css" type="text/css" />
 	<body>
+		<br />
+		<h1><center>Oscar Vehicle Rental System</center></h1><br>
 		<div id="container">
 			<div id="public_menu_bar">
 				<ul class="public_menu_bar">

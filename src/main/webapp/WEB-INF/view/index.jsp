@@ -10,9 +10,12 @@
 		<link rel="stylesheet" href="/VRS/resources/css/style.css" type="text/css" />
 	</head>
 	<body>
+		<br />
+		<h1><center>Oscar Vehicle Rental System</center></h1><br>
 		<div id="container">
 			<div id="public_menu_bar">
 				<ul class="public_menu_bar">
+					<li><a href="#" id="changePasswordLink"> Change password | </a></li>
 					<li><a href="/VRS/logout"> Logout </a></li>
 				</ul>
 			</div><br />
@@ -99,7 +102,7 @@
 										<td align="center">${user.licenseValidity}</td>
 										<td align="center"><a href="/VRS/user/editUser?username=${user.username}">Edit|</a>
 											<a class="deleteUser" href="/VRS/user/deleteUserFromSystem?username=${user.username}">Delete|</a>
-											<a class="resetPassword" href="/VRS/user/resetUserPassword?username=${user.username}">Reset password</a>
+											<a class="resetPassword" href="/VRS/user/resetPassword?username=${user.username}">Reset password</a>
 										</td>
 									</tr>
 								</c:forEach>
@@ -215,20 +218,62 @@
 					</div><br />
 				</div><br />
 				<div class="section_title">
-					<p>Booking list</p>
+					<p>Unavailable vehicles</p>
+				</div>
+				<div id="vehicles_div_unavailable">
+					<div id="tableVehicleListDiv_unavailable">
+						<table border="0" id="vehicleList">
+							<thead>
+								<tr>
+									<th align="left">Vin No</th>
+									<th align="left">Plate No</th>
+									<th align="left">Seating</th>
+									<th align="left">Fuel</th>
+									<th align="left">Model</th>
+									<th align="left">Branch</th>
+									<th align="left">Available</th>
+									<th align="left">Action</th>
+								</tr>
+							</thead>
+							<tbody id="vehicleListBody">
+								<c:forEach items="${damagedVehicles}" var="vehicle" varStatus="rowCounter">
+									<c:choose>
+										<c:when test="${rowCounter.count%2==1}">
+											<tr bgcolor="#BDEDFF">
+										</c:when>
+										<c:otherwise>
+											<tr>
+										</c:otherwise>
+									</c:choose>
+										<td align="left">${vehicle.vin}</td>
+										<td align="left">${vehicle.numberPlate}</td>
+										<td align="left">${vehicle.seating}</td>
+										<td align="left">${vehicle.fuel}</td>
+										<td align="left">${vehicle.model}</td>
+										<td align="left">${branch.name}</td>
+										<td align="left">${vehicle.available}</td>
+										<td align="left"><a href="/VRS/vehicle/editVehicle?vin=${vehicle.vin}">Edit</a>
+										</td>
+									</tr>
+								</c:forEach>
+							</tobdy>
+						</table><br />
+					</div><br />
+				</div><br />
+				<div class="section_title">
+					<p>List of Active Bookings</p>
 				</div>
 				<div id="booking_div">
 					<div id="tableBookingListDiv"  style="height:180px;">
 						<table border="0" id="bookingList">
 							<thead>
 								<tr>
-									<th align="left">Vehicle Vin No</th>
+									<th align="left">Vin No</th>
 									<th align="left">Username</th>
 									<th align="left">Start date</th>
 									<th align="left">End date</th>
 									<th align="left">Insurance</th>
-									<th align="left">Driver</th>
-									<th align="left">Total cost</th>
+									<th align="left">Cost</th>
 									<th align="left">Action</th>
 								</tr>
 							</thead>
@@ -247,10 +292,54 @@
 										<td align="left">${booking.startDate}</td>
 										<td align="left">${booking.endDate}</td>
 										<td align="left">${booking.insurance}</td>
-										<td align="left">${booking.driver}</td>
 										<td align="left">${booking.hireCost}</td>
-										<td align="left"><a class="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?bookingId=${booking.id}">Cancel booking|</a>
-											<a class="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?bookingId=${booking.id}">Extend Hire</a>
+										<td align="left"><a class="cancelVehicleBooking" href="/VRS/vehicle/cancelBooking?bookingId=${booking.id}">Cancel |</a>
+											<a class="extendVehicleHirePeriod" href="/VRS/vehicle/extendHirePeriod?bookingId=${booking.id}">Extend |</a>
+											<a class="returnedVehicle" href="/VRS/vehicle/vehicleReturned?bookingId=${booking.id}"> Return</a>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</div>
+				</div><br>
+				<div class="section_title">
+					<p>List of Past Bookings</p>
+				</div>
+				<div id="booking_div_past">
+					<div id="tableBookingListDiv_past"  style="height:180px;">
+						<table border="0" id="bookingList">
+							<thead>
+								<tr>
+									<th align="left">Vin no</th>
+									<th align="left">Username</th>
+									<th align="left">Start date</th>
+									<th align="left">End date</th>
+									<th align="left">Total</th>
+									<th align="left">Charged</th>
+									<th align="left">Remains</th>
+									<th align="left">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach items="${pastBookings}" var="booking" varStatus="rowCounter">
+									<c:choose>
+										<c:when test="${rowCounter.count%2==1}">
+											<tr bgcolor="#BDEDFF">
+										</c:when>
+										<c:otherwise>
+											<tr>
+										</c:otherwise>
+									</c:choose>
+										<td align="left">${booking.vehicleVin}</td>
+										<td align="left">${booking.username}</td>
+										<td align="left">${booking.startDate}</td>
+										<td align="left">${booking.endDate}</td>
+										<td align="left">${booking.hireCost}</td>
+										<td align="left">${booking.chargedAmount}</td>
+										<td align="left">${booking.remainingAmount}</td>
+										<td align="left">
+											<a href="javascript:alert('Function not implemented.');"> Update record</a>
 										</td>
 									</tr>
 								</c:forEach>
@@ -372,6 +461,30 @@
 			<input type='text' name='extensionStartDate' id='extensionStartDate' /><br /><br />
 			<label for='extensionEndDate'>End date</label>
 			<input type='text' name='extensionEndDate' id='extensionEndDate' />
+		</div>
+		<div id="returnedVehicleModalDialog" title="Return Vehicle">
+			<p> Vehicle inspection and payment details ... </p><br>
+			<table id="returnedVehicleTable">
+				<tbody>
+				</tbody>
+			</table>
+		</div>
+		<div id="changePasswordModalDialog" title="Change Your Password">
+			<p>To change your password provide the following info:</p><br>
+			<table>
+				<tr>
+					<td><label for="currentPassword"> Current password</label></td>
+					<td><input type="password" id="currentPassword" /></td>
+				</tr>
+				<tr>
+					<td><label for="newPassword">New Password </label></td>
+					<td><input type="password" id="newPassword" /></td>
+				</tr>
+				<tr>
+					<td><label for="newPasswordRetyped"> New Password (Retyped) </label></td>
+					<td><input type="password" id="newPasswordRetyped" /></td>
+				</tr>
+			</table>
 		</div>
 	</body>
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
@@ -708,7 +821,28 @@
 				resizable: false, 
 				buttons: { 
 					Yes: function() {
-						window.location.href= $(this).data('link').href; 
+						$.ajax({ 
+							method: 'GET', 
+							url: '/VRS/user/resetPassword', 
+							data: 'username=' + ($(this).data('link').href).split('=')[1], 
+							dataType: 'json', 
+							success: function(data) { 
+								if(data.status == "success") { 
+									$('#customSuccessAlertModalDialog').empty(); 
+									$('#customSuccessAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customSuccessAlertModalDialog').dialog('open');	
+								} else { 
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customAlertModalDialog').dialog('open');	
+								}		
+							}, 
+							error: function() { 
+								$('#customAlertModalDialog').empty(); 
+								$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+								$('#customAlertModalDialog').dialog('open');	
+							}
+						}); 
 						$(this).dialog("close"); 
 					}, 
 					No: function() { 
@@ -906,6 +1040,193 @@
 				}
 			}); 
 			
+			$('#returnedVehicleModalDialog').dialog({
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				open: function() {
+					$.ajax({ 
+						method: 'GET', 
+						url: '/VRS/vehicle/booking', 
+						data: 'bookingId=' + (($(this).data('link').href).split('=')[1]), 
+						dataType: 'json', 
+						success: function(data) {
+							var vinNumber = data.vehicleVin;
+							$('table#returnedVehicleTable tbody').empty();
+							$('table#returnedVehicleTable').append("<tr><td>Booking start date</td><td>"
+							 + "<input type='text' id='returnedVehicleBookingStartDate' value='" +data.startDate+ "' disabled /></td></tr>"); 
+							 $('table#returnedVehicleTable').append("<tr><td>Booking end date</td><td>"
+							 + "<input type='text' id='returnedVehicleBookingEndDate' value='" + data.endDate + "' /></td></tr>"); 
+							 $('table#returnedVehicleTable').append("<tr><td>Insurance</td><td>"
+							 + "<input type='text' id='returnedVehicleInsurance' value='" + data.insurance + "' /></td></tr>"); 
+							 $('table#returnedVehicleTable').append("<tr><td>Daily cost</td><td>"
+							 + "<input type='text' id='returnedVehicleDailyCost'></input></td></tr>"); 
+							 $('table#returnedVehicleTable').append("<tr><td>Damaged?</td><td>"
+							 + "<input type='radio' name='returnedVehicleDamaged' value='Yes' checked/> Yes"
+							 + "<input type='radio' name='returnedVehicleDamaged' value='No' /> No </td></tr>"); 
+							 $('table#returnedVehicleTable').append("<tr><td>Damage cost</td><td>"
+							 + "<input type='text' id='returnedVehicleDamageCost' value='" +data.damageCost + "' /></td></tr>"); 
+							 $('table#returnedVehicleTable').append("<tr><td>Total cost (Damage (if no insurace taken))</td><td>"
+							 + "<input type='text' id='returnedVehicleTotalCost' /></td></tr>");
+							 $('table#returnedVehicleTable').append("<tr><td>Amount Paying</td><td>"
+							 + "<input type='text' id='returnedVehicleAmountPaying' /></td></tr>");  
+							 $('table#returnedVehicleTable').append("<tr><td>Amount Remaining</td><td>"
+							 + "<input type='text' id='returnedVehicleAmountRemaining' /></td></tr>");  
+							 
+							 var endDateVal = data.endDate; 
+							 var startDateVal = data.startDate; 
+							 var startDateChunks = startDateVal.split('-'); 
+							 var endDateChunks = endDateVal.split('-'); 
+							 var date = new Date(); 
+							 
+							 if(date.getFullYear() == endDateChunks[0] && 
+							    date.getMonth() == endDateChunks[1] && 
+							    date.getDate() == endDateChunks[2]) { 
+							    	$('#returnedVehicleBookingEndDate').attr('disabled','disabled'); 
+							 } else { 
+						    	$('#returnedVehicleBookingEndDate').datepicker({
+						    		changeMonth: false, 
+									changeYear: false, 
+									dateFormat: 'yy-mm-dd', 
+									minDate: startDateVal,
+									maxDate: endDateVal
+						    	}); 
+							 }
+							 
+							 $.ajax({
+							 	method: 'GET', 
+							 	url: '/VRS/vehicle/vehicleDailyCost', 
+							 	data: 'vin=' + vinNumber, 
+							 	dataType: 'json', 
+							 	success: function(data) { 
+							 		$('#returnedVehicleDailyCost').attr('value',data.cost); 
+							 		$('#returnedVehicleDailyCost').text(data.cost); 
+							 		 
+							 		console.log("daily cost: " + $("#returnedVehicleDailyCost").val()); 
+							 	}, 
+							 	error: function() { 
+							 		alert('failed to retrieve vehicle cost!.'); 
+							 	}
+							}); 
+							
+							$("input[name='returnedVehicleDamaged'][type='radio']," +
+							  "#returnedVehicleDamageCost, #returnedVehicleBookingEndDate").change(function() {
+							  	console.log("event triggered .... "); 
+							  	var startDate = new Date(startDateChunks[0],startDateChunks[1]-1,startDateChunks[2]); 
+							  	var endDateVal = $("#returnedVehicleBookingEndDate").val(); 
+							  	var endDateChunks = endDateVal.split('-'); 
+							  	var endDate = new Date(endDateChunks[0], endDateChunks[1]-1,endDateChunks[2]); 
+							  	
+							  	var dateDifference = endDate.getTime() - startDate.getTime(); 
+								var days = dateDifference/(86400000); 
+								//console.log("days : " + days);
+								var dailyCost = $("#returnedVehicleDailyCost").val(); 
+								//console.log("daily cost : " + dailyCost); 
+								var damage = $("#returnedVehicleDamageCost").val(); 
+								//console.log("damage cost : " + damage); 
+															
+								var insuranceTaken = $("#returnedVehicleInsurance"); 
+								//console.log("insurance : " + insuranceTaken.val()); 
+								var total; 
+							
+								if(insuranceTaken.val() == 'true') { 
+									total = (days * dailyCost) + 110; //110 is insurance value 
+									$('#returnedVehicleTotalCost').attr('value',total); 
+								} else { 
+									if($("input[name='returnedVehicleDamaged']:checked").val() == "Yes") {
+										//console.log("damaged yes.");  
+										total = (days * dailyCost) + parseInt(damage); 
+										$('#returnedVehicleTotalCost').attr('value',total); 
+									} else { 
+										//console.log("not damaged."); 
+										total = days * dailyCost; 
+										$('#returnedVehicleTotalCost').attr('value',total); 
+									}
+								}
+							}); 
+						}, 
+						error: function() { 
+							alert("retrieving booking details failed."); 
+						}
+					}); 
+				}, 
+				buttons: {
+					OK: function() { 
+						$.ajax({ 
+							method: 'POST', 
+							url: '/VRS/vehicle/returnedVehicle', 
+							data: 'bookingId=' + (($(this).data('link').href).split('=')[1]) + 
+								'&endDate=' + $('#returnedVehicleBookingEndDate').val() +
+								'&damaged=' + $("input[name='returnedVehicleDamaged']:checked").val() +
+								'&damageCost=' + $('#returnedVehicleDamageCost').val() +
+								'&amountPaying=' + $('#returnedVehicleAmountPaying').val() +
+								'&amountRemaining=' + $('#returnedVehicleAmountRemaining').val(), 
+							dataType: 'json', 
+							success: function(data) {
+								if(data.status == "success") {  
+									$('#customSuccessAlertModalDialog').empty(); 
+									$('#customSuccessAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customSuccessAlertModalDialog').dialog('open');
+								} else { 
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customAlertModalDialog').dialog('open');
+								}  
+							}, 
+							error: function() { 
+								$('#customAlertModalDialog').empty(); 
+								$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+								$('#customAlertModalDialog').dialog('open');
+							}
+						}); 
+						$(this).dialog('close'); 
+					}, 
+					Cancel: function() { 
+						$('this').dialog('close');
+					} 
+				}
+			}); 
+			
+			$('#changePasswordModalDialog').dialog({ 
+				modal: true, 
+				autoOpen: false, 
+				width: 'auto', 
+				resizable: false, 
+				buttons: {
+					Change: function() { 
+						$.ajax({
+							method: 'GET', 
+							url: '/VRS/user/changePassword', 
+							data: 'currentPassword=' + $('#currentPassword').val() + 
+							'&newPassword=' + $('#newPassword').val() + 
+							'&newPasswordRetyped=' + $('#newPasswordRetyped').val(),
+							dataType: 'json', 
+							success: function(data) { 
+								if(data.status == "success") {  
+									$('#customSuccessAlertModalDialog').empty(); 
+									$('#customSuccessAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customSuccessAlertModalDialog').dialog('open');
+								} else { 
+									$('#customAlertModalDialog').empty(); 
+									$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+									$('#customAlertModalDialog').dialog('open');
+								}  
+							}, 
+							error: function() { 
+								$('#customAlertModalDialog').empty(); 
+								$('#customAlertModalDialog').append('<p> ' + data.message + ' </p>'); 
+								$('#customAlertModalDialog').dialog('open');
+							}
+						});
+						$(this).dialog('close'); 
+					}, 
+					Cancel: function() { 
+						$(this).dialog('close'); 
+					}
+				}
+			}); 
+			
 			$('#extendVehicleHirePeriodModalDialog').dialog({
 				modal: true, 
 				autoOpen: false, 
@@ -1038,6 +1359,18 @@
 				 .data('link',this)
 				 .dialog('open');
 				 return false; 
+			}); 
+			
+			$('.returnedVehicle').click(function() { 
+				$('#returnedVehicleModalDialog')
+				.data('link', this)
+				.dialog('open'); 
+				return false; 
+			}); 
+			
+			$('#changePasswordLink').click(function() { 
+				$('#changePasswordModalDialog').dialog('open'); 
+				return false;
 			}); 
 		}); 
 	</script>

@@ -10,6 +10,8 @@
 		<link rel="stylesheet" href="/VRS/resources/css/style.css" type="text/css" />
 	</head>
 	<body>
+		<br />
+		<h1><center>Oscar Vehicle Rental System</center></h1><br>
 		<div id="container">
 			<div id="public_menu_bar">
 				<ul class="public_menu_bar">
@@ -206,8 +208,10 @@
 			}); 
 			
 			$('#update').click(function() { 
-				if($('select#modelSelect').children(':selected').val().trim().length <= 0) { 
-					$('#modelModalDialog').dialog('open');
+				if($('#username').val().trim().length <= 0) {
+					 alert("provide a valid email address!"); 
+				} else if($('#firstName').val().trim().length <= 0 || $('#lastName').val().trim().length <= 0) { 
+					alert("provide valid first and last names"); 
 				} else { 
 					$.ajax({ 
 						url: '/VRS/vehicle/editVehicle', 
@@ -215,6 +219,7 @@
 						dataType: 'json', 
 						method: 'POST', 
 						success: function(data) {
+							console.log("success call."); 
 							$('table#errorsTable').empty(); 
 							$.each(data, function(key, value) { 
 								if(key == "status" && value == "success") { 
